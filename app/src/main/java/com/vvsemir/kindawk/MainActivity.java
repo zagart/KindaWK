@@ -2,6 +2,7 @@ package com.vvsemir.kindawk;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.webkit.WebView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -9,5 +10,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        WebView wbWebView = (WebView)findViewById(R.id.webViewAuth);
+        wbWebView.getSettings().setJavaScriptEnabled(true);
+        wbWebView.clearCache(true);
     }
 }
