@@ -1,6 +1,5 @@
 package com.vvsemir.kindawk.Models;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -17,10 +16,17 @@ public class VKAuthManager {
 
     private VKAccessToken vkAccessToken;
 
+    public VKAuthManager() {
+        vkAccessToken = new VKAccessToken();
+    }
+
     public class VKAccessToken {
         public long userId;
         public String accessToken;
 
+        public VKAccessToken(){
+
+        }
         public VKAccessToken(HashMap<String, String> params) {
             userId = Long.getLong(params.get(USER_ID));
             accessToken = params.get(ACCESS_TOKEN);
@@ -33,9 +39,16 @@ public class VKAuthManager {
 
         public boolean isValid(Context context)
         {
-            if(accessToken.isEmpty() && getPreferences(context).contains(ACCESS_TOKEN))
+            if((accessToken == null || accessToken.isEmpty()) && getPreferences(context).contains(ACCESS_TOKEN))
                 accessToken = getPreferences(context).getString(ACCESS_TOKEN, "");
-            return !accessToken.isEmpty();
+            if(userId == 0 && getPreferences(context).contains(USER_ID))
+                userId = Long.parseLong(getPreferences(context).getString(USER_ID, ""));
+
+
+            //TODO check token expity date later
+            if(accessToken == null || accessToken.isEmpty() || userId == 0)
+                return false;
+            return true;
         }
 
         void Set(String token, long id)
@@ -62,7 +75,7 @@ public class VKAuthManager {
         vkAccessToken.clear();
      }
 
-     String[] ParseUrlForToken(String url){
+     public String[] ParseUrlForToken(String url){
          String token   = Utilits.extractPattern(url, "_token=(.*?)&");
          String user_id = Utilits.extractPattern(url, "user_id=(\\d*)");
 
@@ -70,13 +83,18 @@ public class VKAuthManager {
          return new String[]{token, user_id};
       }
 
-    public void SaveAuthPrefs(String[] authData, Context context)
+    public void SaveAuthPrefs(String[] authData, Context context)   throws Exception
     {
+        if(authData == null || authData.length != 2 ||
+           authData[0] == null || authData[1] == null ||
+           authData[0].length() == 0 || authData[1].length()==0)
+            throw new Exception("Failed to parse url to get AUTH token");
+
         SharedPreferences.Editor editor = getPreferences(context).edit();
         editor.putString(ACCESS_TOKEN, authData[0]);
         editor.putString(USER_ID, authData[1]);
         editor.apply();
-        vkAccessToken.Set(authData[0], Long.getLong(authData[1]));
+        vkAccessToken.Set(authData[0], Long.parseLong(authData[1]));
     }
 
     public  VKAccessToken getVKAccessToken(Context context){

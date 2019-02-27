@@ -8,7 +8,7 @@ public class Utilits {
         Pattern pattern = Pattern.compile(extStr);
         Matcher match = pattern.matcher(str);
         if (match.find())
-            return match.group();
+            return match.toMatchResult().group(1);
         return null;
      }
 }

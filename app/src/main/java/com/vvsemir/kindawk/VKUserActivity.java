@@ -17,10 +17,27 @@ public class VKUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vkuser);
+        vkManager = VKManager.getInstance();
 
         VKAuthManager.VKAccessToken vkToken = vkManager.getAccessToken(getApplicationContext());
-        Log.i(TAG, "access_token = " + vkToken.accessToken + "user_id = " + vkToken.userId);
+        Log.i(TAG, "onCreate access_token = " + vkToken.accessToken + "user_id = " + vkToken.userId);
 
+        }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        VKAuthManager.VKAccessToken vkToken = vkManager.getAccessToken(getApplicationContext());
+        Log.i(TAG, "onResume access_token = " + vkToken.accessToken + "user_id = " + vkToken.userId);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        VKAuthManager.VKAccessToken vkToken = vkManager.getAccessToken(getApplicationContext());
+        Log.i(TAG, "onStart access_token = " + vkToken.accessToken + "user_id = " + vkToken.userId);
 
     }
 }
+

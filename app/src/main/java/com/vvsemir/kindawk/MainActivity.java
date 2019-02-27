@@ -13,15 +13,18 @@ import static com.vvsemir.kindawk.Models.Constants.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    static final String TAG="DEBUG MainActivity";
     VKManager vkManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(vkManager.isLoggedIn(getApplicationContext()))
+        vkManager = VKManager.getInstance();
+        if(vkManager.isLoggedIn(getApplicationContext())) {
             StartUserActivity();
-
+            return;
+        }
         setContentView(R.layout.activity_main);
 
         WebView webView = (WebView)findViewById(R.id.webViewAuth);
