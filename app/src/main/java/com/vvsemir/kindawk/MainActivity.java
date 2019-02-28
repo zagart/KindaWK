@@ -40,12 +40,7 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
     private String prepareUrl(){
-        return "https://oauth.vk.com/authorize?client_id=" + APP_VKCLIENT_ID +
-                "&scope=" +  APP_VKCLIENT_SCOPE +
-                "&redirect_uri=https://oauth.vk.com/blank.html" +
-                "&display=mobile" +
-                "&v=" + APP_VKCLIENT_API_V +
-                "&response_type=token";
+        return vkManager.getVKAuthUrl();
     }
     class VKWebViewClient extends WebViewClient {
         @Override
@@ -58,12 +53,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (url == null)
                     return;
-                if (url.startsWith("https://oauth.vk.com/blank.html")) {
-                    if (!url.contains("error=")) {
+                if (url.startsWith(APP_VKCLIENT_AUTH_REDIRECT)) {
+                    if (!url.contains(URL_ERROR)) {
 
                         vkManager.loadTokenFromUrl(url, getApplicationContext());
-                        //intent.putExtra("token", auth[0]);
-                        //intent.putExtra("user_id", Long.parseLong(auth[1]));
                         StartUserActivity();
                     }
                     finish();
