@@ -1,4 +1,4 @@
-package com.vvsemir.kindawk.Models;
+package com.vvsemir.kindawk.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

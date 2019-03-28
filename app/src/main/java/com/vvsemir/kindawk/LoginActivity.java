@@ -1,48 +1,50 @@
 package com.vvsemir.kindawk;
 
+import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.vvsemir.kindawk.auth.AuthManager;
 
-import com.vvsemir.kindawk.Models.VKManager;
+import static com.vvsemir.kindawk.Models.Constants.URL_ERROR;
+import static com.vvsemir.kindawk.auth.AuthManager.APP_VKCLIENT_AUTH_REDIRECT;
 
-import static com.vvsemir.kindawk.Models.Constants.*;
+public class LoginActivity extends AppCompatActivity {
+    static final String TAG="DEBUG LoginActivity";
 
-public class MainActivity extends AppCompatActivity {
-
-    static final String TAG="DEBUG MainActivity";
-    VKManager vkManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        vkManager = VKManager.getInstance();
-        if(vkManager.isLoggedIn(getApplicationContext())) {
+        //if(AuthManager.isUserLoggedIn()) {
+        if(true) {
             StartUserActivity();
+
             return;
         }
-        setContentView(R.layout.activity_main);
+
+        setContentView(R.layout.activity_login);
 
         WebView webView = (WebView)findViewById(R.id.webViewAuth);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new VKWebViewClient());
+        webView.setWebViewClient(new VkWebViewClient());
         webView.setVerticalScrollBarEnabled(false);
         webView.loadUrl(prepareUrl());
     }
 
     private void StartUserActivity(){
-        Intent intent=new Intent(this, VKUserActivity.class);
+        Intent intent=new Intent(this, UserActivity.class);
         startActivity(intent);
         finish();
     }
     private String prepareUrl(){
-        return vkManager.getVKAuthUrl();
+        return AuthManager.getAuthUrl();
     }
-    class VKWebViewClient extends WebViewClient {
+
+    class VkWebViewClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 if (url.startsWith(APP_VKCLIENT_AUTH_REDIRECT)) {
                     if (!url.contains(URL_ERROR)) {
 
-                        vkManager.loadTokenFromUrl(url, getApplicationContext());
+                        AuthManager.saveTokenAfterLogin(url);
                         StartUserActivity();
                     }
                     finish();
