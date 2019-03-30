@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.vvsemir.kindawk.auth.AuthManager;
@@ -19,14 +20,17 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //if(AuthManager.isUserLoggedIn()) {
-        if(true) {
+        if(AuthManager.isUserLoggedIn()) {
+        //if(true) {
             StartUserActivity();
 
             return;
         }
 
         setContentView(R.layout.activity_login);
+        Toolbar toolbar = findViewById(R.id.login_toolbar);
+        setSupportActionBar(toolbar);
+
 
         WebView webView = (WebView)findViewById(R.id.webViewAuth);
         webView.getSettings().setJavaScriptEnabled(true);

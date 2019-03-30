@@ -19,7 +19,7 @@ class AccessToken (var userId: Int? = 0, var accessToken: String? = null){
 
     companion object {
         private const val USER_ID = "user_id"
-        private const val ACCESS_TOKEN = "token"
+        private const val ACCESS_TOKEN = "access_token"
         private const val EMPTY_TOKEN = ""
     }
 

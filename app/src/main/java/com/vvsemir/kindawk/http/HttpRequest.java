@@ -26,7 +26,7 @@ public class HttpRequest {
         String result = new String(VKCLIENT_HTTP_REQUEST_URL + method );
 
         if(post == false){
-            result += "?" + getBodyRequest() + "&" + AuthManager.getCurrentToken().accessTokenToString();
+            result += "?" + getBodyRequest() ;
         }
 
         return result;
@@ -39,10 +39,10 @@ public class HttpRequest {
     public String getBodyRequest(){
         if(requestParams == null) {
 
-            return EMPTY;
+            return AuthManager.getTokenVersionString();
         }
 
-        return requestParams.getParamsString();
+        return requestParams.getParamsString() + "&" + AuthManager.getTokenVersionString();
     }
 
     public String getRequestMethod(){

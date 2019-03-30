@@ -43,7 +43,7 @@ class AuthManager private constructor(context : Context) {
         "&scope=" +  APP_VKCLIENT_SCOPE +
         "&redirect_uri=https://oauth.vk.com/blank.html" +
         "&display=mobile" +
-        "&v=" + APP_VKCLIENT_API_V +
+        "&" + APP_VKCLIENT_API_V +
         "&response_type=token";
 
     private fun parseUrlForToken(url : String ) : HashMap<String, String> {
@@ -73,11 +73,16 @@ class AuthManager private constructor(context : Context) {
         const val URL_TOKEN_PATTERN = "_token=(.*?)&"
         const val URL_USERID_PATTERN = "user_id=(\\d*)"
         const val APP_VKCLIENT_ID = "6870401"
-        const val APP_VKCLIENT_SCOPE = "wall,offline,friends,photos"
+        const val APP_VKCLIENT_SCOPE = "wall,offline,friends,photos,status,notify,groups,notifications"
         const val APP_VKCLIENT_AUTH_REDIRECT = "https://oauth.vk.com/blank.html"
+        const val APP_VKCLIENT_API_V = "v=5.92";
 
         @JvmStatic
         fun getCurrentToken()  = getInstance()?.accessToken
+
+        @JvmStatic
+        fun getTokenVersionString()  = getInstance()?.accessToken?.accessTokenToString() + "&" + APP_VKCLIENT_API_V
+
 
         @JvmStatic
         fun isUserLoggedIn()  = getInstance()?.isLoggedIn()

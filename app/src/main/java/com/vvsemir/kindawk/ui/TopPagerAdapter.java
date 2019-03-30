@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.vvsemir.kindawk.Models.VkApiIntentService;
 import com.vvsemir.kindawk.R;
 
 public class TopPagerAdapter extends FragmentPagerAdapter {
@@ -39,11 +40,11 @@ public class TopPagerAdapter extends FragmentPagerAdapter {
                 //Bundle args = new Bundle();
                 //args.putInt(DemoObjectFragment.ARG_OBJECT, i );
                 //fragment.setArguments(args);
-                return ProfileFragment.newInstance("user0");
+                return ProfileFragment.newInstance(VkApiIntentService.ACTION_ACCOUNT_GET_PROFILE_INFO_RESPONSE, null);
             case 1:
-                return ProfileFragment.newInstance("user1");
+                return new Fragment();
             case 2:
-                return ProfileFragment.newInstance("user2");
+                return new Fragment();
             default:
                 return null;
         }

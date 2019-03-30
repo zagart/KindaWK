@@ -1,96 +1,70 @@
 package com.vvsemir.kindawk.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.vvsemir.kindawk.Models.VkApiIntentService;
 import com.vvsemir.kindawk.R;
+import com.vvsemir.kindawk.http.HttpResponse;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ProfileFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ProfileFragment extends Fragment {
-    private static final String ARG_PARAM_USER = "arg_user_profile";
+public class ProfileFragment extends ReceiverFragment {
 
+    TextView userNameView;
     private String userName;
-    private OnFragmentInteractionListener listener;
 
     public ProfileFragment() {
-        // Required empty public constructor
     }
 
-    public static ProfileFragment newInstance(String name) {
+    public static ProfileFragment newInstance(String response, Parcelable data) {
         ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM_USER, name);
-        fragment.setArguments(args);
+        fragment.setArguments(initBundle(response, data));
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            userName = getArguments().getString(ARG_PARAM_USER);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
-        ((TextView) view.findViewById(R.id.userName)).setText(getArguments().getString(ARG_PARAM_USER));
+        userNameView = (TextView) view.findViewById(R.id.userName);
+
+        updateViews(getArguments().getParcelable(super.ARG_PARAM_INTENT_RESPONSE));
 
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (listener != null) {
-            listener.onFragmentInteraction(uri);
+
+    @Override
+    public void updateViews(Parcelable data) {
+        try{
+            userNameView.setText( ((HttpResponse)data).GetResponseAsJSON().getJSONObject("response").getString("first_name"));
+
+            //userNameView.setText(getArguments().getString(""));
+
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            listener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+    public void startLoadDataService() {
+        VkApiIntentService.getAccountProfileInfo(context);
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public void onResume() {
+        super.onResume();
     }
 }
+
+

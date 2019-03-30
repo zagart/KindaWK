@@ -17,14 +17,14 @@ public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpRespo
     public HttpRequestTask(){
     }
 
-    @Override
+
     public void execute(final HttpRequest httpRequest, final ICallback<HttpResponse> callbackOnResult) {
         Thread thread = new Thread() {
+            @Override
             public void run(){
                 HttpURLConnection connection = null;
 
                 try {
-                    HttpResponse httpResponse = new HttpResponse();
                     URL url = new URL(httpRequest.getStringUrl());
                     connection = (HttpURLConnection)url.openConnection();
                     connection.setRequestMethod(httpRequest.getRequestMethod());
@@ -44,7 +44,7 @@ public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpRespo
                     //read response
                     StringBuffer strBuffer = new StringBuffer();
 
-                    if(connection.getContentLength() > 0) {
+                    //if(connection.getContentLength() > 0) {
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                         String lineBuf;
 
@@ -53,9 +53,9 @@ public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpRespo
                         }
 
                         bufferedReader.close();
-                    }
+                    //}
 
-                    callbackOnResult.onResult( httpResponse.setResponse( responseCode, strBuffer.toString() ) );
+                    callbackOnResult.onResult( new HttpResponse( responseCode, strBuffer.toString() ) );
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
