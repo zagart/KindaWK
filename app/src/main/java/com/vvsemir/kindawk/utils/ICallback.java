@@ -1,5 +1,5 @@
 package com.vvsemir.kindawk.utils;
 
 public interface ICallback <T> {
-    void onResult(final T pResult);
+    void onResult(final T result);
 }

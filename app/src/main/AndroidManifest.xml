@@ -27,7 +27,7 @@
         <activity android:name=".UserActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <service
-            android:name=".Models.VkApiIntentService">
+            android:name=".service.ProviderIntentService">
         </service>
 
     </application>

@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.vvsemir.kindawk.auth.AuthManager;
+import com.vvsemir.kindawk.service.ProviderIntentService;
 import com.vvsemir.kindawk.ui.TopPagerAdapter;
 
 public class UserActivity extends AppCompatActivity{
@@ -68,5 +69,13 @@ public class UserActivity extends AppCompatActivity{
         super.onStart();
 
     }
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, ProviderIntentService.class);
+        stopService(intent);
+        super.onDestroy();
+    }
+
 }
 

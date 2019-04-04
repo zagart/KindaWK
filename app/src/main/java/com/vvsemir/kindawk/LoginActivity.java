@@ -9,7 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.vvsemir.kindawk.auth.AuthManager;
 
-import static com.vvsemir.kindawk.Models.Constants.URL_ERROR;
+import static com.vvsemir.kindawk.service.Constants.URL_ERROR;
 import static com.vvsemir.kindawk.auth.AuthManager.APP_VKCLIENT_AUTH_REDIRECT;
 
 public class LoginActivity extends AppCompatActivity {

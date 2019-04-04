@@ -11,21 +11,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.vvsemir.kindawk.Models.VkApiIntentService;
+import com.vvsemir.kindawk.service.ProviderIntentService;
 import com.vvsemir.kindawk.http.HttpResponse;
 
 public abstract class ReceiverFragment extends Fragment implements IReceiverFragment<Parcelable> {
-    static final String ARG_PARAM_DATA = "receiver_fragment_data";
-    static final String ARG_PARAM_INTENT_RESPONSE = "receiver_fragment_intent_response";
+    static final String ARG_PARAM_PROVIDER_RESPONSE = "provider_fragment_response_action";
+    static final String ARG_PARAM_PROVIDER_DATA = "provider_fragment_data";
+    static final String ARG_PARAM_PROVIDER_PRESERVE_DATA = "provider_fragment_preserve_data";
 
-    ApiBroadcastReceiver apiBroadcastReceiver = new ApiBroadcastReceiver();
+    UpdaterBroadcastReceiver updaterBroadcastReceiver = new UpdaterBroadcastReceiver();
     IntentFilter intentFilter;
 
     Context context;
-    private String initParamIntentResponse;
-    private Parcelable initParamData;
-
-
+    private String paramProviderResponseAction;
+    private Parcelable paramProviderData;
+    private Boolean paramPreserveProviderData;
 
     private OnFragmentInteractionListener activityListener;
 
@@ -33,31 +33,27 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
         // Required empty public constructor
     }
 
-    public static Bundle initBundle(String response, Parcelable data) {
+    public static Bundle initBundle(String responseAction, Parcelable data, Boolean preserveProviderData) {
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM_INTENT_RESPONSE, response);
-        args.putParcelable(ARG_PARAM_DATA, data);
+        args.putString(ARG_PARAM_PROVIDER_RESPONSE, responseAction);
+        args.putParcelable(ARG_PARAM_PROVIDER_DATA, data);
+        args.putBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA, preserveProviderData);
         return args;
     }
 
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public final void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            initParamIntentResponse = getArguments().getString(ARG_PARAM_INTENT_RESPONSE);
-            initParamData = getArguments().getParcelable(ARG_PARAM_DATA);
+            paramProviderResponseAction = getArguments().getString(ARG_PARAM_PROVIDER_RESPONSE);
+            paramProviderData = getArguments().getParcelable(ARG_PARAM_PROVIDER_DATA);
+            paramPreserveProviderData = getArguments().getParcelable(ARG_PARAM_PROVIDER_PRESERVE_DATA);
         }
-        apiBroadcastReceiver = new ApiBroadcastReceiver();
-        intentFilter = new IntentFilter(initParamIntentResponse);
+        updaterBroadcastReceiver = new UpdaterBroadcastReceiver();
+        intentFilter = new IntentFilter(paramProviderResponseAction);
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        onPostCreate();
+        loadData();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -89,25 +85,26 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
     @Override
     public void onResume() {
         super.onResume();
-        context.registerReceiver(apiBroadcastReceiver, intentFilter);
-        startLoadDataService();
+        context.registerReceiver(updaterBroadcastReceiver, intentFilter);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        context.unregisterReceiver(apiBroadcastReceiver);
+        context.unregisterReceiver(updaterBroadcastReceiver);
     }
 
     public void saveArguments(Parcelable data){
-        getArguments().putParcelable( ARG_PARAM_DATA, data );
+        getArguments().putString(ARG_PARAM_PROVIDER_RESPONSE, paramProviderResponseAction);
+        getArguments().putParcelable(ARG_PARAM_PROVIDER_DATA, paramPreserveProviderData ? data : null);
+        getArguments().putBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA, paramPreserveProviderData);
     }
 
-    public class ApiBroadcastReceiver extends BroadcastReceiver {
+    public class UpdaterBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            HttpResponse response = intent.getParcelableExtra(VkApiIntentService.EXTRA_PROFILE_KEY_OUT);
+            HttpResponse response = intent.getParcelableExtra(ProviderIntentService.EXTRA_RESPONSE_DATA);
             updateViews(response);
             saveArguments(response);
         }

@@ -1,10 +1,7 @@
 package com.vvsemir.kindawk.http;
 
-import com.vvsemir.kindawk.KindawkApplication;
-import com.vvsemir.kindawk.Models.RequestParams;
+import com.vvsemir.kindawk.service.RequestParams;
 import com.vvsemir.kindawk.auth.AuthManager;
-
-import static com.vvsemir.kindawk.Models.Constants.*;
 
 public class HttpRequest {
     private static final String VKCLIENT_HTTP_REQUEST_URL = "https://api.vk.com/method/";

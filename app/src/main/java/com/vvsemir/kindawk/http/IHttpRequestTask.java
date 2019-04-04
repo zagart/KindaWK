@@ -2,6 +2,6 @@ package com.vvsemir.kindawk.http;
 
 import com.vvsemir.kindawk.utils.ICallback;
 
-public interface IHttpRequestTask <T, U> {
-    void execute(final T request, final ICallback<U> callbackOnResult);
+public interface IHttpRequestTask <T extends HttpRequest, U extends HttpResponse, V> {
+    U execute(final T request, ICallback<V> callbackOnResult);
 }

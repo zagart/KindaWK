@@ -1,4 +1,4 @@
-package com.vvsemir.kindawk.Models;
+package com.vvsemir.kindawk.service;
 
 import android.os.Bundle;
 import android.os.Parcel;
@@ -42,9 +42,18 @@ public class RequestParams implements Parcelable {
         dest.writeBundle(bundle);
     }
 
-    public boolean contains(String paramName){
-        return params.containsKey(paramName);
+    public boolean contains(String paramKey){
+        return params.containsKey(paramKey);
     }
+
+    public void removeParam(String paramKey){
+        params.remove(paramKey);
+    }
+
+    public String getParam(String paramKey){
+        return params.get(paramKey);
+    }
+
 
     public void put(String paramName, String paramValue) {
         params.put(paramName, paramValue);

@@ -1,8 +1,5 @@
 package com.vvsemir.kindawk.ui;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -10,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.vvsemir.kindawk.Models.VkApiIntentService;
+import com.vvsemir.kindawk.service.ProviderIntentService;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.http.HttpResponse;
 
@@ -22,15 +19,14 @@ public class ProfileFragment extends ReceiverFragment {
     public ProfileFragment() {
     }
 
-    public static ProfileFragment newInstance(String response, Parcelable data) {
+    public static ProfileFragment newInstance(String response, Parcelable data, Boolean preserveProviderData) {
         ProfileFragment fragment = new ProfileFragment();
-        fragment.setArguments(initBundle(response, data));
+        fragment.setArguments(initBundle(response, data, preserveProviderData));
         return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onPostCreate() {
     }
 
     @Override
@@ -38,7 +34,7 @@ public class ProfileFragment extends ReceiverFragment {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
         userNameView = (TextView) view.findViewById(R.id.userName);
 
-        updateViews(getArguments().getParcelable(super.ARG_PARAM_INTENT_RESPONSE));
+        updateViews(getArguments().getParcelable(super.ARG_PARAM_PROVIDER_RESPONSE));
 
         return view;
     }
@@ -46,6 +42,10 @@ public class ProfileFragment extends ReceiverFragment {
 
     @Override
     public void updateViews(Parcelable data) {
+        if(data == null) {
+            return;
+        }
+
         try{
             userNameView.setText( ((HttpResponse)data).GetResponseAsJSON().getJSONObject("response").getString("first_name"));
 
@@ -57,8 +57,8 @@ public class ProfileFragment extends ReceiverFragment {
     }
 
     @Override
-    public void startLoadDataService() {
-        VkApiIntentService.getAccountProfileInfo(context);
+    public void loadData() {
+        ProviderIntentService.getAccountProfileInfo(context);
     }
 
     @Override

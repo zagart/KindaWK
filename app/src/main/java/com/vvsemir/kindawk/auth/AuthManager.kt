@@ -2,9 +2,7 @@ package com.vvsemir.kindawk.auth
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v4.content.LocalBroadcastManager
 import android.webkit.CookieManager
-import com.vvsemir.kindawk.Models.Constants.*
 import com.vvsemir.kindawk.utils.Utilits
 
 class AuthManager private constructor(context : Context) {
