@@ -10,6 +10,7 @@ import com.vvsemir.kindawk.http.HttpResponse;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
 import com.vvsemir.kindawk.provider.ProviderManager;
+import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.provider.UserProfileProvider;
 import com.vvsemir.kindawk.utils.ICallback;
 
@@ -32,7 +33,8 @@ public class ProviderIntentService extends StickyIntentService {
 
     public ProviderIntentService() {
         super(PROVIDER_INTENT_SERVICE);
-        ProviderManager.getInstance().createProvider(new NewsWallProvider());
+        ProviderManager.instance.createProvider(new NewsWallProvider());
+        ProviderManager.instance.createProvider(new UserProfileProvider());
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ProviderIntentService extends StickyIntentService {
     }
 
     private void handleAccountGetProfileInfo() {
-        UserProfileProvider dataProvider = (UserProfileProvider)ProviderManager.getInstance().getProvider(UserProfileProvider.class);
+        UserProfileProvider dataProvider = (UserProfileProvider)ProviderManager.instance.getProvider(UserProfileProvider.class);
 
         UserProfile profileData = dataProvider.loadData(null);
 
@@ -90,7 +92,7 @@ public class ProviderIntentService extends StickyIntentService {
         responseIntent.setAction(ACTION_ACCOUNT_GET_PROFILE_INFO_RESPONSE);
         responseIntent.addCategory(Intent.CATEGORY_DEFAULT);
         responseIntent.putExtra(EXTRA_RESPONSE_DATA, profileData);
-        Log.d("INTENT_SERVICE", "onResult comes profile name: " + profileData.getName());
+        Log.d("INTENT_SERVICE", "onResult comes profile name: " + ((UserProfile) profileData).getHomeTown());
         sendBroadcast(responseIntent);
     }
 
@@ -100,7 +102,7 @@ public class ProviderIntentService extends StickyIntentService {
     }
 
     private void handleWallGet(RequestParams params) {
-        NewsWallProvider dataProvider = (NewsWallProvider)ProviderManager.getInstance().getProvider(NewsWallProvider.class);
+        NewsWallProvider dataProvider = (NewsWallProvider)ProviderManager.instance.getProvider(NewsWallProvider.class);
 
         NewsWall news = dataProvider.loadData(params);
 

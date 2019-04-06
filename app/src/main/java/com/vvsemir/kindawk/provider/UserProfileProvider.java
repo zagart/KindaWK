@@ -34,6 +34,6 @@ public class UserProfileProvider implements IProvider <RequestParams, UserProfil
 
     @Override
     public void resetData() {
-        profileData.clean();
+        //profileData.clean();
     }
 }

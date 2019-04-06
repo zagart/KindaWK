@@ -7,12 +7,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.vvsemir.kindawk.service.ProviderIntentService;
-import com.vvsemir.kindawk.http.HttpResponse;
+
 
 public abstract class ReceiverFragment extends Fragment implements IReceiverFragment<Parcelable> {
     static final String ARG_PARAM_PROVIDER_RESPONSE = "provider_fragment_response_action";
@@ -33,6 +30,7 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
         // Required empty public constructor
     }
 
+
     public static Bundle initBundle(String responseAction, Parcelable data, Boolean preserveProviderData) {
         Bundle args = new Bundle();
         args.putString(ARG_PARAM_PROVIDER_RESPONSE, responseAction);
@@ -47,7 +45,7 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
         if (getArguments() != null) {
             paramProviderResponseAction = getArguments().getString(ARG_PARAM_PROVIDER_RESPONSE);
             paramProviderData = getArguments().getParcelable(ARG_PARAM_PROVIDER_DATA);
-            paramPreserveProviderData = getArguments().getParcelable(ARG_PARAM_PROVIDER_PRESERVE_DATA);
+            paramPreserveProviderData = getArguments().getBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA);
         }
         updaterBroadcastReceiver = new UpdaterBroadcastReceiver();
         intentFilter = new IntentFilter(paramProviderResponseAction);
@@ -96,15 +94,16 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
 
     public void saveArguments(Parcelable data){
         getArguments().putString(ARG_PARAM_PROVIDER_RESPONSE, paramProviderResponseAction);
-        getArguments().putParcelable(ARG_PARAM_PROVIDER_DATA, paramPreserveProviderData ? data : null);
         getArguments().putBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA, paramPreserveProviderData);
+        getArguments().putParcelable(ARG_PARAM_PROVIDER_DATA,
+                (paramPreserveProviderData != null && paramPreserveProviderData)? data : null);
     }
 
     public class UpdaterBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            HttpResponse response = intent.getParcelableExtra(ProviderIntentService.EXTRA_RESPONSE_DATA);
+            Parcelable response = intent.getParcelableExtra(ProviderIntentService.EXTRA_RESPONSE_DATA);
             updateViews(response);
             saveArguments(response);
         }

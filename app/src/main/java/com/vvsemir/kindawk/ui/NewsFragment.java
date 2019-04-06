@@ -34,17 +34,24 @@ public class NewsFragment extends ReceiverFragment {
 
     @Override
     public void onPostCreate(){
-        final RecyclerView recyclerView = getActivity().findViewById(R.id.newsList);
-        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
         newsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view =  inflater.inflate(R.layout.fragment_news, container, false);
+        final RecyclerView recyclerView = view.findViewById(R.id.newsList);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsRecyclerAdapter);
         recyclerView.addOnScrollListener(recyclerViewOnScrollListener);
+        return view;
     }
 
     @Override
     public void updateViews(Parcelable data) {
-        newsRecyclerAdapter.addItems(data);
+        newsRecyclerAdapter.addItems((NewsWall)data);
         isLoading = false;
         newsRecyclerAdapter.setShowLoadingProgress(false);
     }
@@ -89,12 +96,6 @@ public class NewsFragment extends ReceiverFragment {
         ProviderIntentService.getWall(context, params);
     }
 
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_news, container, false);
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

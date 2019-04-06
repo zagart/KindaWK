@@ -9,7 +9,8 @@ import com.vvsemir.kindawk.service.RequestParams;
 import com.vvsemir.kindawk.utils.ICallback;
 
 public class NewsWallProvider implements IProvider <RequestParams, NewsWall> {
-    static final String ARG_PARAM_REQUEST_METHOD = "wall.get";
+    //static final String ARG_PARAM_REQUEST_METHOD = "wall.get";
+    static final String ARG_PARAM_REQUEST_METHOD = "newsfeed.get";
     public static final String ARG_PARAM_REQUEST_RANGE_START = "wall.get.range.start";
     public static final String ARG_PARAM_REQUEST_RANGE_END = "wall.get.range.end";
 
@@ -19,9 +20,10 @@ public class NewsWallProvider implements IProvider <RequestParams, NewsWall> {
 
     public NewsWallProvider() {
         requestParams = new RequestParams();
-        requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
-        requestParams.put("count", 100);
-        requestParams.put("filter","all");
+        //requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
+        //requestParams.put("count", 100);
+        //requestParams.put("filter","all");
+        requestParams.put("filters","post,photo,photo_tag,wall_photo");
     }
 
 

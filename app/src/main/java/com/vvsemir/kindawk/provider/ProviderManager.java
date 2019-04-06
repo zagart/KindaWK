@@ -1,18 +1,22 @@
 package com.vvsemir.kindawk.provider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProviderManager implements IProviderManager <IProvider> {
-    private static ProviderManager instance = new ProviderManager();
+    public static final ProviderManager instance = new ProviderManager();
 
-    private List<IProvider> providers;
+    private List<IProvider> providers = new ArrayList<>();
 
     private ProviderManager() {
     }
-
-    public static ProviderManager getInstance(){
+    /*
+    public static synchronized ProviderManager getInstance(){
+        if(instance == null) {
+            instance = new ProviderManager();
+        }
         return instance;
-    }
+    }*/
 
     @Override
     public void createProvider(IProvider provider) {

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vvsemir.kindawk.R;
+import com.vvsemir.kindawk.provider.NewsPost;
 import com.vvsemir.kindawk.provider.NewsWall;
 
 public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.ViewHolder> {
@@ -23,7 +24,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (getItemViewType(position) == ViewType.POST) {
-            ((NewsItemView) viewHolder.itemView).setPostText(((NewsWall.Post)news.getItem(position)).getPostText());
+            ((NewsItemView) viewHolder.itemView).setPostText(((NewsPost)news.getItem(position)).getPostText());
+            ((NewsItemView) viewHolder.itemView).setPostDate(((NewsPost)news.getItem(position)).getDateUnixTime());
         }
     }
 

@@ -4,37 +4,45 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.vvsemir.kindawk.http.HttpResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class NewsWall implements IRecyclerListData<NewsWall.Post>, Parcelable {
-
-    private final List<Post> news = new ArrayList<>();
+public class NewsWall implements IRecyclerListData<NewsPost>, Parcelable {
+    private final List<NewsPost> news = new ArrayList<>();
 
     public NewsWall() {
     }
 
-    public NewsWall( final List<Post> copyNews) {
+    public NewsWall( final List<NewsPost> copyNews) {
         news.clear();
         this.news.addAll(0, copyNews);
     }
 
     private NewsWall(Parcel in) {
-        Bundle bundle = in.readBundle(List.class.getClassLoader());
-
-        for (String key : bundle.keySet()) {
-            params.put(key, bundle.getString(key));
-        }
+        in.readTypedList(news, NewsPost.CREATOR);
     }
 
     @Override
-    public Post getItem(int index) {
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(news);
+    }
+
+
+    @Override
+    public NewsPost getItem(int index) {
         return news.get(index);
     }
 
@@ -45,16 +53,30 @@ public class NewsWall implements IRecyclerListData<NewsWall.Post>, Parcelable {
 
     void setFromHttp(final HttpResponse httpResponse){
         try{
-            JSONObject jsonResponse = ((HttpResponse)httpResponse).GetResponseAsJSON().getJSONObject("response");
+            Gson gson = new Gson().newBuilder().registerTypeAdapter(Date.class, new DateGsonAdapter()).create();
 
+            JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
+            //JsonElement items  = response.get("items");
+            //JsonArray items = response.getAsJsonArray();
+            JsonObject response = httpObj.getAsJsonObject("response");
+            JsonArray items = response.getAsJsonArray("items");
+
+            List<NewsPost> posts = gson.fromJson(items, new TypeToken<ArrayList<NewsPost>>() {}.getType());
+            if(posts != null) {
+                news.addAll(0, posts);
+            }
+            //news.
+            /*
+            JSONObject jsonResponse = ((HttpResponse)httpResponse).GetResponseAsJSON().getJSONObject("response");
             Iterator<String> keysIterator = jsonResponse.keys();
-            int size = jsonResponse.getInt("count");
             JSONArray array = jsonResponse.getJSONArray("items");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject row = array.getJSONObject(i);
-                Post post = new Post();
-                news.add(post.setPostText( row.getString("text") ) );
-            }
+                NewsPost post = new NewsPost();
+                post.setPostText( row.getString("text"));
+                news.add( post );
+            }*/
+
         } catch (Exception ex){
             ex.printStackTrace();
         }
@@ -69,17 +91,13 @@ public class NewsWall implements IRecyclerListData<NewsWall.Post>, Parcelable {
     }
 
     public NewsWall getNewsRange(final int startRange, final int endRange) {
-        return new NewsWall(news.subList(startRange, endRange));
+        //return new NewsWall(news.subList(startRange, endRange));
+        return this;
     }
 
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
     }
 
     public static final Parcelable.Creator<NewsWall> CREATOR = new Parcelable.Creator<NewsWall>() {
@@ -92,19 +110,4 @@ public class NewsWall implements IRecyclerListData<NewsWall.Post>, Parcelable {
             return new NewsWall[size];
         }
     };
-
-
-    public class Post {
-        private String postText;
-
-        public String getPostText() {
-            return postText;
-        }
-
-        public Post setPostText(String postText) {
-            this.postText = postText;
-
-            return this;
-        }
-    }
 }

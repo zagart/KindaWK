@@ -12,13 +12,13 @@ import java.util.Map;
 
 public class RequestParams implements Parcelable {
 
-    private HashMap<String, String> params;
+    private HashMap<String, String> params = new HashMap<String, String>();;
 
     public RequestParams(){
-        params = new HashMap<String, String>();
     }
 
     private RequestParams(Parcel in) {
+
         Bundle bundle = in.readBundle(HashMap.class.getClassLoader());
 
         for (String key : bundle.keySet()) {

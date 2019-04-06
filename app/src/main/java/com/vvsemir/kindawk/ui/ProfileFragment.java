@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.service.ProviderIntentService;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.http.HttpResponse;
@@ -34,7 +35,11 @@ public class ProfileFragment extends ReceiverFragment {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
         userNameView = (TextView) view.findViewById(R.id.userName);
 
-        updateViews(getArguments().getParcelable(super.ARG_PARAM_PROVIDER_RESPONSE));
+        Bundle bundle = getArguments();
+
+        if( bundle.containsKey(super.ARG_PARAM_PROVIDER_DATA) ) {
+            updateViews(bundle.getParcelable(super.ARG_PARAM_PROVIDER_DATA));
+        }
 
         return view;
     }
@@ -47,10 +52,7 @@ public class ProfileFragment extends ReceiverFragment {
         }
 
         try{
-            userNameView.setText( ((HttpResponse)data).GetResponseAsJSON().getJSONObject("response").getString("first_name"));
-
-            //userNameView.setText(getArguments().getString(""));
-
+            userNameView.setText(( (UserProfile)data).getFirstName());
         } catch (Exception ex){
             ex.printStackTrace();
         }
