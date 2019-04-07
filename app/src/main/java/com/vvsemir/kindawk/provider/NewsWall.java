@@ -56,8 +56,6 @@ public class NewsWall implements IRecyclerListData<NewsPost>, Parcelable {
             Gson gson = new Gson().newBuilder().registerTypeAdapter(Date.class, new DateGsonAdapter()).create();
 
             JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
-            //JsonElement items  = response.get("items");
-            //JsonArray items = response.getAsJsonArray();
             JsonObject response = httpObj.getAsJsonObject("response");
             JsonArray items = response.getAsJsonArray("items");
 

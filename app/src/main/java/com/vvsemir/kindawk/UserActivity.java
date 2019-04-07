@@ -15,6 +15,8 @@ import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.service.ProviderIntentService;
 import com.vvsemir.kindawk.ui.TopPagerAdapter;
 
+import java.io.File;
+
 public class UserActivity extends AppCompatActivity{
 
     TopPagerAdapter topPagerAdapter;
@@ -23,11 +25,12 @@ public class UserActivity extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.edit_item) {
+        if (id == R.id.action_menu) {
+            /*
             AuthManager.userLogout();
             Intent intent=new Intent(this, LoginActivity.class);
             startActivity(intent);
-            finish();
+            finish();*/
             return true;
         }
 
@@ -72,10 +75,12 @@ public class UserActivity extends AppCompatActivity{
 
     @Override
     protected void onDestroy() {
+        if(!isChangingConfigurations()) {
+            ProviderIntentService.deleteTempFiles(getCacheDir());
+        }
         Intent intent = new Intent(this, ProviderIntentService.class);
         stopService(intent);
         super.onDestroy();
     }
-
 }
 

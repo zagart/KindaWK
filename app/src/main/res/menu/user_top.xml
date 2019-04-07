@@ -1,7 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/edit_item"
-        android:icon="@drawable/ic_exit"
-        android:title="@string/app_name"
+    <item
+        android:id="@+id/action_edit"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/edit"
         app:showAsAction="ifRoom" />
+
+
+    <item android:id="@+id/action_menu"
+        android:icon="@drawable/ic_menu"
+        android:title="@string/app_name"
+        app:showAsAction="always" >
+        <menu>
+            <item android:id="@+id/action_profile"
+                android:title="@string/my_profile" />
+            <item android:id="@+id/action_logout"
+                android:title="@string/logout" />
+        </menu>
+    </item>
 </menu>

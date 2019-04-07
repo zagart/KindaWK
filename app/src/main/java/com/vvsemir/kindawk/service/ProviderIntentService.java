@@ -14,6 +14,9 @@ import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.provider.UserProfileProvider;
 import com.vvsemir.kindawk.utils.ICallback;
 
+import java.io.File;
+import java.io.IOException;
+
 public class ProviderIntentService extends StickyIntentService {
     public static final String PROVIDER_INTENT_SERVICE = "ProviderIntentService";
 
@@ -35,16 +38,6 @@ public class ProviderIntentService extends StickyIntentService {
         super(PROVIDER_INTENT_SERVICE);
         ProviderManager.instance.createProvider(new NewsWallProvider());
         ProviderManager.instance.createProvider(new UserProfileProvider());
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     public static void getAccountProfileInfo(final Context context) {
@@ -114,4 +107,29 @@ public class ProviderIntentService extends StickyIntentService {
         sendBroadcast(responseIntent);
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    public static void deleteTempFiles(File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        deleteTempFiles(f);
+                    } else {
+                        f.delete();
+                    }
+                }
+            }
+        }
+        file.delete();
+    }
 }

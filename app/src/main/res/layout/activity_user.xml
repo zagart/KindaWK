@@ -21,7 +21,9 @@
         android:layout_height="wrap_content"
         android:background="@color/colorBgTabs"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:tabGravity="fill">
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/colorPrimary"
+        app:tabTextAppearance="@style/TextAppearance.AppCompat.Tooltip">
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabProfile"
@@ -33,12 +35,14 @@
             android:id="@+id/tabFriends"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
+            android:icon="@drawable/ic_friends"
             android:text="@string/friends" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabNews"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
+            android:icon="@drawable/ic_news"
             android:text="@string/news" />
 
     </android.support.design.widget.TabLayout>

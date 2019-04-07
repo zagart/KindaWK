@@ -4,21 +4,35 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 import com.vvsemir.kindawk.http.HttpResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.Iterator;
 
 public class UserProfile implements Parcelable {
+
+    @SerializedName("first_name")
     private String firstName;
+    @SerializedName("last_name")
     private String lastName;
+    @SerializedName("bdate")
     private String birthDate;
+    @SerializedName("home_town")
     private String homeTown;
+    @SerializedName("country")
     private String country;
+    @SerializedName("status")
     private String status;
+    @SerializedName("phone")
     private String phone;
+
     private Uri profilePhoto;
 
     public String getFirstName() {
@@ -117,13 +131,49 @@ public class UserProfile implements Parcelable {
         dest.writeValue(this.profilePhoto);
     }
 
+
     void setFromHttp(final HttpResponse httpResponse) {
         try {
-            JSONObject jsonResponse = ((HttpResponse) httpResponse).GetResponseAsJSON().getJSONObject("response");
-            firstName = jsonResponse.getString("first_name");
+            Gson gson = new Gson().newBuilder().create();;
+            JsonObject root = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
+            JsonObject response = root.getAsJsonObject("response");
+            UserProfile userProfile = gson.fromJson(response, UserProfile.class);
+            this.copy( userProfile );
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    void setPhotoUri(final Uri tempPhotoFile) {
+        profilePhoto = tempPhotoFile;
+    }
+
+    URL getPhotoURLFromHttp(final HttpResponse httpResponse) {
+        try {
+            Gson gson = new Gson().newBuilder().create();;
+            JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
+            JsonArray response = httpObj.getAsJsonArray("response");
+            URL url =  new URL(( response).get(0).getAsJsonObject().get("photo_medium").getAsString());
+
+            return url;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    void copy(final UserProfile copy) {
+        this.firstName = copy.firstName;
+        this.lastName = copy.lastName;
+        this.birthDate = copy.birthDate;
+        this.homeTown = copy.homeTown;
+        this.country = copy.country;
+        this.status = copy.status;
+        this.phone = copy.phone;
+        this.profilePhoto = copy.profilePhoto;
     }
 
     public static final Creator<UserProfile> CREATOR = new Creator<UserProfile>() {
