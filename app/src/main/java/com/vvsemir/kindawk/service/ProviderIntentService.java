@@ -27,6 +27,7 @@ public class ProviderIntentService extends StickyIntentService {
     public static final String ACTION_WALL_GET = "action.Wall.Get";
     public static final String ACTION_WALL_GET_RESPONSE = "action.Wall.Get.Response";
 
+
     private static final String EXTRA_REQUEST_PARAMS = "Provider.Request.Params";
     public static final String EXTRA_RESPONSE_DATA = "Provider.Response.Data";
 

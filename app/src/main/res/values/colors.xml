@@ -2,6 +2,10 @@
 <resources>
     <color name="colorPrimary">#A74AB1</color>
     <color name="colorPrimaryDark">#441863</color>
-    <color name="colorBgTabs">#C6B1F0</color>
+    <color name="colorBottomPrimaryDark">#332955</color>
+    <color name="colorBgTabs">#B9A5E0</color>
+    <color name="colorDisable">#B9A5E0</color>
+    <color name="colorEnable">#ECE398</color>
+    <color name="colorSelected">#FDFD25</color>
     <color name="colorAccent">#D81B60</color>
 </resources>

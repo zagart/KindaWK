@@ -20,9 +20,9 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
     IntentFilter intentFilter;
 
     Context context;
-    private String paramProviderResponseAction;
-    private Parcelable paramProviderData;
-    private Boolean paramPreserveProviderData;
+    String paramProviderResponseAction;
+    Parcelable paramProviderData;
+    Boolean paramPreserveProviderData;
 
     private OnFragmentInteractionListener activityListener;
 
@@ -42,11 +42,17 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
     @Override
     public final void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             paramProviderResponseAction = getArguments().getString(ARG_PARAM_PROVIDER_RESPONSE);
             paramProviderData = getArguments().getParcelable(ARG_PARAM_PROVIDER_DATA);
             paramPreserveProviderData = getArguments().getBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA);
         }
+
+        if(paramProviderResponseAction == null){
+            return;
+        }
+
         updaterBroadcastReceiver = new UpdaterBroadcastReceiver();
         intentFilter = new IntentFilter(paramProviderResponseAction);
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);

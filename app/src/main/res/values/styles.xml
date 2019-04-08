@@ -4,4 +4,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="OptionsPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:itemBackground">@color/colorPrimaryDark</item>
+        <item name="android:divider">@color/colorPrimary</item>
+    </style>
 </resources>

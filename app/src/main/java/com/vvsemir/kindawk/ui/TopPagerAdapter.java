@@ -11,6 +11,7 @@ public class TopPagerAdapter extends FragmentPagerAdapter {
     private static final String PROFILE="Profile";
     private static final String NEWS = "News";
     private static final String FRIENDS = "Friends";
+    private static final int count = 3;
 
     public TopPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -38,11 +39,13 @@ public class TopPagerAdapter extends FragmentPagerAdapter {
                 //Bundle args = new Bundle();
                 //args.putInt(DemoObjectFragment.ARG_OBJECT, i );
                 //fragment.setArguments(args);
-                return ProfileFragment.newInstance(ProviderIntentService.ACTION_ACCOUNT_GET_PROFILE_INFO_RESPONSE, null, true);
+                return new Fragment();
             case 1:
                 return NewsFragment.newInstance(ProviderIntentService.ACTION_WALL_GET_RESPONSE, null, false);
             case 2:
                 return new Fragment();
+//            case 3:
+//                return ProfileFragment.newInstance(ProviderIntentService.ACTION_ACCOUNT_GET_PROFILE_INFO_RESPONSE, null, true);
             default:
                 return null;
         }
@@ -50,6 +53,6 @@ public class TopPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return count;
     }
 }
