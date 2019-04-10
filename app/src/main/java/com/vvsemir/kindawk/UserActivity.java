@@ -20,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.vvsemir.kindawk.auth.AuthManager;
-import com.vvsemir.kindawk.service.ProviderIntentService;
+import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
 import com.vvsemir.kindawk.ui.MessagesFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
@@ -92,6 +92,8 @@ public class UserActivity extends AppCompatActivity{
         viewPager = (ViewPager) findViewById(R.id.userViewPager);
         viewPager.setAdapter(topPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);*/
+        Intent intent = new Intent(this, ProviderService.class);
+        startService(intent);
     }
 
     @Override
@@ -109,9 +111,12 @@ public class UserActivity extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         if(!isChangingConfigurations()) {
-            ProviderIntentService.deleteTempFiles(getCacheDir());
+            ProviderService.deleteTempFiles(getCacheDir());
         }
-        Intent intent = new Intent(this, ProviderIntentService.class);
+        //Intent intent = new Intent(this, ProviderIntentService.class);
+        //stopService(intent);
+
+        Intent intent = new Intent(this, ProviderService.class);
         stopService(intent);
         super.onDestroy();
     }
@@ -134,7 +139,7 @@ public class UserActivity extends AppCompatActivity{
                     finish();*/
                 }
                 else if(id == R.id.action_profile){
-                    loadFragment(ProfileFragment.newInstance(ProviderIntentService.ACTION_ACCOUNT_GET_PROFILE_INFO_RESPONSE, null, true));
+                    loadFragment(ProfileFragment.newInstance());
                 }
                 return false;
             }
@@ -152,10 +157,10 @@ public class UserActivity extends AppCompatActivity{
                             fragment = new MessagesFragment();
                             break;
                         case R.id.action_newsfeed:
-                            fragment = NewsFragment.newInstance(ProviderIntentService.ACTION_WALL_GET_RESPONSE, null, false);
+                            fragment = NewsFragment.newInstance();
                             break;
                         case R.id.action_friends:
-                            fragment = FriendsFragment.newInstance(ProviderIntentService.ACTION_FRIENDS_GET, null, false);;
+                            fragment = FriendsFragment.newInstance();;
                             break;
                     }
 

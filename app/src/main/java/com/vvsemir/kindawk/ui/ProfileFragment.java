@@ -2,6 +2,7 @@ package com.vvsemir.kindawk.ui;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +11,10 @@ import android.widget.TextView;
 
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.provider.UserProfile;
-import com.vvsemir.kindawk.service.ProviderIntentService;
+import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.http.HttpResponse;
+import com.vvsemir.kindawk.service.ProviderService;
 
 public class ProfileFragment extends ReceiverFragment {
 
@@ -23,9 +25,9 @@ public class ProfileFragment extends ReceiverFragment {
     public ProfileFragment() {
     }
 
-    public static ProfileFragment newInstance(String response, Parcelable data, Boolean preserveProviderData) {
+    public static ProfileFragment newInstance(Parcelable data, Boolean preserveProviderData) {
         ProfileFragment fragment = new ProfileFragment();
-        fragment.setArguments(initBundle(response, data, preserveProviderData));
+        fragment.setArguments(initBundle(data, preserveProviderData));
         return fragment;
     }
 
@@ -66,7 +68,18 @@ public class ProfileFragment extends ReceiverFragment {
 
     @Override
     public void loadData() {
-        ProviderIntentService.getAccountProfileInfo(context);
+        ProviderService.getAccountProfileInfo(new ICallback<UserProfile>() {
+            @Override
+            public void onResult(UserProfile result) {
+                updateViews(result);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                //to do
+                Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage() );
+            }
+        } );
     }
 
     @Override

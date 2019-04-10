@@ -42,7 +42,6 @@ public class FriendsFragment extends ReceiverFragment {
 
     }
 
-    @Override
     public void loadData() {
 
     }

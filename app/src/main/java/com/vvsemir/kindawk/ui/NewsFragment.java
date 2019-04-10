@@ -1,12 +1,12 @@
 package com.vvsemir.kindawk.ui;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +15,9 @@ import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
 
-import com.vvsemir.kindawk.service.ProviderIntentService;
+import com.vvsemir.kindawk.service.ICallback;
+import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
-import com.vvsemir.kindawk.utils.ICallback;
 
 public class NewsFragment extends ReceiverFragment {
     private NewsRecyclerAdapter newsRecyclerAdapter;
@@ -93,7 +93,18 @@ public class NewsFragment extends ReceiverFragment {
         params.put(NewsWallProvider.ARG_PARAM_REQUEST_RANGE_START, startPosition);
         params.put(NewsWallProvider.ARG_PARAM_REQUEST_RANGE_END, endPosition);
 
-        ProviderIntentService.getWall(context, params);
+        ProviderService.getWall(new ICallback<NewsWall>() {
+            @Override
+            public void onResult(NewsWall result) {
+                updateViews(result);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                //to do
+                Log.d("getWall", "getWall : loading exception!!!" + throwable.getMessage() );
+            }
+        }, params);
     }
 
 

@@ -1,6 +1,6 @@
 package com.vvsemir.kindawk.http;
 
-import com.vvsemir.kindawk.utils.ICallback;
+import com.vvsemir.kindawk.service.ICallback;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -8,21 +8,12 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 
-import com.vvsemir.kindawk.service.ProviderIntentService;
-
 
 public abstract class ReceiverFragment extends Fragment implements IReceiverFragment<Parcelable> {
-    static final String ARG_PARAM_PROVIDER_RESPONSE = "provider_fragment_response_action";
     static final String ARG_PARAM_PROVIDER_DATA = "provider_fragment_data";
-    static final String ARG_PARAM_PROVIDER_PRESERVE_DATA = "provider_fragment_preserve_data";
-
-    UpdaterBroadcastReceiver updaterBroadcastReceiver = new UpdaterBroadcastReceiver();
-    IntentFilter intentFilter;
 
     Context context;
-    String paramProviderResponseAction;
     Parcelable paramProviderData;
-    Boolean paramPreserveProviderData;
 
     private OnFragmentInteractionListener activityListener;
 
@@ -31,11 +22,9 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
     }
 
 
-    public static Bundle initBundle(String responseAction, Parcelable data, Boolean preserveProviderData) {
+    public static Bundle initBundle(Parcelable data) {
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM_PROVIDER_RESPONSE, responseAction);
         args.putParcelable(ARG_PARAM_PROVIDER_DATA, data);
-        args.putBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA, preserveProviderData);
         return args;
     }
 
@@ -44,18 +33,9 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            paramProviderResponseAction = getArguments().getString(ARG_PARAM_PROVIDER_RESPONSE);
             paramProviderData = getArguments().getParcelable(ARG_PARAM_PROVIDER_DATA);
-            paramPreserveProviderData = getArguments().getBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA);
         }
 
-        if(paramProviderResponseAction == null){
-            return;
-        }
-
-        updaterBroadcastReceiver = new UpdaterBroadcastReceiver();
-        intentFilter = new IntentFilter(paramProviderResponseAction);
-        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         onPostCreate();
         loadData();
     }
@@ -83,37 +63,35 @@ public abstract class ReceiverFragment extends Fragment implements IReceiverFrag
     @Override
     public void onDetach() {
         super.onDetach();
-        activityListener = null;
+        //activityListener = null;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        context.registerReceiver(updaterBroadcastReceiver, intentFilter);
     }
 
     @Override
     public void onPause() {
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_PARAM_PROVIDER_DATA, paramProviderData);
+        setArguments(args);
+
         super.onPause();
-        context.unregisterReceiver(updaterBroadcastReceiver);
     }
 
     public void saveArguments(Parcelable data){
-        getArguments().putString(ARG_PARAM_PROVIDER_RESPONSE, paramProviderResponseAction);
-        getArguments().putBoolean(ARG_PARAM_PROVIDER_PRESERVE_DATA, paramPreserveProviderData);
-        getArguments().putParcelable(ARG_PARAM_PROVIDER_DATA,
-                (paramPreserveProviderData != null && paramPreserveProviderData)? data : null);
+        getArguments().putParcelable(ARG_PARAM_PROVIDER_DATA, data);
     }
 
-    public class UpdaterBroadcastReceiver extends BroadcastReceiver {
+    //public class UpdaterBroadcastReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Parcelable response = intent.getParcelableExtra(ProviderIntentService.EXTRA_RESPONSE_DATA);
-            updateViews(response);
-            saveArguments(response);
-        }
-    }
+        //public void onReceive(Context context, Intent intent) {
+        //    Parcelable response = intent.getParcelableExtra(ProviderIntentService.EXTRA_RESPONSE_DATA);
+        //    updateViews(response);
+        //    saveArguments(response);
+        //}
+   // }
 
 
     /**

@@ -3,6 +3,7 @@
     <string name="news">News</string>
     <string name="profile">Profile</string>
     <string name="my_profile">My profile</string>
+    <string name="profile_photo">Profile Photo</string>
     <string name="friends">Friends</string>
     <string name="messages">Messages</string>
     <string name="logout">Logout</string>

@@ -7,26 +7,24 @@ import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.http.HttpRequest;
 import com.vvsemir.kindawk.http.HttpRequestTask;
 import com.vvsemir.kindawk.http.HttpResponse;
+import com.vvsemir.kindawk.service.ICallback;
+import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
-import com.vvsemir.kindawk.utils.ICallback;
 
 import java.net.URL;
 
-public class UserProfileProvider implements IProvider <RequestParams, UserProfile> {
+public class UserProfileProvider extends BaseProvider<UserProfile> {
     static final String ARG_PARAM_REQUEST_METHOD = "account.getProfileInfo";
     static final String ARG_PARAM_REQUEST_PHOTO_METHOD = "getProfiles";
 
     private Context context;
     private UserProfile profileData = new UserProfile();
-    private RequestParams requestParams;
 
-    public UserProfileProvider() {
-        requestParams = null;
+    public UserProfileProvider(ICallback<UserProfile> callback) {
+        super(callback);
     }
 
-
-    @Override
-    public UserProfile loadData(RequestParams request) {
+    void loadData() {
         HttpResponse httpResponse = new HttpRequestTask().execute(
                 new HttpRequest(ARG_PARAM_REQUEST_METHOD, false, requestParams), null);
 
@@ -48,12 +46,22 @@ public class UserProfileProvider implements IProvider <RequestParams, UserProfil
             }
         }
 
+        ProviderService.getInstance().getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onResult(profileData);
+            }
+        });
 
-        return profileData;
     }
 
     @Override
     public void resetData() {
         //profileData.clean();
+    }
+
+    @Override
+    public void run() {
+        loadData();
     }
 }

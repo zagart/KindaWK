@@ -29,6 +29,8 @@
         <service
             android:name=".service.ProviderIntentService">
         </service>
+        <service android:name=".service.ProviderService" android:exported="false">
+        </service>
 
     </application>
 

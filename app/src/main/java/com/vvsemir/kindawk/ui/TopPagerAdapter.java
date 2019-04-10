@@ -5,7 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.vvsemir.kindawk.service.ProviderIntentService;
+import com.vvsemir.kindawk.service.ProviderService;
+
 
 public class TopPagerAdapter extends FragmentPagerAdapter {
     private static final String PROFILE="Profile";
@@ -41,7 +42,7 @@ public class TopPagerAdapter extends FragmentPagerAdapter {
                 //fragment.setArguments(args);
                 return new Fragment();
             case 1:
-                return NewsFragment.newInstance(ProviderIntentService.ACTION_WALL_GET_RESPONSE, null, false);
+                return NewsFragment.newInstance(ProviderService.ACTION_WALL_GET_RESPONSE, null, false);
             case 2:
                 return new Fragment();
 //            case 3:
