@@ -4,35 +4,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
-import com.vvsemir.kindawk.ui.MessagesFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
 import com.vvsemir.kindawk.ui.ProfileFragment;
-import com.vvsemir.kindawk.ui.TopPagerAdapter;
 
-import java.io.File;
 
 public class UserActivity extends AppCompatActivity{
-
-    //TopPagerAdapter topPagerAdapter;
-    //ViewPager viewPager;
     BottomNavigationView bottomNavigationView;
 
     @Override
@@ -57,8 +46,10 @@ public class UserActivity extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
         if (id == R.id.action_menu) {
             showPopupMenu(this, findViewById(R.id.action_menu));
+
             return true;
         }
 
@@ -86,26 +77,8 @@ public class UserActivity extends AppCompatActivity{
         setBottomNavigationListener();
         bottomNavigationView.setSelectedItemId(0);
 
-        /*
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        topPagerAdapter = new TopPagerAdapter(getSupportFragmentManager());
-        viewPager = (ViewPager) findViewById(R.id.userViewPager);
-        viewPager.setAdapter(topPagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);*/
         Intent intent = new Intent(this, ProviderService.class);
         startService(intent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
     }
 
     @Override
@@ -113,8 +86,6 @@ public class UserActivity extends AppCompatActivity{
         if(!isChangingConfigurations()) {
             ProviderService.deleteTempFiles(getCacheDir());
         }
-        //Intent intent = new Intent(this, ProviderIntentService.class);
-        //stopService(intent);
 
         Intent intent = new Intent(this, ProviderService.class);
         stopService(intent);
@@ -171,13 +142,14 @@ public class UserActivity extends AppCompatActivity{
 
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentsContainer, fragment)
-                    .addToBackStack(null)
-                    .commit();
+            getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentsContainer, fragment)
+                .addToBackStack(null)
+                .commit();
+
             return true;
         }
+
         return false;
     }
 }

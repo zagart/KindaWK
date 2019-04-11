@@ -6,7 +6,7 @@ import android.webkit.CookieManager
 import com.vvsemir.kindawk.utils.Utilits
 
 class AuthManager private constructor(context : Context) {
-    private var appContext: Context
+    var appContext: Context
     var accessToken: AccessToken
 
     init {
@@ -77,6 +77,9 @@ class AuthManager private constructor(context : Context) {
 
         @JvmStatic
         fun getCurrentToken()  = getInstance()?.accessToken
+
+        @JvmStatic
+        fun getCurrentContext()  = getInstance()?.appContext
 
         @JvmStatic
         fun getTokenVersionString()  = getInstance()?.accessToken?.accessTokenToString() + "&" + APP_VKCLIENT_API_V

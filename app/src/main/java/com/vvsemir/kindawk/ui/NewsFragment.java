@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,24 +20,26 @@ import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
 
-public class NewsFragment extends ReceiverFragment {
+public class NewsFragment extends Fragment {
     private NewsRecyclerAdapter newsRecyclerAdapter;
     private LinearLayoutManager layoutManager;
     public static final int PAGE_SIZE = 12;
     public static final int MAX_VISIBLE_POSTS = 100;
     private boolean isLoading = false;
 
-    public static NewsFragment newInstance(String responseAction, Parcelable data, Boolean preserveProviderData) {
+    public static NewsFragment newInstance() {
         NewsFragment fragment = new NewsFragment();
-        fragment.setArguments(initBundle(responseAction, data, preserveProviderData));
+
         return fragment;
     }
 
     @Override
-    public void onPostCreate(){
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         newsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -46,18 +49,22 @@ public class NewsFragment extends ReceiverFragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsRecyclerAdapter);
         recyclerView.addOnScrollListener(recyclerViewOnScrollListener);
+        loadData();
+
         return view;
     }
 
-    @Override
-    public void updateViews(Parcelable data) {
+    public void updateViewsWithData(Parcelable data) {
+        if(data == null) {
+            return;
+        }
+
         newsRecyclerAdapter.addItems((NewsWall)data);
         isLoading = false;
         newsRecyclerAdapter.setShowLoadingProgress(false);
     }
 
-    @Override
-    public void loadData() {
+    private void loadData() {
         loadMoreItems(0, PAGE_SIZE);
     }
 
@@ -96,7 +103,13 @@ public class NewsFragment extends ReceiverFragment {
         ProviderService.getWall(new ICallback<NewsWall>() {
             @Override
             public void onResult(NewsWall result) {
-                updateViews(result);
+                updateViewsWithData(result);
+            }
+
+            @Override
+            public void onNotify(NewsWall result) {
+                //to do
+                Log.d("getNewsFeed", "getNewsFeed: notification refresh!!!");
             }
 
             @Override

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class RequestParams implements Parcelable {
 
-    private HashMap<String, String> params = new HashMap<String, String>();;
+    private HashMap<String, String> params = new HashMap<>();
 
     public RequestParams(){
     }

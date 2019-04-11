@@ -2,6 +2,7 @@ package com.vvsemir.kindawk.ui;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,65 +14,62 @@ import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.R;
-import com.vvsemir.kindawk.http.HttpResponse;
 import com.vvsemir.kindawk.service.ProviderService;
 
-public class ProfileFragment extends ReceiverFragment {
-
+public class ProfileFragment extends Fragment {
     ImageView profilePhotoView;
-    TextView userNameView;
-    private String userName;
+    TextView firstNameView;
+    TextView lastNameView;
+    TextView countryView;
+    TextView birthDateView;
+    TextView statusView;
+    TextView homeTownView;
+    TextView phoneView;
 
     public ProfileFragment() {
     }
 
-    public static ProfileFragment newInstance(Parcelable data, Boolean preserveProviderData) {
+    public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
-        fragment.setArguments(initBundle(data, preserveProviderData));
-        return fragment;
-    }
 
-    @Override
-    public void onPostCreate() {
+        return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
-        userNameView = (TextView) view.findViewById(R.id.userName);
         profilePhotoView = (ImageView) view.findViewById(R.id.profilePhotoView);
-
-        Bundle bundle = getArguments();
-
-        if( bundle.containsKey(super.ARG_PARAM_PROVIDER_DATA) ) {
-            updateViews(bundle.getParcelable(super.ARG_PARAM_PROVIDER_DATA));
-        }
+        firstNameView = (TextView) view.findViewById(R.id.userName);
+        loadData();
 
         return view;
     }
 
-
-    @Override
-    public void updateViews(Parcelable data) {
+    public void updateViewsWithData(Parcelable data) {
         if(data == null) {
             return;
         }
 
         try{
-            userNameView.setText(( (UserProfile)data).getFirstName());
+            firstNameView.setText(( (UserProfile)data).getFirstName());
             profilePhotoView.setImageBitmap(
-                    ImageLoader.getInstance().getBitmapFromFile(( (UserProfile)data).getProfilePhoto()));
-        } catch (Exception ex){
+                ImageLoader.getInstance().getBitmapFromFile(( (UserProfile)data).getProfilePhoto()));
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    @Override
     public void loadData() {
         ProviderService.getAccountProfileInfo(new ICallback<UserProfile>() {
             @Override
             public void onResult(UserProfile result) {
-                updateViews(result);
+                updateViewsWithData(result);
+            }
+
+            @Override
+            public void onNotify(UserProfile result) {
+                //to do
+                Log.d("getAccountProfileInfo", "getAccountProfileInfo : notification refresh!!!");
             }
 
             @Override
@@ -80,11 +78,6 @@ public class ProfileFragment extends ReceiverFragment {
                 Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage() );
             }
         } );
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 }
 

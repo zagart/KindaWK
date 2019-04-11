@@ -1,19 +1,46 @@
 package com.vvsemir.kindawk.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 
-public class FriendsFragment extends ReceiverFragment {
+public class FriendsFragment extends Fragment {
 
     public FriendsFragment() {
     }
 
-    public static FriendsFragment newInstance(String response, Parcelable data, Boolean preserveProviderData) {
+    public static FriendsFragment newInstance() {
         FriendsFragment fragment = new FriendsFragment();
-        fragment.setArguments(initBundle(response, data, preserveProviderData));
+
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        loadData();
+        return view;
+    }
+
+    public void updateViewsWithData(Parcelable data) {
+        if (data == null) {
+            return;
+        }
+    }
+
+    private void loadData() {
     }
 
     @Override
@@ -21,28 +48,4 @@ public class FriendsFragment extends ReceiverFragment {
         super.onPrepareOptionsMenu(menu);
     }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPostCreate() {
-
-    }
-
-    @Override
-    public void updateViews(Parcelable data) {
-
-    }
-
-    public void loadData() {
-
-    }
 }
