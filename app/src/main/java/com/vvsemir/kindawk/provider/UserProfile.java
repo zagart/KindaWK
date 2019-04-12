@@ -1,5 +1,7 @@
 package com.vvsemir.kindawk.provider;
 
+import android.content.ContentValues;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,7 +19,9 @@ import java.net.URL;
 import java.util.Iterator;
 
 public class UserProfile implements Parcelable {
+    public static final String PHOTO_BYTES = "ProfilePhotoBytes";
 
+    private int userId;
     @SerializedName("first_name")
     private String firstName;
     @SerializedName("last_name")
@@ -34,6 +38,15 @@ public class UserProfile implements Parcelable {
     private String phone;
 
     private Uri profilePhoto;
+    private ContentValues profilePhotoBytes;
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -99,10 +112,19 @@ public class UserProfile implements Parcelable {
         this.profilePhoto = profilePhoto;
     }
 
+    public ContentValues getProfilePhotoBytes() {
+        return profilePhotoBytes;
+    }
+
+    public void setProfilePhotoBytes(ContentValues profilePhotoBytes) {
+        this.profilePhotoBytes = profilePhotoBytes;
+    }
+
     public UserProfile() {
     }
 
     private UserProfile(Parcel in) {
+        this.userId = in.readInt();
         this.firstName = in.readString();
         this.lastName = in.readString();
         this.birthDate = in.readString();
@@ -111,6 +133,7 @@ public class UserProfile implements Parcelable {
         this.status = in.readString();
         this.phone = in.readString();
         this.profilePhoto = (Uri)in.readValue(Uri.class.getClassLoader());
+        this.profilePhotoBytes = in.readParcelable(ContentValues.class.getClassLoader());
     }
 
 
@@ -121,6 +144,7 @@ public class UserProfile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.userId);
         dest.writeString(this.firstName);
         dest.writeString(this.lastName);
         dest.writeString(this.birthDate);
@@ -129,6 +153,7 @@ public class UserProfile implements Parcelable {
         dest.writeString(this.status);
         dest.writeString(this.phone);
         dest.writeValue(this.profilePhoto);
+        dest.writeParcelable(this.profilePhotoBytes, flags);
     }
 
 
@@ -145,24 +170,16 @@ public class UserProfile implements Parcelable {
         }
     }
 
-    void setPhotoUri(final Uri tempPhotoFile) {
-        profilePhoto = tempPhotoFile;
-    }
-
-    URL getPhotoURLFromHttp(final HttpResponse httpResponse) {
+    void setPhotoURLFromHttp(final HttpResponse httpResponse) {
         try {
             Gson gson = new Gson().newBuilder().create();;
             JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
             JsonArray response = httpObj.getAsJsonArray("response");
             URL url =  new URL(( response).get(0).getAsJsonObject().get("photo_medium").getAsString());
-
-            return url;
-
+            setProfilePhoto(Uri.parse(url.toString()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        return null;
     }
 
     void copy(final UserProfile copy) {
@@ -173,7 +190,19 @@ public class UserProfile implements Parcelable {
         this.country = copy.country;
         this.status = copy.status;
         this.phone = copy.phone;
+
+        this.userId = copy.userId;
         this.profilePhoto = copy.profilePhoto;
+
+        if(this.profilePhotoBytes != null) {
+            this.profilePhotoBytes.clear();
+        } else {
+            this.profilePhotoBytes = new ContentValues();
+        }
+
+        if(copy.profilePhotoBytes != null) {
+            this.profilePhotoBytes.putAll(copy.profilePhotoBytes);
+        }
     }
 
     public static final Creator<UserProfile> CREATOR = new Creator<UserProfile>() {

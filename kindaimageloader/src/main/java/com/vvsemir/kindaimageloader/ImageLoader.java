@@ -35,6 +35,23 @@ public class ImageLoader {
         return null;
     }
 
+    public byte[] getBytesFromFile(URL url) {
+        return HttpFileLoader.downloadBytes(url);
+    }
+
+    public Bitmap getBitmapFromBytes(byte[] imageBytes) {
+        Bitmap bitmap = null;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
     public Bitmap getBitmapFromFile(Uri uriFile) {
         Bitmap bitmap = null;
         try {

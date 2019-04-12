@@ -9,6 +9,8 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.vvsemir.kindawk.auth.AuthManager;
+import com.vvsemir.kindawk.db.DbManager;
 import com.vvsemir.kindawk.provider.BaseProvider;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
@@ -27,10 +29,11 @@ public class ProviderService extends Service {
     public static final String ACTION_WALL_GET = "action.Wall.Get";
     private static final String EXTRA_REQUEST_PARAMS = "Provider.Request.Params";
     public static final String EXTRA_RESPONSE_DATA = "Provider.Response.Data";
-
+    private static ProviderService instance;
 
     private ExecutorService executorService;
-    private static ProviderService instance;
+    private DbManager dbManager;
+
     private Handler handler = new Handler(Looper.getMainLooper());
     private List<BaseProvider> providers  = new ArrayList<>();
 
@@ -45,6 +48,7 @@ public class ProviderService extends Service {
         super.onCreate();
         instance = ProviderService.this;
         executorService = Executors.newCachedThreadPool();
+        dbManager = new DbManager(AuthManager.getCurrentContext());
     }
 
     @Override
@@ -87,6 +91,10 @@ public class ProviderService extends Service {
 
     public Handler getHandler() {
         return handler;
+    }
+
+    public DbManager getDbManager() {
+        return dbManager;
     }
 
     private BaseProvider getProviderFromList(Class providerClass){

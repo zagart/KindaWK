@@ -53,7 +53,8 @@ public class ProfileFragment extends Fragment {
         try{
             firstNameView.setText(( (UserProfile)data).getFirstName());
             profilePhotoView.setImageBitmap(
-                ImageLoader.getInstance().getBitmapFromFile(( (UserProfile)data).getProfilePhoto()));
+                ImageLoader.getInstance().
+                        getBitmapFromBytes( ((UserProfile)data).getProfilePhotoBytes().getAsByteArray(UserProfile.PHOTO_BYTES) ));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

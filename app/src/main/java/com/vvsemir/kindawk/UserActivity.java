@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
+import com.vvsemir.kindawk.ui.MessagesFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
 import com.vvsemir.kindawk.ui.ProfileFragment;
 
@@ -125,7 +126,7 @@ public class UserActivity extends AppCompatActivity{
                     Fragment fragment = null;
                     switch (item.getItemId()) {
                         case R.id.action_messages:
-                            fragment = new MessagesFragment();
+                            fragment = MessagesFragment.newInstance();
                             break;
                         case R.id.action_newsfeed:
                             fragment = NewsFragment.newInstance();
