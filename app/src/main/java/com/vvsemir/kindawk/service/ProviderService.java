@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.db.DbManager;
 import com.vvsemir.kindawk.provider.BaseProvider;
+import com.vvsemir.kindawk.provider.FriendsList;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
 import com.vvsemir.kindawk.provider.UserProfile;
@@ -82,6 +83,17 @@ public class ProviderService extends Service {
         }
 
         dataProvider.setRequestParams(params);
+        instance.executorService.execute(dataProvider);
+    }
+
+    public static void getFriends(ICallback<FriendsList> callback) {
+        FriendsProvider dataProvider = (FriendsProvider)instance.getProviderFromList(FriendsProvider.class);
+
+        if(dataProvider == null){
+            dataProvider = new FriendsProvider(callback);
+        }
+
+        dataProvider.setRequestParams(null);
         instance.executorService.execute(dataProvider);
     }
 

@@ -15,8 +15,10 @@ public class NewsPost implements Parcelable {
     private int sourceId;
 
     @SerializedName("date")
-    private String dateUnixTime;
-    //private Long dateUnixTime;
+    private Long dateUnixTime;
+
+    @SerializedName("post_id")
+    private int postId;
 
     @SerializedName("text")
     private String postText;
@@ -42,14 +44,20 @@ public class NewsPost implements Parcelable {
         this.sourceId = sourceId;
     }
 
-    public String getDateUnixTime() {
-    //public Long getDateUnixTime() {
+    public Long getDateUnixTime() {
         return dateUnixTime;
     }
 
-    //public void setDateUnixTime(Long dateUnixTime) {
-    public void setDateUnixTime(String dateUnixTime) {
+    public void setDateUnixTime(Long dateUnixTime) {
         this.dateUnixTime = dateUnixTime;
+    }
+
+    public int getPostId() {
+        return postId;
+    }
+
+    public void setPostId(int postId) {
+        this.postId = postId;
     }
 
     public String getPostText() {
@@ -99,8 +107,8 @@ public class NewsPost implements Parcelable {
     private NewsPost(Parcel in) {
         this.type = in.readString();
         this.sourceId = in.readInt();
-        //this.dateUnixTime = (Long) in.readValue(Long.class.getClassLoader());
-        this.dateUnixTime = in.readString();
+        this.dateUnixTime = in.readLong();
+        this.postId = in.readInt();
         this.postText = in.readString();
         this.sourcePhotoUrl = in.readString();
         this.postPhotoUrl = in.readString();
@@ -116,13 +124,13 @@ public class NewsPost implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.type);
-        dest.writeInt(this.sourceId);
-        //dest.writeValue(this.dateUnixTime);
-        dest.writeString(this.dateUnixTime);
-        dest.writeString(this.postText);
-        dest.writeString(this.sourcePhotoUrl);
-        dest.writeString(this.postPhotoUrl);
+        dest.writeString(type);
+        dest.writeInt(sourceId);
+        dest.writeLong(dateUnixTime);
+        dest.writeInt(postId);
+        dest.writeString(postText);
+        dest.writeString(sourcePhotoUrl);
+        dest.writeString(postPhotoUrl);
         dest.writeParcelable(sourcePhoto, 0);
         dest.writeParcelable(postPhoto, 0);
     }

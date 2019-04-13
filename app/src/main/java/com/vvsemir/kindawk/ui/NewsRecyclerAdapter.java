@@ -25,7 +25,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (getItemViewType(position) == ViewType.POST) {
             ((NewsItemView) viewHolder.itemView).setPostText(((NewsPost)news.getItem(position)).getPostText());
-            ((NewsItemView) viewHolder.itemView).setPostDate(((NewsPost)news.getItem(position)).getDateUnixTime());
+            ((NewsItemView) viewHolder.itemView).setPostDate(((NewsPost)news.getItem(position)).getDateUnixTime().toString());
         }
     }
 

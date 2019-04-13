@@ -16,7 +16,13 @@ public class DateGsonAdapter implements JsonDeserializer<Date> {
 
     @Override
     public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        String date = json.getAsString();
+        String date;
+
+        if (json.getAsJsonPrimitive().isNumber()) {
+            date = new Date(json.getAsLong() * 1000).toString();
+        } else{
+            date = json.getAsString();
+        }
 
         try {
             return simpleDateFormat.parse(date);

@@ -9,4 +9,5 @@
     <string name="logout">Logout</string>
     <string name="edit">Edit</string>
     <string name="refresh">Refresh</string>
+    <string name="settings">Settings</string>
 </resources>

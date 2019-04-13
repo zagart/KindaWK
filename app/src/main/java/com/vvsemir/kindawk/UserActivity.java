@@ -17,7 +17,6 @@ import android.view.View;
 
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
-import com.vvsemir.kindawk.ui.MessagesFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
 import com.vvsemir.kindawk.ui.ProfileFragment;
 
@@ -110,8 +109,8 @@ public class UserActivity extends AppCompatActivity{
                     startActivity(intent);
                     finish();*/
                 }
-                else if(id == R.id.action_profile){
-                    loadFragment(ProfileFragment.newInstance());
+                else if(id == R.id.action_settings){
+                    //loadFragment(ProfileFragment.newInstance());
                 }
                 return false;
             }
@@ -125,8 +124,8 @@ public class UserActivity extends AppCompatActivity{
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Fragment fragment = null;
                     switch (item.getItemId()) {
-                        case R.id.action_messages:
-                            fragment = MessagesFragment.newInstance();
+                        case R.id.action_profile:
+                            fragment = ProfileFragment.newInstance();
                             break;
                         case R.id.action_newsfeed:
                             fragment = NewsFragment.newInstance();
