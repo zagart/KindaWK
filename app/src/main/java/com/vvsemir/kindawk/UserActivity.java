@@ -22,7 +22,7 @@ import com.vvsemir.kindawk.ui.ProfileFragment;
 
 
 public class UserActivity extends AppCompatActivity{
-    BottomNavigationView bottomNavigationView;
+    public BottomNavigationView bottomNavigationView;
 
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
@@ -75,10 +75,11 @@ public class UserActivity extends AppCompatActivity{
 
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         setBottomNavigationListener();
-        bottomNavigationView.setSelectedItemId(0);
 
         Intent intent = new Intent(this, ProviderService.class);
         startService(intent);
+
+        bottomNavigationView.setSelectedItemId(R.id.action_profile);
     }
 
     @Override
@@ -91,6 +92,13 @@ public class UserActivity extends AppCompatActivity{
         stopService(intent);
         super.onDestroy();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
 
     public void showPopupMenu(Context context, View view){
         Context wrapper = new ContextThemeWrapper(context, R.style.OptionsPopupMenu);

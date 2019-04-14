@@ -1,6 +1,7 @@
 package com.vvsemir.kindawk.ui;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +33,15 @@ public class FriendsListAdapter extends BaseAdapter {
         if(friends != null){
             Friend friend = friends.getItem(position);
             ((TextView) view.findViewById(R.id.friendFirstNameView)).setText(friend.getFirstName());
+            ((TextView) view.findViewById(R.id.friendCountryView)).setText(friend.getCountry().getTitle());
+
             ImageView avatarView = view.findViewById(R.id.friendPhotoView);
+            //avatarView.setImageResource(R.drawable.ic_person);
             avatarView.setImageBitmap(
                     ImageLoader.getInstance().
                     getBitmapFromBytes( friend.getPhoto100Bytes().getAsByteArray(Friend.PHOTO_BYTES)));
+
+            Log.d("ZZZadapter", "  view success" );
         }
 
         return view;
@@ -43,12 +49,20 @@ public class FriendsListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return friends.getCount();
+        if(friends != null) {
+            return friends.getCount();
+        }
+
+        return 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return friends.getItem(position);
+        if(friends != null) {
+            return friends.getItem(position);
+        }
+
+        return null;
     }
 
     @Override

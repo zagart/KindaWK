@@ -67,6 +67,11 @@ public class FriendsFragment extends Fragment {
             }
 
             @Override
+            public void onServiceNotStarted() {
+
+            }
+
+            @Override
             public void onNotify(FriendsList result) {
                 //to do
                 Log.d("getFriends", "getFriends : notification refresh!!!");

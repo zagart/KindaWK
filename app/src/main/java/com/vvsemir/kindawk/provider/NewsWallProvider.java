@@ -13,10 +13,14 @@ import com.vvsemir.kindawk.service.RequestParams;
 public class NewsWallProvider extends BaseProvider<NewsWall> {
     //static final String ARG_PARAM_REQUEST_METHOD = "wall.get";
     static final String ARG_PARAM_REQUEST_METHOD = "newsfeed.get";
+    static final String ARG_PARAM_REQUEST_FILTERS = "post";
+    static final int ARG_PARAM_REQUEST_COUNT = 60;
+    static final String ARG_PARAM_REQUEST_FIELDS = "photo_100";
+    static final int ARG_PARAM_REQUEST_MAX_PHOTOS = 1;
+
     public static final String ARG_PARAM_REQUEST_RANGE_START = "wall.get.range.start";
     public static final String ARG_PARAM_REQUEST_RANGE_END = "wall.get.range.end";
 
-    private Context context;
     private NewsWall news = new NewsWall();
 
     public NewsWallProvider(ICallback<NewsWall> callback) {
@@ -26,9 +30,10 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     private void setInitialParams(){
         if(requestParams != null){
             requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
-            requestParams.put("count", 100);
-            requestParams.put("filter","all");
-            requestParams.put("filters","post,photo,photo_tag,wall_photo");
+            requestParams.put("count", ARG_PARAM_REQUEST_COUNT);
+            requestParams.put("max_photos",ARG_PARAM_REQUEST_MAX_PHOTOS);
+            requestParams.put("filters",ARG_PARAM_REQUEST_FILTERS);
+            requestParams.put("fields",ARG_PARAM_REQUEST_FIELDS);
         }
     }
 

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vvsemir.kindaimageloader.ImageLoader;
+import com.vvsemir.kindawk.UserActivity;
 import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.R;
@@ -77,6 +78,11 @@ public class ProfileFragment extends Fragment {
             public void onError(Throwable throwable) {
                 //to do
                 Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage() );
+            }
+
+            @Override
+            public void onServiceNotStarted() {
+                ((UserActivity)getActivity()).bottomNavigationView.setSelectedItemId(R.id.action_profile);
             }
         } );
     }

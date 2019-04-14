@@ -1,7 +1,6 @@
 package com.vvsemir.kindawk.provider;
 
 import android.content.ContentValues;
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -19,9 +18,9 @@ public class Friend implements Parcelable {
     @SerializedName("bdate")
     private String birthDate;
     @SerializedName("city")
-    private DataCity city;
+    private DataIdTitle city;
     @SerializedName("country")
-    private Integer country;
+    private DataIdTitle country;
     @SerializedName("status")
     private String status;
     @SerializedName("photo_100")
@@ -61,19 +60,19 @@ public class Friend implements Parcelable {
         this.birthDate = birthDate;
     }
 
-    public DataCity getCity() {
+    public DataIdTitle getCity() {
         return city;
     }
 
-    public void setCity(DataCity city) {
+    public void setCity(DataIdTitle city) {
         this.city = city;
     }
 
-    public Integer getCountry() {
+    public DataIdTitle getCountry() {
         return country;
     }
 
-    public void setCountry(Integer country) {
+    public void setCountry(DataIdTitle country) {
         this.country = country;
     }
 
@@ -110,8 +109,8 @@ public class Friend implements Parcelable {
         this.firstName = in.readString();
         this.lastName = in.readString();
         this.birthDate = in.readString();
-        this.city = in.readParcelable(DataCity.class.getClassLoader());
-        this.country = in.readInt();
+        this.city = in.readParcelable(DataIdTitle.class.getClassLoader());
+        this.country = in.readParcelable(DataIdTitle.class.getClassLoader());
         this.status = in.readString();
         this.photo100Url = in.readString();
         this.photo100Bytes = in.readParcelable(ContentValues.class.getClassLoader());
@@ -130,7 +129,7 @@ public class Friend implements Parcelable {
         dest.writeString(lastName);
         dest.writeString(birthDate);
         dest.writeParcelable(city, 0);
-        dest.writeInt(country);
+        dest.writeParcelable(country, 0);
         dest.writeString(status);
         dest.writeString(photo100Url);
         dest.writeParcelable(photo100Bytes, 0);

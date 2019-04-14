@@ -1,6 +1,6 @@
 package com.vvsemir.kindawk.provider;
 
-import android.graphics.Bitmap;
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -25,8 +25,9 @@ public class NewsPost implements Parcelable {
 
     private String sourcePhotoUrl;
     private String postPhotoUrl;
-    private Bitmap sourcePhoto;
-    private Bitmap postPhoto;
+    private ContentValues sourcePhoto;
+    private ContentValues postPhoto;
+
 
     public String getType() {
         return type;
@@ -84,25 +85,25 @@ public class NewsPost implements Parcelable {
         this.postPhotoUrl = postPhotoUrl;
     }
 
-    public Bitmap getSourcePhoto() {
+    public ContentValues getSourcePhoto() {
         return sourcePhoto;
     }
 
-    public void setSourcePhoto(Bitmap sourcePhoto) {
+    public void setSourcePhoto(ContentValues sourcePhoto) {
         this.sourcePhoto = sourcePhoto;
     }
 
-    public Bitmap getPostPhoto() {
+    public ContentValues getPostPhoto() {
         return postPhoto;
     }
 
-    public void setPostPhoto(Bitmap postPhoto) {
+    public void setPostPhoto(ContentValues postPhoto) {
         this.postPhoto = postPhoto;
     }
 
+
     public NewsPost() {
     }
-
 
     private NewsPost(Parcel in) {
         this.type = in.readString();
@@ -112,10 +113,9 @@ public class NewsPost implements Parcelable {
         this.postText = in.readString();
         this.sourcePhotoUrl = in.readString();
         this.postPhotoUrl = in.readString();
-        this.sourcePhoto = in.readParcelable(Bitmap.class.getClassLoader());
-        this.postPhoto = in.readParcelable(Bitmap.class.getClassLoader());
+        this.sourcePhoto = in.readParcelable(ContentValues.class.getClassLoader());
+        this.postPhoto = in.readParcelable(ContentValues.class.getClassLoader());
     }
-
 
     @Override
     public int describeContents() {

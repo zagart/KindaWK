@@ -36,6 +36,10 @@ public class FriendsList implements Parcelable {
         return friends.size();
     }
 
+    public final List<Friend> getList() {
+        return friends;
+    }
+
     void setFromHttp(final HttpResponse httpResponse){
         friends.clear();
 
@@ -57,6 +61,10 @@ public class FriendsList implements Parcelable {
 
     public void append(FriendsList list) {
         friends.addAll(list.friends);
+    }
+
+    public void addFriend(Friend friend) {
+        friends.add( friend);
     }
 
     public void removeAllFriends(){

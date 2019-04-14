@@ -19,7 +19,7 @@ import java.net.URL;
 
 public class FriendsProvider extends BaseProvider<FriendsList> {
     static final String ARG_PARAM_REQUEST_METHOD = "friends.get";
-    static final int ARG_PARAM_REQUEST_MAX_FRIENDS = 100;
+    static final int ARG_PARAM_REQUEST_MAX_FRIENDS = 50;
     static final String ARG_PARAM_REQUEST_ORDER  = "name";
     static final String ARG_PARAM_REQUEST_FIELDS = "bdate,city,country,status,photo_100";
 
@@ -62,29 +62,20 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
             if (httpResponse != null) {
                 friendsList.setFromHttp(httpResponse);
             }
-             for(int i = 0; i < friendsList.getCount(); i++) {
-                 Uri photoUri = friendsList.getItem(i).getPhoto100Url();
-             }
 
+            for(int i = 0; i < friendsList.getCount(); i++) {
+                Friend friend = friendsList.getItem(i);
+                String photoUrl = friendsList.getItem(i).getPhoto100Url();
 
-
-
-            if (httpPhotoResponse != null) {
-                profileData.setUserId(userId);
-                profileData.setPhotoURLFromHttp(httpPhotoResponse);
-                Uri photoUri = profileData.getProfilePhoto();
-
-                if (photoUri != null) {
-                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(photoUri.toString()));
-
+                if(!photoUrl.isEmpty()){
+                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(photoUrl));
                     if(imageBytes != null && imageBytes.length > 0 ){
                         ContentValues contentPhotoBytes = new ContentValues();
-                        contentPhotoBytes.put(UserProfile.PHOTO_BYTES, imageBytes);
-                        profileData.setProfilePhotoBytes(contentPhotoBytes);
+                        contentPhotoBytes.put(Friend.PHOTO_BYTES, imageBytes);
+                        friend.setPhoto100Bytes(contentPhotoBytes);
                     }
                 }
             }
-            Log.d("GGGgetDataFromDb", " loadApiData  success");
         } catch (Exception ex){
             ex.printStackTrace();
         }
@@ -92,26 +83,36 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
 
     private void putDataInDb(){
         DbManager dbManager = ProviderService.getInstance().getDbManager();
-        dbManager.removeAllUserProfile();
-        dbManager.insertUserProfile(profileData);
-        Log.d("GGGgetDataFromDb", "  putDataInDb success");
+        dbManager.removeAllFriends();
+        dbManager.insertFriends(friendsList);
+        Log.d("ZZZgetDataFromDb", "  putDataInDb success");
     }
 
     private boolean getDataFromDb(){
         DbManager dbManager = ProviderService.getInstance().getDbManager();
+        friendsList.removeAllFriends();
 
-        Cursor cursor = dbManager.getUserProfile(AuthManager.getCurrentToken().getUserId());
+        Cursor cursor = dbManager.getFriends();
         while (cursor.moveToNext()) {
-            profileData.setUserId(cursor.getInt(0));
-            profileData.setFirstName(cursor.getString(1));
-            byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("profilePhotoBytes"));
+            Friend friend = new Friend();
+            friend.setUid(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+            friend.setFirstName(cursor.getString(cursor.getColumnIndexOrThrow("first_name")));
+            friend.setLastName(cursor.getString(cursor.getColumnIndexOrThrow("last_name")));
+            friend.setBirthDate(cursor.getString(cursor.getColumnIndexOrThrow("bdate")));
+            friend.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+            DataIdTitle country = new DataIdTitle();
+            country.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("country")));
+            friend.setCountry(country);
+
+            byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("photobytes"));
             ContentValues contentPhotoBytes = new ContentValues();
-            contentPhotoBytes.put(UserProfile.PHOTO_BYTES, imageBytes);
-            profileData.setProfilePhotoBytes(contentPhotoBytes);
-            Log.d("GGGgetDataFromDb", "  getDataFromDb success");
-            return true;
+            contentPhotoBytes.put(friend.PHOTO_BYTES, imageBytes);
+            friend.setPhoto100Bytes(contentPhotoBytes);
+            Log.d("ZZZgetDataFromDb", "  getDataFromDb success");
+            friendsList.addFriend(friend);
         }
 
+        //return friendsList.getCount() > 0;
         return false;
     }
 

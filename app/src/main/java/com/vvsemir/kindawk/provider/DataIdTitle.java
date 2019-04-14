@@ -3,7 +3,7 @@ package com.vvsemir.kindawk.provider;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class DataCity implements Parcelable {
+public class DataIdTitle implements Parcelable {
     private int id;
     private String title;
 
@@ -23,7 +23,10 @@ public class DataCity implements Parcelable {
         this.title = title;
     }
 
-    private DataCity(Parcel in) {
+    public DataIdTitle() {
+    }
+
+    public DataIdTitle(Parcel in) {
         this.id = in.readInt();
         this.title = in.readString();
     }
@@ -38,14 +41,14 @@ public class DataCity implements Parcelable {
     public int describeContents() {
         return 0;
     }
-    public static final Creator<DataCity> CREATOR = new Creator<DataCity>() {
+    public static final Creator<DataIdTitle> CREATOR = new Creator<DataIdTitle>() {
 
-        public DataCity createFromParcel(Parcel in) {
-            return new DataCity(in);
+        public DataIdTitle createFromParcel(Parcel in) {
+            return new DataIdTitle(in);
         }
 
-        public DataCity[] newArray(int size) {
-            return new DataCity[size];
+        public DataIdTitle[] newArray(int size) {
+            return new DataIdTitle[size];
         }
     };
 }

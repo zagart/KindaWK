@@ -13,6 +13,7 @@ import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.db.DbManager;
 import com.vvsemir.kindawk.provider.BaseProvider;
 import com.vvsemir.kindawk.provider.FriendsList;
+import com.vvsemir.kindawk.provider.FriendsProvider;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
 import com.vvsemir.kindawk.provider.UserProfile;
@@ -64,7 +65,18 @@ public class ProviderService extends Service {
         return null;
     }
 
-    public static void getAccountProfileInfo(ICallback<UserProfile> callback) {
+    public static void getAccountProfileInfo(final ICallback<UserProfile> callback) {
+        if (instance == null) {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onServiceNotStarted();
+                }
+            }, 500);
+
+            return;
+        }
+
         UserProfileProvider dataProvider = (UserProfileProvider)instance.getProviderFromList(UserProfileProvider.class);
 
         if(dataProvider == null){
@@ -76,6 +88,10 @@ public class ProviderService extends Service {
     }
 
     public static void getWall(ICallback<NewsWall> callback, final RequestParams params) {
+        if (instance == null) {
+            return;
+        }
+
         NewsWallProvider dataProvider = (NewsWallProvider)instance.getProviderFromList(NewsWallProvider.class);
 
         if(dataProvider == null){
@@ -87,6 +103,10 @@ public class ProviderService extends Service {
     }
 
     public static void getFriends(ICallback<FriendsList> callback) {
+        if (instance == null) {
+            return;
+        }
+
         FriendsProvider dataProvider = (FriendsProvider)instance.getProviderFromList(FriendsProvider.class);
 
         if(dataProvider == null){
