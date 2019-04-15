@@ -113,12 +113,8 @@ public class NewsFragment extends Fragment {
             }
 
             @Override
-            public void onServiceNotStarted() {
-
-            }
-
-            @Override
             public void onError(Throwable throwable) {
+
                 //to do
                 Log.d("getWall", "getWall : loading exception!!!" + throwable.getMessage() );
             }

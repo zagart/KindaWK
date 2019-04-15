@@ -26,16 +26,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ProviderService extends Service {
-    public static final String ACTION_ACCOUNT_GET_PROFILE_INFO = "action.Account.GetProfileInfo";
-    public static final String ACTION_FRIENDS_GET = "action.Friends.Get";
-    public static final String ACTION_WALL_GET = "action.Wall.Get";
-    private static final String EXTRA_REQUEST_PARAMS = "Provider.Request.Params";
-    public static final String EXTRA_RESPONSE_DATA = "Provider.Response.Data";
-    private static ProviderService instance;
+    public static final String EXCEPTION_SERVICE_NOT_STARTED = "Sorry, Provider Service not started";
 
+    private static ProviderService instance;
     private ExecutorService executorService;
     private DbManager dbManager;
-
     private Handler handler = new Handler(Looper.getMainLooper());
     private List<BaseProvider> providers  = new ArrayList<>();
 
@@ -70,9 +65,9 @@ public class ProviderService extends Service {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    callback.onServiceNotStarted();
+                    callback.onError(new CallbackExceptionFactory.Companion.ServiceException(EXCEPTION_SERVICE_NOT_STARTED));
                 }
-            }, 500);
+            }, 300);
 
             return;
         }

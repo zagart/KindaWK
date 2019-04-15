@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.provider.NewsPost;
 import com.vvsemir.kindawk.provider.NewsWall;
@@ -24,8 +25,22 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (getItemViewType(position) == ViewType.POST) {
-            ((NewsItemView) viewHolder.itemView).setPostText(((NewsPost)news.getItem(position)).getPostText());
-            ((NewsItemView) viewHolder.itemView).setPostDate(((NewsPost)news.getItem(position)).getDateUnixTime().toString());
+            NewsItemView itemView = (NewsItemView) viewHolder.itemView;
+            NewsPost newsPost = (NewsPost)news.getItem(position);
+
+            itemView.setPostText(newsPost.getPostText());
+            itemView.setPostDate(newsPost.getDateUnixTime().toString());
+            itemView.setPostId(String.valueOf(newsPost.getPostId()));
+            itemView.setSourceName(newsPost.getSourceName());
+
+            if(newsPost.getSourcePhoto() != null) {
+                itemView.setSourcePhoto(ImageLoader.getInstance().
+                        getBitmapFromBytes(newsPost.getSourcePhoto().getAsByteArray(NewsPost.PHOTO_BYTES)));
+            }
+            if(newsPost.getPostPhoto() != null) {
+                itemView.setPostPhoto(ImageLoader.getInstance().
+                        getBitmapFromBytes(newsPost.getPostPhoto().getAsByteArray(NewsPost.PHOTO_BYTES)));
+            }
         }
     }
 

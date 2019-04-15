@@ -3,10 +3,15 @@ package com.vvsemir.kindawk.provider;
 import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class NewsPost implements Parcelable {
+    public static final String PHOTO_BYTES = "PostPhotoBytes";
 
     @SerializedName("type")
     private String type;
@@ -23,6 +28,11 @@ public class NewsPost implements Parcelable {
     @SerializedName("text")
     private String postText;
 
+    @SerializedName("attachments")
+    private List<Attachment> attachments;
+
+
+    private String sourceName;
     private String sourcePhotoUrl;
     private String postPhotoUrl;
     private ContentValues sourcePhoto;
@@ -69,6 +79,14 @@ public class NewsPost implements Parcelable {
         this.postText = postText;
     }
 
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
     public String getSourcePhotoUrl() {
         return sourcePhotoUrl;
     }
@@ -101,6 +119,9 @@ public class NewsPost implements Parcelable {
         this.postPhoto = postPhoto;
     }
 
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
 
     public NewsPost() {
     }
@@ -111,6 +132,7 @@ public class NewsPost implements Parcelable {
         this.dateUnixTime = in.readLong();
         this.postId = in.readInt();
         this.postText = in.readString();
+        this.sourceName = in.readString();
         this.sourcePhotoUrl = in.readString();
         this.postPhotoUrl = in.readString();
         this.sourcePhoto = in.readParcelable(ContentValues.class.getClassLoader());
@@ -129,6 +151,7 @@ public class NewsPost implements Parcelable {
         dest.writeLong(dateUnixTime);
         dest.writeInt(postId);
         dest.writeString(postText);
+        dest.writeString(sourceName);
         dest.writeString(sourcePhotoUrl);
         dest.writeString(postPhotoUrl);
         dest.writeParcelable(sourcePhoto, 0);
@@ -147,4 +170,44 @@ public class NewsPost implements Parcelable {
     };
 
 
+    class Attachment{
+        String type;
+        AttachPhoto photo;
+    }
+
+    class AttachPhoto{
+        int id;
+        List<AttachPhotoSizes> sizes;
+    }
+
+    class AttachPhotoSizes{
+        String type;
+        String url;
+        int width;
+        int height;
+    }
+
+    class DataProfileIdPhotourl{
+        int id;
+        String photo_100;
+        String first_name;
+        String last_name;
+    }
+
+    static class DataIdPhotourl{
+        public DataIdPhotourl(int id, String photo, String name) {
+            this.id = id;
+            this.photo_100 = photo_100;
+            this.name = name;
+        }
+        int id;
+        String photo_100;
+        String name;
+    }
+
+    static void makeMapFromDataIdPhotoList(DataIdPhotourl[] list, HashMap<Integer, DataIdPhotourl> map){
+        for(DataIdPhotourl item : list){
+            map.put(item.id, item);
+        }
+    }
 }

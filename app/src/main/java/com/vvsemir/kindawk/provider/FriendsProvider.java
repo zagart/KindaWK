@@ -65,7 +65,7 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
 
             for(int i = 0; i < friendsList.getCount(); i++) {
                 Friend friend = friendsList.getItem(i);
-                String photoUrl = friendsList.getItem(i).getPhoto100Url();
+                String photoUrl = friend.getPhoto100Url();
 
                 if(!photoUrl.isEmpty()){
                     byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(photoUrl));
@@ -112,8 +112,7 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
             friendsList.addFriend(friend);
         }
 
-        //return friendsList.getCount() > 0;
-        return false;
+        return friendsList.getCount() > 0;
     }
 
     @Override
