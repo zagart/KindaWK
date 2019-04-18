@@ -8,4 +8,5 @@
     <color name="colorEnable">#ECE398</color>
     <color name="colorSelected">#FDFD25</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorBgFragments">#FADDD9</color>
 </resources>

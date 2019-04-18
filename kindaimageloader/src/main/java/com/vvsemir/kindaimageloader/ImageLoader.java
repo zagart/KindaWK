@@ -47,9 +47,9 @@ public class ImageLoader {
             bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            return bitmap;
         }
-
-        return bitmap;
     }
 
     public Bitmap getBitmapFromFile(Uri uriFile) {

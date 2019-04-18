@@ -59,15 +59,15 @@ public class FriendsList implements Parcelable {
         }
     }
 
-    public void append(FriendsList list) {
+    public synchronized void append(FriendsList list) {
         friends.addAll(list.friends);
     }
 
-    public void addFriend(Friend friend) {
+    public synchronized void addFriend(Friend friend) {
         friends.add( friend);
     }
 
-    public void removeAllFriends(){
+    public synchronized void removeAllFriends(){
         friends.clear();
     }
 

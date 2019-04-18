@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBgFragments"
     android:orientation="vertical"
     tools:context=".ui.ProfileFragment">
 
@@ -9,8 +10,8 @@
         android:id="@+id/profilePhotoView"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="@string/profile_photo" />
+        android:contentDescription="@string/profile_photo"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/userName"

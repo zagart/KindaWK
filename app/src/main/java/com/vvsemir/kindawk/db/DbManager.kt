@@ -4,9 +4,10 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import com.vvsemir.kindawk.provider.Friend
-import com.vvsemir.kindawk.provider.FriendsList
-import com.vvsemir.kindawk.provider.UserProfile
+import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_FRIENDS
+import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_NEWSFEED
+import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_PROFILE
+import com.vvsemir.kindawk.provider.*
 
 class DbManager (context : Context) {
     private var appContext: Context
@@ -32,8 +33,13 @@ class DbManager (context : Context) {
     fun getUserProfile(userId : Int): Cursor? {
         return query(prepareSqlGetUserProfile(userId))
     }
+
     fun getFriends(): Cursor? {
         return query(prepareSqlGetFriends())
+    }
+
+    fun getNewsWall(startId : Int, endId : Int): Cursor? {
+        return query(prepareSqlGetNewsWall(startId, endId))
     }
 
     fun removeAllUserProfile() =  deleteAll(DbOpenHelper.DB_TABLE_PROFILE)
@@ -65,14 +71,48 @@ class DbManager (context : Context) {
         return resultIds
     }
 
+    fun insertNewsWall(newsWall : NewsWall) : Long? {
+        var resultIds : Long = 1
+        newsWall.news.forEach(){
+            val values = ContentValues()
+
+            values.put("type" , it.type)
+            values.put("source_id" , it.sourceId)
+            values.put("date" , it.dateUnixTime.time)
+            values.put("post_id" , it.postId)
+            values.put("post_text" , it.postText)
+            values.put("source_name" , it.sourceName)
+            values.put("source_photo_url" , it.sourcePhotoUrl)
+            values.put("post_photo_url" , it.postPhotoUrl)
+
+            if(it.sourcePhoto != null) {
+                values.put("source_photo_bytes", it.sourcePhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
+            }
+
+            if(it.postPhoto != null) {
+                values.put("post_photo_bytes", it.postPhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
+            }
+
+            resultIds *= insert( DbOpenHelper.DB_TABLE_NEWSFEED, values ) ?: -1
+        }
+
+        return resultIds
+    }
+
 
     private  fun prepareSqlGetUserProfile(userId : Int): String {
-        return "SELECT * FROM profile WHERE userId = $userId"
+        return "SELECT * FROM $DB_TABLE_PROFILE WHERE userId = $userId"
     }
 
     private  fun prepareSqlGetFriends(): String {
-        return "SELECT * FROM friends"
+        return "SELECT * FROM $DB_TABLE_FRIENDS"
     }
+
+    private  fun prepareSqlGetNewsWall(startId : Int, endId : Int): String {
+        return "SELECT * FROM $DB_TABLE_NEWSFEED WHERE _id BETWEEN $startId AND $endId"
+    }
+
+
 
     companion object {
         private var instance: DbManager? = null

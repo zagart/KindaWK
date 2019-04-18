@@ -12,22 +12,11 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DateGsonAdapter implements JsonDeserializer<Date> {
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm", Locale.getDefault());
 
     @Override
     public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        String date;
-
         if (json.getAsJsonPrimitive().isNumber()) {
-            date = new Date(json.getAsLong() * 1000).toString();
-        } else{
-            date = json.getAsString();
-        }
-
-        try {
-            return simpleDateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            return new Date(json.getAsLong() * 1000);
         }
 
         return null;

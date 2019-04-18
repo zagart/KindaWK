@@ -100,6 +100,8 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
             return true;
         }
 
+        cursor.close();
+
         return false;
     }
 

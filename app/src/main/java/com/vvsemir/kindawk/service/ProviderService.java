@@ -124,7 +124,7 @@ public class ProviderService extends Service {
         return dbManager;
     }
 
-    private BaseProvider getProviderFromList(Class providerClass){
+    public BaseProvider getProviderFromList(Class providerClass){
         for(BaseProvider provider : providers){
             if(providerClass.isInstance(provider)){
                 return provider;

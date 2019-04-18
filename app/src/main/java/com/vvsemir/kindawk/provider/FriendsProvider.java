@@ -112,6 +112,8 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
             friendsList.addFriend(friend);
         }
 
+        cursor.close();
+
         return friendsList.getCount() > 0;
     }
 

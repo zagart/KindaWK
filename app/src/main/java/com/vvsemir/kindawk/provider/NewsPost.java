@@ -3,11 +3,8 @@ package com.vvsemir.kindawk.provider;
 import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
 import com.google.gson.annotations.SerializedName;
-
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 
 public class NewsPost implements Parcelable {
@@ -20,7 +17,7 @@ public class NewsPost implements Parcelable {
     private int sourceId;
 
     @SerializedName("date")
-    private Long dateUnixTime;
+    private Date dateUnixTime;
 
     @SerializedName("post_id")
     private int postId;
@@ -31,6 +28,8 @@ public class NewsPost implements Parcelable {
     @SerializedName("attachments")
     private List<Attachment> attachments;
 
+    @SerializedName("copy_history")
+    private List<CopyPost> copyHistory;
 
     private String sourceName;
     private String sourcePhotoUrl;
@@ -55,13 +54,11 @@ public class NewsPost implements Parcelable {
         this.sourceId = sourceId;
     }
 
-    public Long getDateUnixTime() {
+    public Date getDateUnixTime() {
         return dateUnixTime;
     }
 
-    public void setDateUnixTime(Long dateUnixTime) {
-        this.dateUnixTime = dateUnixTime;
-    }
+    public void setDateUnixTime(Date dateUnixTime) {this.dateUnixTime = dateUnixTime;    }
 
     public int getPostId() {
         return postId;
@@ -123,13 +120,17 @@ public class NewsPost implements Parcelable {
         return attachments;
     }
 
+    public List<CopyPost> getCopyHistory() {
+        return copyHistory;
+    }
+
     public NewsPost() {
     }
 
     private NewsPost(Parcel in) {
         this.type = in.readString();
         this.sourceId = in.readInt();
-        this.dateUnixTime = in.readLong();
+        this.dateUnixTime = (Date)in.readSerializable();
         this.postId = in.readInt();
         this.postText = in.readString();
         this.sourceName = in.readString();
@@ -148,7 +149,7 @@ public class NewsPost implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(type);
         dest.writeInt(sourceId);
-        dest.writeLong(dateUnixTime);
+        dest.writeSerializable(dateUnixTime);
         dest.writeInt(postId);
         dest.writeString(postText);
         dest.writeString(sourceName);
@@ -187,27 +188,8 @@ public class NewsPost implements Parcelable {
         int height;
     }
 
-    class DataProfileIdPhotourl{
-        int id;
-        String photo_100;
-        String first_name;
-        String last_name;
-    }
-
-    static class DataIdPhotourl{
-        public DataIdPhotourl(int id, String photo, String name) {
-            this.id = id;
-            this.photo_100 = photo_100;
-            this.name = name;
-        }
-        int id;
-        String photo_100;
-        String name;
-    }
-
-    static void makeMapFromDataIdPhotoList(DataIdPhotourl[] list, HashMap<Integer, DataIdPhotourl> map){
-        for(DataIdPhotourl item : list){
-            map.put(item.id, item);
-        }
+    class CopyPost {
+        String text;
+        List<Attachment> attachments;
     }
 }
