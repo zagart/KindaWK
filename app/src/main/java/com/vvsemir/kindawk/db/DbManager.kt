@@ -8,6 +8,7 @@ import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_FRIENDS
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_NEWSFEED
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_PROFILE
 import com.vvsemir.kindawk.provider.*
+import java.util.*
 
 class DbManager (context : Context) {
     private var appContext: Context
@@ -71,11 +72,9 @@ class DbManager (context : Context) {
         return resultIds
     }
 
-    fun insertNewsWall(newsWall : NewsWall) : Long? {
-        var resultIds : Long = 1
-        newsWall.news.forEach(){
+    fun insertNewsWall(posts: List<NewsPost>) {
+        posts.forEach(){
             val values = ContentValues()
-
             values.put("type" , it.type)
             values.put("source_id" , it.sourceId)
             values.put("date" , it.dateUnixTime.time)
@@ -93,10 +92,14 @@ class DbManager (context : Context) {
                 values.put("post_photo_bytes", it.postPhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
             }
 
-            resultIds *= insert( DbOpenHelper.DB_TABLE_NEWSFEED, values ) ?: -1
-        }
+            val response = insert( DbOpenHelper.DB_TABLE_NEWSFEED, values )
 
-        return resultIds
+            if(response == null || response < 0){
+                removeAllNews();
+
+                return;
+            }
+        }
     }
 
 
@@ -112,7 +115,45 @@ class DbManager (context : Context) {
         return "SELECT * FROM $DB_TABLE_NEWSFEED WHERE _id BETWEEN $startId AND $endId"
     }
 
+    fun getNewsWallRange(startId : Int, endId : Int) : List<NewsPost> {
+        val resCurosor : Cursor? = getNewsWall(startId, endId)
+        try {
+            val posts = ArrayList<NewsPost>()
+            val cursor = resCurosor;
 
+            if (cursor != null && cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                if (cursor.getCount() > 0) {
+                    do {
+                        var post = NewsPost()
+                        post.type = cursor.getString(cursor.getColumnIndexOrThrow("type"))
+                        post.sourceId = cursor.getInt(cursor.getColumnIndexOrThrow("source_id"))
+                        post.dateUnixTime = Date(cursor.getLong(cursor.getColumnIndexOrThrow("date")))
+                        post.postId = cursor.getInt(cursor.getColumnIndexOrThrow("post_id"))
+                        post.postText = cursor.getString(cursor.getColumnIndexOrThrow("post_text"))
+                        post.sourceName = cursor.getString(cursor.getColumnIndexOrThrow("source_name"))
+                        post.sourcePhotoUrl = cursor.getString(cursor.getColumnIndexOrThrow("source_photo_url"))
+                        post.postPhotoUrl = cursor.getString(cursor.getColumnIndexOrThrow("post_photo_url"))
+
+                        val sourcePhotoBytes = ContentValues()
+                        sourcePhotoBytes.put(NewsPost.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("source_photo_bytes")))
+                        post.sourcePhoto = sourcePhotoBytes
+
+                        val postPhotoBytes = ContentValues()
+                        postPhotoBytes.put(NewsPost.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("post_photo_bytes")))
+                        post.postPhoto = postPhotoBytes
+
+                        posts.add(post)
+
+                    } while ((cursor.moveToNext()))
+                }
+            }
+
+            return posts
+        } finally {
+            resCurosor?.close();
+        }
+    }
 
     companion object {
         private var instance: DbManager? = null
@@ -122,18 +163,12 @@ class DbManager (context : Context) {
                     instance ?: DbManager(context)
                 }
 
+    }
 
-        //@JvmStatic
-       // fun getCurrentToken()  = getInstance().appContext
+    enum class DbResponse {
+        DB_RESPONSE_STATUS_SUCCESS,
+        DB_RESPONSE_STATUS_ERROR,
+        DB_RESPONSE_STATUS_EMPTY_TABLE,
+        DB_RESPONSE_STATUS_EMPTY_CURSOR
     }
 }
-
-/*
-companion object {
-    private var instance: AuthManager? = null
-
-    fun getInstance(context: Context): AuthManager =
-            instance ?: synchronized(this) {
-                instance ?: AuthManager(context)
-            }
-*/

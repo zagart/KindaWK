@@ -35,7 +35,7 @@ public abstract class BaseRecyclerViewScrollListener extends RecyclerView.OnScro
     public void onScrolled(RecyclerView view, int dx, int dy) {
         int lastVisibleItemPosition = 0;
         int totalItemCount = layoutManager.getItemCount();
-        lastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+        lastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
 
         if (totalItemCount < previousTotalItemCount) {
             this.currentPage = this.startingPageIndex;

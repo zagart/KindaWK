@@ -15,12 +15,18 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.vvsemir.kindawk.R;
+import com.vvsemir.kindawk.provider.NewsPost;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
 
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class NewsFragment extends Fragment {
     private NewsRecyclerAdapter newsRecyclerAdapter;
@@ -45,7 +51,7 @@ public class NewsFragment extends Fragment {
         recyclerViewOnScrollListener = new BaseRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                loadMoreItems(page, page + NewsWallProvider.PAGE_SIZE);
+                loadMoreItems(totalItemsCount, totalItemsCount + NewsWallProvider.PAGE_SIZE);
             }
 
             @Override
@@ -61,7 +67,7 @@ public class NewsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_news, container, false);
-        progressBar =  view.findViewById(R.id.progressBarNews);
+        //progressBar =  view.findViewById(R.id.progressBarNews);
         recyclerView = view.findViewById(R.id.newsList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsRecyclerAdapter);
@@ -75,21 +81,25 @@ public class NewsFragment extends Fragment {
         return view;
     }
 
-    public void updateViewsWithData(Parcelable data) {
+    public void updateViewsWithData(final Parcelable data) {
         if(data == null) {
             return;
         }
-
+        NewsWall freshNewsWall =  (NewsWall)data;
         //newsRecyclerAdapter.setShowLoadingProgress(false);
         showProgressView(false);
-        newsRecyclerAdapter.updateItems((NewsWall)data);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
+        Log.d("WWR updateViewsWithData", "here!!! " + data.hashCode());
+        //recyclerView.post(new Runnable() {
+        //    @Override
+        //    public void run() {
+        if(freshNewsWall.getCount() > 0) {
+            newsRecyclerAdapter.updateItems(freshNewsWall);
+            newsRecyclerAdapter.notifyDataSetChanged();
+        }
                 //newsRecyclerAdapter.notifyItemRangeInserted(curSize, allContacts.size() - 1);
-                newsRecyclerAdapter.notifyDataSetChanged();
-            }
-        });
+
+          //  }
+        //});
         isLoading = false;
     }
 
@@ -115,20 +125,25 @@ public class NewsFragment extends Fragment {
             @Override
             public void onNotify(NewsWall result) {
                 //to do
-                Log.d("getNewsFeed", "getNewsFeed: notification refresh!!!");
+                Log.d("WWRgetWall", "getNewsFeed: notification refresh!!!");
             }
 
             @Override
             public void onError(Throwable throwable) {
 
-                //to do
-                Log.d("getWall", "getWall : loading exception!!!" + throwable.getMessage() );
+                NewsWall errorNews = new NewsWall();
+                NewsPost errorPost = new NewsPost();
+                errorPost.setPostText(NewsWallProvider.EXCEPTION_LOADING_API);
+                errorNews.addPost(errorPost);
+                updateViewsWithData(errorNews);
+
+                Log.d("WWRonError", "getWall : loading exception!!!" + throwable.getMessage() );
             }
         }, params);
     }
 
     void showProgressView(boolean show) {
-        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        //progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
 

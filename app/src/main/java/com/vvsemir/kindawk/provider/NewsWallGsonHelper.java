@@ -22,26 +22,26 @@ import java.util.List;
 
 public class NewsWallGsonHelper {
     public static final String EXCEPTION_PARSING_API_RESPONSE = "Sorry, can not read posts from API";
-    private NewsWall newsWall;
     private final NewsWallProvider newsWallProvider;
 
-    private NewsWallGsonHelper(@Nullable final NewsWall newsWall, final NewsWallProvider newsWallProvider) {
-        this.newsWall = newsWall;
+    private NewsWallGsonHelper(final NewsWallProvider newsWallProvider) {
         this.newsWallProvider = newsWallProvider;
     }
 
-    static NewsWallGsonHelper createInstance(final NewsWall newsWall, final NewsWallProvider newsWallProvider){
-        return new NewsWallGsonHelper(newsWall, newsWallProvider);
+    static NewsWallGsonHelper createInstance(final NewsWallProvider newsWallProvider){
+        return new NewsWallGsonHelper(newsWallProvider);
     }
 
-    void setFromHttp(final HttpResponse httpResponse){
+    List<NewsPost> getPostsFromHttp(final HttpResponse httpResponse){
+        List<NewsPost> posts = null;
+
         try{
             Gson gson = new Gson().newBuilder().registerTypeAdapter(Date.class, new DateGsonAdapter()).create();
             JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
             JsonObject response = httpObj.getAsJsonObject("response");
             JsonArray items = response.getAsJsonArray("items");
 
-            List<NewsPost> posts = gson.fromJson(items, new TypeToken<ArrayList<NewsPost>>() {}.getType());
+            posts = gson.fromJson(items, new TypeToken<ArrayList<NewsPost>>() {}.getType());
 
             if(posts == null) {
                 throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_PARSING_API_RESPONSE);
@@ -86,9 +86,10 @@ public class NewsWallGsonHelper {
             }
 
             newsWallProvider.setNextFromChainRequest(nextFrom);
-            newsWall.appendPosts(posts);
         } catch (Exception ex){
             ex.printStackTrace();
+        } finally {
+            return posts;
         }
     }
 

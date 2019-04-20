@@ -1,23 +1,44 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBgFragments"
-    android:orientation="vertical"
     tools:context=".ui.ProfileFragment">
 
-    <ImageView
-        android:id="@+id/profilePhotoView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:contentDescription="@string/profile_photo"
-        android:scaleType="centerCrop" />
+        android:layout_height="0dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/guideline">
+        <ImageView
+            android:id="@+id/profilePhotoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/profile_photo"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"/>
+
+    </FrameLayout>
 
     <TextView
-        android:id="@+id/userName"
-        android:layout_width="match_parent"
+        android:id="@+id/firstNameView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_margin="66dp" />
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="28dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline" />
 
-</LinearLayout>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.28"/>
+
+</android.support.constraint.ConstraintLayout>

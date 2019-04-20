@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.db.DbManager;
@@ -91,7 +92,9 @@ public class ProviderService extends Service {
 
         if(dataProvider == null){
             dataProvider = new NewsWallProvider(callback);
+            Log.d("WWA newdataProvider", " hash=" + dataProvider.hashCode());
         }
+        Log.d("WWA olddataProvider", " hash=" + dataProvider.hashCode());
 
         dataProvider.setRequestParams(params);
         instance.executorService.execute(dataProvider);

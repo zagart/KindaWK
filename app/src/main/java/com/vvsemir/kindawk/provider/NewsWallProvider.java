@@ -18,9 +18,10 @@ import com.vvsemir.kindawk.service.RequestParams;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 
 public class NewsWallProvider extends BaseProvider<NewsWall> {
-    static final String EXCEPTION_LOADING_API = "Sorry, can not read posts from API";
+    public static final String EXCEPTION_LOADING_API = "Sorry, can not read posts from API";
     static final String ARG_PARAM_REQUEST_METHOD = "newsfeed.get";
     static final String ARG_PARAM_REQUEST_FILTERS = "post";
     static final String ARG_PARAM_REQUEST_FIELDS = "photo_100";
@@ -79,53 +80,77 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     }
 
     void loadData() {
+        try {
+            DbManager.DbResponse dbResponse = getDataFromDb();
+            Log.d("WWW getDatFromDb", "  response = " + dbResponse);
 
-        if(!getDataFromDb()) {
+            if (dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR ||
+                    dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE) {
+                newsWall.removeAllNews();
 
-            if (rangeHelper.checkNextApiRequest()) {
-                loadApiData();
-                putDataInDb();
+                if (rangeHelper.checkNextApiRequest()) {
+                    List<NewsPost> posts = loadApiData();
+
+                    if (posts != null && posts.size() > 0) {
+
+                        putDataInDb(posts);
+
+                        newsWall.appendPosts(posts);
+                    }
+                }
             }
+
+            ProviderService.getInstance().getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onResult(newsWall);
+                }
+            });
+        } catch (Exception ex){
+            ex.printStackTrace();
+            ProviderService.getInstance().getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onError(CallbackExceptionFactory.Companion.createException
+                            (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_API));
+                }
+            });
         }
-
-        ProviderService.getInstance().getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onResult(newsWall);
-            }
-        });
     }
 
-    void loadApiData() {
+    List<NewsPost> loadApiData() {
         try {
             HttpResponse httpResponse = new HttpRequestTask().execute(
                     new HttpRequest(ARG_PARAM_REQUEST_METHOD, false, requestParams), null);
 
             if (httpResponse != null) {
-                NewsWallGsonHelper.createInstance(newsWall, this).setFromHttp(httpResponse);
-            }
+                List<NewsPost> posts = NewsWallGsonHelper.createInstance(this).getPostsFromHttp(httpResponse);
 
-            loadApiImagesForRange(rangeHelper.startPos, rangeHelper.endPos);
+                if(posts != null && posts.size() > 0) {
+                    loadApiImagesForRange(posts);
+
+                    return posts;
+                }
+            }
 
             Log.d("WWW loadApiData", "  loadApiData");
         } catch (Exception ex){
             ex.printStackTrace();
+            ProviderService.getInstance().getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onError(CallbackExceptionFactory.Companion.createException
+                        (CallbackExceptionFactory.THROWABLE_TYPE_EXCEPTION_HTTP, EXCEPTION_LOADING_API));
+                }
+            });
+        } finally {
+            return null;
         }
     }
 
-    void loadApiImagesForRange(int startPos, int endPos){
+    void loadApiImagesForRange( List<NewsPost> posts ){
         try {
-            //if(endPos >= news.getCount()){
-            //    Log.d("EXEX loadApiImages ", " endPos = " + endPos  + "news.getCount()) = " + news.getCount());
-            //    throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_API);
-            //}
-
-            if(endPos > newsWall.getCount()){
-                endPos = newsWall.getCount();
-            }
-
-            for (int i = startPos; i < endPos; i++) {
-                NewsPost post = newsWall.getItem(i);
+            for(NewsPost post : posts){
                 String postPhotoUrl = post.getPostPhotoUrl();
                 String sourcePhotoUrl = post.getSourcePhotoUrl();
 
@@ -153,55 +178,45 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         }
     }
 
-    private void putDataInDb(){
+    private void putDataInDb(List<NewsPost> posts){
         DbManager dbManager = ProviderService.getInstance().getDbManager();
-        dbManager.removeAllNews();
-        dbManager.insertNewsWall(newsWall);
+        dbManager.insertNewsWall(posts);
         Log.d("WWW putDataFromDb", "  putDataInDb success");
     }
 
-    private boolean getDataFromDb(){
+    private DbManager.DbResponse getDataFromDb(){
         DbManager dbManager = ProviderService.getInstance().getDbManager();
 
         if(rangeHelper.startPos == 0) {
             newsWall.removeAllNews();
+            Log.d("WWW getDatFromDb", " rangeHelper.startPos=" + rangeHelper.startPos +
+                    " rangeHelper.endPos=" + rangeHelper.endPos );
         }
 
-        Cursor cursor = dbManager.getNewsWall(rangeHelper.startPos + 1, rangeHelper.endPos + 1);
-        boolean success = cursor.getCount() > 0;
+        Log.d("WWW getDatFromDb"," newsWall.hash=" + newsWall.hashCode() );
 
-        while (cursor.moveToNext()) {
-            NewsPost post = new NewsPost();
+        List<NewsPost> posts = dbManager.getNewsWallRange(rangeHelper.startPos + 1, rangeHelper.endPos + 1); //rawid started witn 1 not 0
 
-            post.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
-            post.setSourceId(cursor.getInt(cursor.getColumnIndexOrThrow("source_id")));
-            post.setDateUnixTime(new Date(cursor.getLong(cursor.getColumnIndexOrThrow("date"))) );
-            post.setPostId(cursor.getInt(cursor.getColumnIndexOrThrow("post_id")));
-            post.setPostText(cursor.getString(cursor.getColumnIndexOrThrow("post_text")));
-            post.setSourceName(cursor.getString(cursor.getColumnIndexOrThrow("source_name")));
-            post.setSourcePhotoUrl(cursor.getString(cursor.getColumnIndexOrThrow("source_photo_url")));
-            post.setPostPhotoUrl(cursor.getString(cursor.getColumnIndexOrThrow("post_photo_url")));
-
-            {
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("source_photo_bytes"));
-                ContentValues contentPhotoBytes = new ContentValues();
-                contentPhotoBytes.put(NewsPost.PHOTO_BYTES, imageBytes);
-                post.setSourcePhoto(contentPhotoBytes);
-            }
-
-            {
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("post_photo_bytes"));
-                ContentValues contentPhotoBytes = new ContentValues();
-                contentPhotoBytes.put(NewsPost.PHOTO_BYTES, imageBytes);
-                post.setPostPhoto(contentPhotoBytes);
-            }
-
-            Log.d("WWW getDatFromDb", "  getDataFromDb success");
-            newsWall.addPost(post);
+        if(posts == null){
+            return DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR;
         }
 
-        cursor.close();
-        return success;
+        if(posts.size() > 0){
+            Log.d("WWW getDatFromDb", "  newsWall. old size = " + newsWall.getCount());
+            newsWall.appendPosts(posts);
+            Log.d("WWW getDatFromDb", "  getDataFromDb success, db posts size = " + posts.size() +
+                    "  newsWall. new size = " + newsWall.getCount());
+
+            return DbManager.DbResponse.DB_RESPONSE_STATUS_SUCCESS;
+        } else {
+
+            if(rangeHelper.startPos == 0) {
+                return DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE;
+            }
+            else{
+                return DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_CURSOR;
+            }
+        }
     }
 
 
@@ -230,6 +245,10 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
             if(startPos == 0 || (nextFromChainRequest != null && !nextFromChainRequest.isEmpty()) ) {
                 checkNext = true;
             }
+            if(nextFromChainRequest != null)
+                Log.d("WWW checkNextApiRequest", " nextFromChainRequest=" + nextFromChainRequest);
+            else
+                Log.d("WWW checkNextApiRequest", " nextFromChainRequest= 0");
 
             return checkNext;
         }
