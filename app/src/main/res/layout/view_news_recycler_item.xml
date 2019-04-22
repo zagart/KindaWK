@@ -5,10 +5,13 @@
 
     <ImageView
         android:id="@+id/userPhotoView"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_margin="4dp"
-        android:contentDescription="@null"/>
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@null" />
 
     <TextView
         android:id="@+id/postSourceNameView"
@@ -20,6 +23,7 @@
         android:layout_marginEnd="4dp"
         android:layout_toStartOf="@+id/postDateView"
         android:layout_toEndOf="@id/userPhotoView"
+        android:textColor="@color/colorTitleText"
         android:textStyle="bold" />
 
     <TextView
@@ -32,7 +36,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
         android:gravity="end"
-        android:textStyle="bold" />
+        android:textColor="@color/colorBottomPrimaryDark" />
 
     <TextView
         android:id="@+id/postIdView"
@@ -48,22 +52,25 @@
         android:id="@+id/postTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/postIdView"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="8dp"
+        android:layout_below="@+id/userPhotoView"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:layout_toEndOf="@id/userPhotoView"
-        android:maxLines="12"
-        android:textStyle="bold" />
+        android:layout_toStartOf="@+id/postPhotoView"
+        android:maxLines="8"
+        android:textColor="@android:color/black" />
 
     <ImageView
         android:id="@+id/postPhotoView"
-        android:layout_width="240dp"
-        android:layout_height="160dp"
-        android:layout_below="@id/postTextView"
+        android:layout_width="140dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/userPhotoView"
         android:layout_alignParentEnd="true"
-        android:layout_margin="4dp"
-        android:contentDescription="@null"/>
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@null" />
 
 </RelativeLayout>

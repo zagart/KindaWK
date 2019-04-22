@@ -10,7 +10,7 @@ public class Friend implements Parcelable {
     public static final String PHOTO_BYTES = "FriendPhotoBytes";
 
     @SerializedName("id")
-    private int uid;
+    private int userId;
     @SerializedName("first_name")
     private String firstName;
     @SerializedName("last_name")
@@ -24,16 +24,17 @@ public class Friend implements Parcelable {
     @SerializedName("status")
     private String status;
     @SerializedName("photo_100")
-    private String photo100Url;
+    private String photoUrl;
 
-    private ContentValues photo100Bytes;
+    private ContentValues photoBytes;
 
-    public int getUid() {
-        return uid;
+
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUid(int uid) {
-        this.uid = uid;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getFirstName() {
@@ -84,36 +85,38 @@ public class Friend implements Parcelable {
         this.status = status;
     }
 
-    public String getPhoto100Url() {
-        return photo100Url;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhoto100Url(String photo100Url) {
-        this.photo100Url = photo100Url;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
-    public ContentValues getPhoto100Bytes() {
-        return photo100Bytes;
+    public ContentValues getPhotoBytes() {
+        return photoBytes;
     }
 
-    public void setPhoto100Bytes(ContentValues photo100Bytes) {
-        this.photo100Bytes = photo100Bytes;
+    public void setPhotoBytes(ContentValues photoBytes) {
+        this.photoBytes = photoBytes;
     }
 
     public Friend() {
+        city = new DataIdTitle();
+        country = new DataIdTitle();
     }
 
 
     private Friend(Parcel in) {
-        this.uid = in.readInt();
+        this.userId = in.readInt();
         this.firstName = in.readString();
         this.lastName = in.readString();
         this.birthDate = in.readString();
         this.city = in.readParcelable(DataIdTitle.class.getClassLoader());
         this.country = in.readParcelable(DataIdTitle.class.getClassLoader());
         this.status = in.readString();
-        this.photo100Url = in.readString();
-        this.photo100Bytes = in.readParcelable(ContentValues.class.getClassLoader());
+        this.photoUrl = in.readString();
+        this.photoBytes = in.readParcelable(ContentValues.class.getClassLoader());
     }
 
 
@@ -124,15 +127,15 @@ public class Friend implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(uid);
+        dest.writeInt(userId);
         dest.writeString(firstName);
         dest.writeString(lastName);
         dest.writeString(birthDate);
         dest.writeParcelable(city, 0);
         dest.writeParcelable(country, 0);
         dest.writeString(status);
-        dest.writeString(photo100Url);
-        dest.writeParcelable(photo100Bytes, 0);
+        dest.writeString(photoUrl);
+        dest.writeParcelable(photoBytes, 0);
     }
 
     public static final Creator<Friend> CREATOR = new Creator<Friend>() {

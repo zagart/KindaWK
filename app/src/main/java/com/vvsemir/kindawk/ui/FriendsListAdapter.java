@@ -15,7 +15,7 @@ import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.provider.FriendsList;
 
 public class FriendsListAdapter extends BaseAdapter {
-    private FriendsList friends;
+    private FriendsList friendsList = new FriendsList();
     private final LayoutInflater inflater;
 
     public FriendsListAdapter(final Context context) {
@@ -30,8 +30,8 @@ public class FriendsListAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.friends_list_item, parent, false);
         }
 
-        if(friends != null){
-            Friend friend = friends.getItem(position);
+        if(friendsList != null){
+            Friend friend = friendsList.getItem(position);
             ((TextView) view.findViewById(R.id.friendFirstNameView)).setText(friend.getFirstName());
             ((TextView) view.findViewById(R.id.friendCountryView)).setText(friend.getCountry().getTitle());
 
@@ -39,7 +39,7 @@ public class FriendsListAdapter extends BaseAdapter {
             //avatarView.setImageResource(R.drawable.ic_person);
             avatarView.setImageBitmap(
                     ImageLoader.getInstance().
-                    getBitmapFromBytes( friend.getPhoto100Bytes().getAsByteArray(Friend.PHOTO_BYTES)));
+                    getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES)));
 
             Log.d("ZZZadapter", "  view success" );
         }
@@ -49,8 +49,8 @@ public class FriendsListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(friends != null) {
-            return friends.getCount();
+        if(friendsList != null) {
+            return friendsList.getCount();
         }
 
         return 0;
@@ -58,8 +58,8 @@ public class FriendsListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        if(friends != null) {
-            return friends.getItem(position);
+        if(friendsList != null) {
+            return friendsList.getItem(position);
         }
 
         return null;
@@ -69,8 +69,9 @@ public class FriendsListAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
+
     public void updateData(FriendsList data){
-        friends = data;
+        friendsList.append(data.getList());
         notifyDataSetChanged();
     }
 }

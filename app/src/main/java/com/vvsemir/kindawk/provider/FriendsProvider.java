@@ -5,19 +5,27 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.db.DbManager;
 import com.vvsemir.kindawk.http.HttpRequest;
 import com.vvsemir.kindawk.http.HttpRequestTask;
 import com.vvsemir.kindawk.http.HttpResponse;
+import com.vvsemir.kindawk.service.CallbackExceptionFactory;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FriendsProvider extends BaseProvider<FriendsList> {
+    public static final String EXCEPTION_LOADING_FRIENDS_API = "Sorry, can not read friends from API";
     static final String ARG_PARAM_REQUEST_METHOD = "friends.get";
     static final int ARG_PARAM_REQUEST_MAX_FRIENDS = 50;
     static final String ARG_PARAM_REQUEST_ORDER  = "name";
@@ -31,20 +39,46 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
     }
 
     void loadData() {
-        if(!getDataFromDb()) {
-            loadApiData();
-            putDataInDb();
-        }
+        try {
+            DbManager.DbResponse dbResponse = getDataFromDb();
+            Log.d("FF getDatFromDb", "  response = " + dbResponse);
 
-        ProviderService.getInstance().getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onResult(friendsList);
+            if (dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR ||
+                    dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE) {
+                friendsList.removeAllFriends();
+
+                List<Friend> friends = loadApiData();
+
+                if (friends != null && friends.size() > 0) {
+
+                    putDataInDb(friends);
+
+                    friendsList.append(friends);
+                }
             }
-        });
+
+            ProviderService.getInstance().getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onResult(friendsList);
+                }
+            });
+
+        } catch (Exception ex){
+            ex.printStackTrace();
+            ProviderService.getInstance().getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onError(CallbackExceptionFactory.Companion.createException
+                            (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_FRIENDS_API));
+                }
+            });
+        }
     }
 
-    private void loadApiData(){
+    private List<Friend> loadApiData(){
+        List<Friend> friends = null;
+
         try {
             if(requestParams == null){
                 requestParams = new RequestParams();
@@ -59,62 +93,84 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
             HttpResponse httpResponse = new HttpRequestTask().execute(
                     new HttpRequest(ARG_PARAM_REQUEST_METHOD, false, requestParams), null);
 
-            if (httpResponse != null) {
-                friendsList.setFromHttp(httpResponse);
+            if (httpResponse == null) {
+                throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_FRIENDS_API);
             }
 
-            for(int i = 0; i < friendsList.getCount(); i++) {
-                Friend friend = friendsList.getItem(i);
-                String photoUrl = friend.getPhoto100Url();
+            friends = getFriendsFromHttp(httpResponse);
 
-                if(!photoUrl.isEmpty()){
+            if(friends != null && friends.size() > 0) {
+                loadApiImages(friends);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        } finally {
+            return friends;
+        }
+    }
+
+    private void putDataInDb(List<Friend> friends) {
+        DbManager dbManager = ProviderService.getInstance().getDbManager();
+        dbManager.removeAllFriends();
+        dbManager.insertFriends(friends);
+        Log.d("ZZZgetDataFromDb", "  putDataInDb success");
+    }
+
+    private DbManager.DbResponse getDataFromDb() {
+        DbManager dbManager = ProviderService.getInstance().getDbManager();
+        friendsList.removeAllFriends();
+
+        List<Friend> friends = dbManager.getFriends();
+
+        if(friends == null){
+            return DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR;
+        }
+
+        if(friends.size() > 0){
+            friendsList.append(friends);
+
+            return DbManager.DbResponse.DB_RESPONSE_STATUS_SUCCESS;
+        } else {
+            return DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE;
+        }
+    }
+
+    private List<Friend> getFriendsFromHttp(final HttpResponse httpResponse){
+        List<Friend> friends = null;
+
+        try{
+            Gson gson = new Gson().newBuilder().create();
+            JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
+            JsonObject response = httpObj.getAsJsonObject("response");
+            JsonArray items = response.getAsJsonArray("items");
+
+            friends = gson.fromJson(items, new TypeToken<ArrayList<Friend>>() {}.getType());
+        } catch (Exception ex){
+            ex.printStackTrace();
+        } finally {
+            return friends;
+        }
+    }
+
+    private void loadApiImages(List<Friend> friends) throws Exception {
+        try{
+            for(int i = 0; i < friends.size(); i++) {
+                Friend friend = friends.get(i);
+                String photoUrl = friend.getPhotoUrl();
+
+                if (!photoUrl.isEmpty()) {
                     byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(photoUrl));
-                    if(imageBytes != null && imageBytes.length > 0 ){
+                    if (imageBytes != null && imageBytes.length > 0) {
                         ContentValues contentPhotoBytes = new ContentValues();
                         contentPhotoBytes.put(Friend.PHOTO_BYTES, imageBytes);
-                        friend.setPhoto100Bytes(contentPhotoBytes);
+                        friend.setPhotoBytes(contentPhotoBytes);
                     }
                 }
             }
         } catch (Exception ex){
             ex.printStackTrace();
+            throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_FRIENDS_API);
         }
-    }
-
-    private void putDataInDb(){
-        DbManager dbManager = ProviderService.getInstance().getDbManager();
-        dbManager.removeAllFriends();
-        dbManager.insertFriends(friendsList);
-        Log.d("ZZZgetDataFromDb", "  putDataInDb success");
-    }
-
-    private boolean getDataFromDb(){
-        DbManager dbManager = ProviderService.getInstance().getDbManager();
-        friendsList.removeAllFriends();
-
-        Cursor cursor = dbManager.getFriends();
-        while (cursor.moveToNext()) {
-            Friend friend = new Friend();
-            friend.setUid(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
-            friend.setFirstName(cursor.getString(cursor.getColumnIndexOrThrow("first_name")));
-            friend.setLastName(cursor.getString(cursor.getColumnIndexOrThrow("last_name")));
-            friend.setBirthDate(cursor.getString(cursor.getColumnIndexOrThrow("bdate")));
-            friend.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
-            DataIdTitle country = new DataIdTitle();
-            country.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("country")));
-            friend.setCountry(country);
-
-            byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("photobytes"));
-            ContentValues contentPhotoBytes = new ContentValues();
-            contentPhotoBytes.put(friend.PHOTO_BYTES, imageBytes);
-            friend.setPhoto100Bytes(contentPhotoBytes);
-            Log.d("ZZZgetDataFromDb", "  getDataFromDb success");
-            friendsList.addFriend(friend);
-        }
-
-        cursor.close();
-
-        return friendsList.getCount() > 0;
     }
 
     @Override

@@ -24,24 +24,6 @@ import com.vvsemir.kindawk.ui.ProfileFragment;
 public class UserActivity extends AppCompatActivity{
     public BottomNavigationView bottomNavigationView;
 
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        /*if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-                try {
-                    Method m = menu.getClass().getDeclaredMethod(
-                            "setOptionalIconsVisible", Boolean.TYPE);
-                    m.setAccessible(true);
-                    m.invoke(menu, true);
-                } catch (NoSuchMethodException e) {
-                    Log.e("tag", "onMenuOpened", e);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }*/
-        return super.onMenuOpened(featureId, menu);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -59,6 +41,7 @@ public class UserActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.user_top, menu);
+        //return true;
         return super.onCreateOptionsMenu(menu);
     }
 

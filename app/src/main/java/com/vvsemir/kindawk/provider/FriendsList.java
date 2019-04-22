@@ -40,27 +40,9 @@ public class FriendsList implements Parcelable {
         return friends;
     }
 
-    void setFromHttp(final HttpResponse httpResponse){
-        friends.clear();
 
-        try{
-            Gson gson = new Gson().newBuilder().create();
-
-            JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
-            JsonObject response = httpObj.getAsJsonObject("response");
-            JsonArray items = response.getAsJsonArray("items");
-
-            List<Friend> friendsGson = gson.fromJson(items, new TypeToken<ArrayList<Friend>>() {}.getType());
-            if(friendsGson != null) {
-                friends.addAll(0, friendsGson);
-            }
-        } catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
-
-    public synchronized void append(FriendsList list) {
-        friends.addAll(list.friends);
+    public synchronized void append(List<Friend> addFriends) {
+        friends.addAll(addFriends);
     }
 
     public synchronized void addFriend(Friend friend) {

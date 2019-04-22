@@ -9,4 +9,5 @@
     <color name="colorSelected">#FDFD25</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBgFragments">#FADDD9</color>
+    <color name="colorTitleText">#630724</color>
 </resources>

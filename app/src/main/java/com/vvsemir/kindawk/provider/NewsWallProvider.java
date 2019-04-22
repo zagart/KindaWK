@@ -70,7 +70,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
             request.removeParam(PARAM_REQUEST_RANGE_END);
         }
 
-        super.setRequestParams(request);
+        requestParams = request;
         addInitialParams();
     }
 
@@ -119,17 +119,17 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     }
 
     List<NewsPost> loadApiData() {
+        List<NewsPost> posts = null;
+
         try {
             HttpResponse httpResponse = new HttpRequestTask().execute(
                     new HttpRequest(ARG_PARAM_REQUEST_METHOD, false, requestParams), null);
 
             if (httpResponse != null) {
-                List<NewsPost> posts = NewsWallGsonHelper.createInstance(this).getPostsFromHttp(httpResponse);
+                posts = NewsWallGsonHelper.createInstance(this).getPostsFromHttp(httpResponse);
 
                 if(posts != null && posts.size() > 0) {
                     loadApiImagesForRange(posts);
-
-                    return posts;
                 }
             }
 
@@ -144,7 +144,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
                 }
             });
         } finally {
-            return null;
+            return posts;
         }
     }
 

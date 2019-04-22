@@ -28,16 +28,19 @@ public class UserProfile implements Parcelable {
     private String lastName;
     @SerializedName("bdate")
     private String birthDate;
-    @SerializedName("home_town")
-    private String homeTown;
+
+    @SerializedName("city")
+    private DataIdTitle city;
     @SerializedName("country")
-    private String country;
+    private DataIdTitle country;
+
+
     @SerializedName("status")
     private String status;
     @SerializedName("phone")
     private String phone;
 
-    private Uri profilePhoto;
+    private String profilePhoto;
     private ContentValues profilePhotoBytes;
 
     public int getUserId() {
@@ -72,19 +75,19 @@ public class UserProfile implements Parcelable {
         this.birthDate = birthDate;
     }
 
-    public String getHomeTown() {
-        return homeTown;
+    public DataIdTitle getCity() {
+        return city;
     }
 
-    public void setHomeTown(String homeTown) {
-        this.homeTown = homeTown;
+    public void setCity(DataIdTitle city) {
+        this.city = city;
     }
 
-    public String getCountry() {
+    public DataIdTitle getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(DataIdTitle country) {
         this.country = country;
     }
 
@@ -104,11 +107,11 @@ public class UserProfile implements Parcelable {
         this.phone = phone;
     }
 
-    public Uri getProfilePhoto() {
+    public String getProfilePhoto() {
         return profilePhoto;
     }
 
-    public void setProfilePhoto(Uri profilePhoto) {
+    public void setProfilePhoto(String profilePhoto) {
         this.profilePhoto = profilePhoto;
     }
 
@@ -121,6 +124,8 @@ public class UserProfile implements Parcelable {
     }
 
     public UserProfile() {
+        city = new DataIdTitle();
+        country = new DataIdTitle();
     }
 
     private UserProfile(Parcel in) {
@@ -128,11 +133,11 @@ public class UserProfile implements Parcelable {
         this.firstName = in.readString();
         this.lastName = in.readString();
         this.birthDate = in.readString();
-        this.homeTown = in.readString();
-        this.country = in.readString();
+        this.city = in.readParcelable(DataIdTitle.class.getClassLoader());
+        this.country = in.readParcelable(DataIdTitle.class.getClassLoader());
         this.status = in.readString();
         this.phone = in.readString();
-        this.profilePhoto = (Uri)in.readValue(Uri.class.getClassLoader());
+        this.profilePhoto = in.readString();
         this.profilePhotoBytes = in.readParcelable(ContentValues.class.getClassLoader());
     }
 
@@ -148,49 +153,22 @@ public class UserProfile implements Parcelable {
         dest.writeString(this.firstName);
         dest.writeString(this.lastName);
         dest.writeString(this.birthDate);
-        dest.writeString(this.homeTown);
-        dest.writeString(this.country);
+        dest.writeParcelable(city, 0);
+        dest.writeParcelable(country, 0);
         dest.writeString(this.status);
         dest.writeString(this.phone);
         dest.writeValue(this.profilePhoto);
         dest.writeParcelable(this.profilePhotoBytes, flags);
     }
 
-
-    void setFromHttp(final HttpResponse httpResponse) {
-        try {
-            Gson gson = new Gson().newBuilder().create();;
-            JsonObject root = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
-            JsonObject response = root.getAsJsonObject("response");
-            UserProfile userProfile = gson.fromJson(response, UserProfile.class);
-            this.copy( userProfile );
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    void setPhotoURLFromHttp(final HttpResponse httpResponse) {
-        try {
-            Gson gson = new Gson().newBuilder().create();;
-            JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
-            JsonArray response = httpObj.getAsJsonArray("response");
-            URL url =  new URL(( response).get(0).getAsJsonObject().get("photo_medium").getAsString());
-            setProfilePhoto(Uri.parse(url.toString()));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
     void copy(final UserProfile copy) {
         this.firstName = copy.firstName;
         this.lastName = copy.lastName;
         this.birthDate = copy.birthDate;
-        this.homeTown = copy.homeTown;
+        this.city = copy.city;
         this.country = copy.country;
         this.status = copy.status;
         this.phone = copy.phone;
-
         this.userId = copy.userId;
         this.profilePhoto = copy.profilePhoto;
 

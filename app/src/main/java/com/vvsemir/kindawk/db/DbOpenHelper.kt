@@ -9,11 +9,10 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
         db?.execSQL(DB_TABLE_PROFILE_CREATE)
         db?.execSQL(DB_TABLE_FRIENDS_CREATE)
         db?.execSQL(DB_TABLE_NEWSFEED_CREATE)
+        db?.execSQL(DB_TABLE_PHOTOS_CREATE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("DROP TABLE IF EXISTS profile")
-        onCreate(db)
     }
 
     companion object {
@@ -21,28 +20,32 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
         const val DB_VERSION = 1
         const val DB_TABLE_PROFILE = "profile"
         const val DB_TABLE_FRIENDS = "friends"
+        const val DB_TABLE_PHOTOS = "photos"
         const val DB_TABLE_NEWSFEED = "newsfeed"
-        const val DB_TABLE_PROFILE_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_PROFILE (userId INTEGER NOT NULL PRIMARY KEY, " +
+
+
+
+        const val DB_TABLE_PROFILE_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_PROFILE (user_id INTEGER NOT NULL PRIMARY KEY, " +
                 "first_name TEXT," +
                 "last_name TEXT," +
                 "bdate TEXT," +
-                "home_town TEXT," +
                 "city TEXT," +
                 "country TEXT," +
                 "status TEXT," +
                 "phone TEXT, " +
-                "profilePhoto TEXT, " +
-                "profilePhotoBytes BLOB" +
+                "photo_url TEXT, " +
+                "photo_bytes BLOB" +
                 ")"
-        const val DB_TABLE_FRIENDS_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_FRIENDS (id INTEGER NOT NULL PRIMARY KEY, " +
+        const val DB_TABLE_FRIENDS_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_FRIENDS (user_id INTEGER NOT NULL PRIMARY KEY, " +
                 "first_name TEXT," +
                 "last_name TEXT," +
                 "bdate TEXT," +
                 "city TEXT," +
                 "country TEXT," +
                 "status TEXT," +
-                "photo_100 TEXT, " +
-                "photobytes BLOB" +
+                "phone TEXT, " +
+                "photo_url TEXT, " +
+                "photo_bytes BLOB" +
                 ")"
         const val DB_TABLE_NEWSFEED_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_NEWSFEED " +
                 "(_id INTEGER PRIMARY KEY, " +
@@ -57,5 +60,14 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
                 "source_photo_url TEXT, " +
                 "source_photo_bytes BLOB" +
                 ")"
+        const val DB_TABLE_PHOTOS_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_PHOTOS " +
+                "(photo_id INTEGER PRIMARY KEY, " +
+                "photo_url TEXT UNIQUE, " +
+                "width INTEGER, " +
+                "height INTEGER, " +
+                "user_id INTEGER, " +
+                "photo_bytes BLOB" +
+                ")"
+
     }
 }
