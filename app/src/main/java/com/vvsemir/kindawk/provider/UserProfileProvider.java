@@ -97,7 +97,7 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
 
                 if (photoUrl != null) {
                     userProfile.setProfilePhoto(photoUrl);
-                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(photoUrl));
+                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromNetworkFile(new URL(photoUrl));
 
                     if(imageBytes != null && imageBytes.length > 0 ){
                         ContentValues contentPhotoBytes = new ContentValues();

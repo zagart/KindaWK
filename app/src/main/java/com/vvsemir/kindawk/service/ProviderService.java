@@ -10,6 +10,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.db.DbManager;
 import com.vvsemir.kindawk.provider.BaseProvider;
@@ -17,6 +18,8 @@ import com.vvsemir.kindawk.provider.FriendsList;
 import com.vvsemir.kindawk.provider.FriendsProvider;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
+import com.vvsemir.kindawk.provider.Photo;
+import com.vvsemir.kindawk.provider.PhotosProvider;
 import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.provider.UserProfileProvider;
 
@@ -114,6 +117,18 @@ public class ProviderService extends Service {
         dataProvider.setRequestParams(null);
         instance.executorService.execute(dataProvider);
     }
+
+    public static void getPhotosByOwner(final RequestParams params, ILoaderCallback<List<Photo>> callback ) {
+        if (instance == null) {
+            return;
+        }
+
+        PhotosProvider dataProvider = new PhotosProvider(callback);
+
+        dataProvider.setRequestParams(params);
+        instance.executorService.execute(dataProvider);
+    }
+
 
     public static ProviderService getInstance() {
         return instance;

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,13 +16,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.UserActivity;
+import com.vvsemir.kindawk.auth.AuthManager;
+import com.vvsemir.kindawk.provider.Photo;
 import com.vvsemir.kindawk.provider.UserProfile;
+import com.vvsemir.kindawk.provider.UserProfileProvider;
 import com.vvsemir.kindawk.service.CallbackExceptionFactory;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.service.ProviderService;
+import com.vvsemir.kindawk.service.RequestParams;
+
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
     ImageView profilePhotoView;
@@ -29,25 +38,22 @@ public class ProfileFragment extends Fragment {
     TextView countryView;
     TextView birthDateView;
     TextView statusView;
-    TextView homeTownView;
     TextView phoneView;
+    RecyclerView recyclerView;
+    View progressView;
+    int currentUserId;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    private LinearLayoutManager layoutManager;
+    PhotosRecyclerAdapter photosRecyclerAdapter;
 
-        if (id == R.id.action_add_photo) {
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+        currentUserId = AuthManager.getCurrentToken().getUserId();
+        photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
     }
 
     @Override
@@ -68,12 +74,17 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
-        profilePhotoView = (ImageView) view.findViewById(R.id.profilePhotoView);
-        firstNameView = (TextView) view.findViewById(R.id.profFirstNameView);
-        lastNameView = (TextView) view.findViewById(R.id.profLastNameView);
-        countryView = (TextView) view.findViewById(R.id.profCountryView);
-        statusView  = (TextView) view.findViewById(R.id.profStatusView);;
-        phoneView  = (TextView) view.findViewById(R.id.profPhoneView);;
+        profilePhotoView = view.findViewById(R.id.profilePhotoView);
+        firstNameView = view.findViewById(R.id.profFirstNameView);
+        lastNameView = view.findViewById(R.id.profLastNameView);
+        countryView = view.findViewById(R.id.profCountryView);
+        statusView  = view.findViewById(R.id.profStatusView);
+        phoneView  = view.findViewById(R.id.profPhoneView);
+        recyclerView = view.findViewById(R.id.profPhotoList);
+        progressView = view.findViewById(R.id.profPhotoProgress);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(photosRecyclerAdapter);
 
         loadData();
 
@@ -135,6 +146,58 @@ public class ProfileFragment extends Fragment {
                 Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage() );
             }
         } );
+
+        showProgress();
+        RequestParams params = new RequestParams();
+        params.put(UserProfileProvider.PARAM_REQUEST_USERID, currentUserId);
+        ProviderService.getPhotosByOwner(params, new ILoaderCallback<List<Photo>>() {
+
+            @Override
+            public void onResult(final List<Photo> result) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        photosRecyclerAdapter.updateItems(result);
+                        hideProgress();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideProgress();
+                    }
+                });
+            }
+        } );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_add_photo) {
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void hideProgress() {
+        if (progressView.getVisibility() != View.GONE) {
+            progressView.setVisibility(View.GONE);
+        }
+    }
+
+    private void showProgress() {
+        if (progressView.getVisibility() != View.VISIBLE) {
+            progressView.setVisibility(View.VISIBLE);
+        }
     }
 }
 

@@ -155,7 +155,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
                 String sourcePhotoUrl = post.getSourcePhotoUrl();
 
                 if (postPhotoUrl != null && !postPhotoUrl.isEmpty()) {
-                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(postPhotoUrl));
+                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromNetworkFile(new URL(postPhotoUrl));
                     if (imageBytes != null && imageBytes.length > 0) {
                         ContentValues contentPhotoBytes = new ContentValues();
                         contentPhotoBytes.put(NewsPost.PHOTO_BYTES, imageBytes);
@@ -164,7 +164,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
                 }
 
                 if (sourcePhotoUrl != null && !sourcePhotoUrl.isEmpty()) {
-                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromFile(new URL(sourcePhotoUrl));
+                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromNetworkFile(new URL(sourcePhotoUrl));
                     if (imageBytes != null && imageBytes.length > 0) {
                         ContentValues contentPhotoBytes = new ContentValues();
                         contentPhotoBytes.put(NewsPost.PHOTO_BYTES, imageBytes);
