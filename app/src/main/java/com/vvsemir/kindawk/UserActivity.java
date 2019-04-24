@@ -60,16 +60,18 @@ public class UserActivity extends AppCompatActivity{
         setBottomNavigationListener();
 
         Intent intent = new Intent(this, ProviderService.class);
-        startService(intent);
+        stopService(intent);
+        Intent intent2 = new Intent(this, ProviderService.class);
+        startService(intent2);
 
         bottomNavigationView.setSelectedItemId(R.id.action_profile);
     }
 
     @Override
     protected void onDestroy() {
-        if(!isChangingConfigurations()) {
-            ProviderService.deleteTempFiles(getCacheDir());
-        }
+        //if(!isChangingConfigurations()) {
+            //ProviderService.deleteTempFiles(getCacheDir());
+        //}
 
         Intent intent = new Intent(this, ProviderService.class);
         stopService(intent);

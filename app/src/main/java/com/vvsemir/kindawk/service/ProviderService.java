@@ -5,15 +5,14 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.db.DbManager;
-import com.vvsemir.kindawk.provider.BaseProvider;
+import com.vvsemir.kindawk.db.DbOpenHelper;
+import com.vvsemir.kindawk.provider.DbCleanerProvider;
 import com.vvsemir.kindawk.provider.FriendsList;
 import com.vvsemir.kindawk.provider.FriendsProvider;
 import com.vvsemir.kindawk.provider.NewsWall;
@@ -23,11 +22,11 @@ import com.vvsemir.kindawk.provider.PhotosProvider;
 import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.provider.UserProfileProvider;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 
 public class ProviderService extends Service {
     public static final String EXCEPTION_SERVICE_NOT_STARTED = "Sorry, Provider Service not started";
@@ -36,7 +35,6 @@ public class ProviderService extends Service {
     private ExecutorService executorService;
     private DbManager dbManager;
     private Handler handler = new Handler(Looper.getMainLooper());
-    private List<BaseProvider> providers  = new ArrayList<>();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -55,6 +53,7 @@ public class ProviderService extends Service {
     @Override
     public void onDestroy() {
         executorService.shutdownNow();
+        dbManager.onDestroy();
         super.onDestroy();
     }
 
@@ -76,13 +75,18 @@ public class ProviderService extends Service {
             return;
         }
 
-        UserProfileProvider dataProvider = (UserProfileProvider)instance.getProviderFromList(UserProfileProvider.class);
-
-        if(dataProvider == null){
-            dataProvider = new UserProfileProvider(callback);
-        }
-
+        UserProfileProvider dataProvider = new UserProfileProvider(callback);
         dataProvider.setRequestParams(null);
+        instance.executorService.execute(dataProvider);
+    }
+
+    public static void reloadProfileData() {
+        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_PROFILE));
+        instance.executorService.execute(dataProvider);
+    }
+
+    public static void reloadNewsWall() {
+        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_NEWSFEED));
         instance.executorService.execute(dataProvider);
     }
 
@@ -91,14 +95,7 @@ public class ProviderService extends Service {
             return;
         }
 
-        NewsWallProvider dataProvider = (NewsWallProvider)instance.getProviderFromList(NewsWallProvider.class);
-
-        if(dataProvider == null){
-            dataProvider = new NewsWallProvider(callback);
-            Log.d("WWA newdataProvider", " hash=" + dataProvider.hashCode());
-        }
-        Log.d("WWA olddataProvider", " hash=" + dataProvider.hashCode());
-
+        NewsWallProvider dataProvider = new NewsWallProvider(callback);
         dataProvider.setRequestParams(params);
         instance.executorService.execute(dataProvider);
     }
@@ -108,12 +105,7 @@ public class ProviderService extends Service {
             return;
         }
 
-        FriendsProvider dataProvider = (FriendsProvider)instance.getProviderFromList(FriendsProvider.class);
-
-        if(dataProvider == null){
-            dataProvider = new FriendsProvider(callback);
-        }
-
+        FriendsProvider dataProvider = new FriendsProvider(callback);
         dataProvider.setRequestParams(null);
         instance.executorService.execute(dataProvider);
     }
@@ -124,7 +116,6 @@ public class ProviderService extends Service {
         }
 
         PhotosProvider dataProvider = new PhotosProvider(callback);
-
         dataProvider.setRequestParams(params);
         instance.executorService.execute(dataProvider);
     }
@@ -142,16 +133,7 @@ public class ProviderService extends Service {
         return dbManager;
     }
 
-    public BaseProvider getProviderFromList(Class providerClass){
-        for(BaseProvider provider : providers){
-            if(providerClass.isInstance(provider)){
-                return provider;
-            }
-        }
-
-        return null;
-    }
-
+    /*
     public static void deleteTempFiles(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -166,6 +148,5 @@ public class ProviderService extends Service {
             }
         }
         file.delete();
-    }
-
+    }*/
 }

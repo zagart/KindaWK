@@ -9,16 +9,21 @@ import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_NEWSFEED
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_PROFILE
 import com.vvsemir.kindawk.provider.*
 import java.util.*
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 class DbManager (context : Context) {
     private var appContext: Context
     var dbHelper : DbOpenHelper
     private var db : SQLiteDatabase? = null
+    val  executorService = Executors.newSingleThreadExecutor()
 
     init {
         appContext = context
         dbHelper = DbOpenHelper(context)
         db = dbHelper.writableDatabase
+        db?.enableWriteAheadLogging()
     }
 
     private fun query( sqlQuery : String  ): Cursor? {
@@ -27,15 +32,14 @@ class DbManager (context : Context) {
 
     private fun insert(table: String, values: ContentValues): Long? = db?.insert( table, "", values)
 
-    private fun deleteAll(table: String) = db?.delete( table , null , null)
-
     private fun dropTable(table: String) = db?.execSQL( "Drop table IF EXISTS $table")
 
+    fun deleteAll(table: String) = db?.delete( table , null , null)
 
     fun removeAllUserProfile() =  deleteAll(DbOpenHelper.DB_TABLE_PROFILE)
     fun removeAllFriends() =  deleteAll(DbOpenHelper.DB_TABLE_FRIENDS)
     fun removeAllNews() =  deleteAll(DbOpenHelper.DB_TABLE_NEWSFEED)
-    fun removePhotos() =  deleteAll(DbOpenHelper.DB_TABLE_PHOTOS)
+    fun removeAllPhotos() =  deleteAll(DbOpenHelper.DB_TABLE_PHOTOS)
 
     fun insertUserProfile(userProfile : UserProfile) : Long? {
         val values = ContentValues()
@@ -127,9 +131,9 @@ class DbManager (context : Context) {
 
     fun getNewsWallRange(startId : Int, endId : Int) : List<NewsPost> {
         val resCurosor : Cursor? = query(prepareSqlGetNewsWall(startId, endId))
+        val posts = ArrayList<NewsPost>()
 
         try {
-            val posts = ArrayList<NewsPost>()
             val cursor = resCurosor;
 
             if (cursor != null && cursor.getCount() != 0) {
@@ -159,18 +163,16 @@ class DbManager (context : Context) {
                     } while ((cursor.moveToNext()))
                 }
             }
-
-            return posts
         } finally {
             resCurosor?.close();
+            return posts
         }
     }
 
     fun getFriends(): List<Friend> {
         val resCurosor : Cursor? = query(prepareSqlGetFriends())
-
+        val friends = ArrayList<Friend>()
         try {
-            val friends = ArrayList<Friend>()
             val cursor = resCurosor;
 
             if (cursor != null && cursor.getCount() != 0) {
@@ -197,22 +199,22 @@ class DbManager (context : Context) {
                     } while ((cursor.moveToNext()))
                 }
             }
-
-            return friends
         } finally {
             resCurosor?.close();
+            return friends
         }
     }
 
-    fun getUserProfile(userId : Int) : UserProfile {
+    fun getUserProfile(userId : Int) : UserProfile? {
         val resCurosor : Cursor? = query(prepareSqlGetUserProfile(userId))
+        var result : UserProfile? = null
 
         try {
             val cursor = resCurosor;
-            val userProfile = UserProfile()
 
             if (cursor != null && cursor.getCount() != 0) {
                 cursor.moveToFirst();
+                val userProfile = UserProfile()
                 userProfile.firstName= cursor.getString(cursor.getColumnIndexOrThrow("first_name"))
                 userProfile.lastName= cursor.getString(cursor.getColumnIndexOrThrow("last_name"))
                 userProfile.birthDate= cursor.getString(cursor.getColumnIndexOrThrow("bdate"))
@@ -221,18 +223,21 @@ class DbManager (context : Context) {
                 userProfile.status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
                 userProfile.phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"))
                 userProfile.profilePhoto = cursor.getString(cursor.getColumnIndexOrThrow("photo_url"))
-
                 val profilePhotoBytes = ContentValues()
                 profilePhotoBytes.put(UserProfile.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("photo_bytes")))
                 userProfile.profilePhotoBytes = profilePhotoBytes
+                result = userProfile
             }
 
-            return userProfile
         } finally {
             resCurosor?.close();
+            return result
         }
     }
 
+    fun onDestroy(){
+        executorService.shutdownNow()
+    }
 
     companion object {
         private var instance: DbManager? = null
@@ -241,6 +246,12 @@ class DbManager (context : Context) {
                 instance ?: synchronized(this) {
                     instance ?: DbManager(context)
                 }
+
+        fun runTask(){
+            //val callFuture : Future<Any?>? = instance?.executorService?.submit( Callable<> )
+            //val result = callFuture?.get()
+        }
+
 
     }
 

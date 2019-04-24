@@ -25,7 +25,7 @@ import java.util.List;
 
 public class PhotosProvider implements Runnable {
     public static final String EXCEPTION_LOADING_API = "Sorry, can not read photos from server";
-    static final String ARG_PARAM_REQUEST_METHOD = "photos.get";
+    static final String ARG_PARAM_REQUEST_METHOD = "photos.getAll";
     static final String PARAM_REQUEST_ALBUMID = "profile";
     public static final String PARAM_REQUEST_OWNERID = "owner_id";
 
@@ -46,7 +46,7 @@ public class PhotosProvider implements Runnable {
             requestParams = new RequestParams();
             requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
         }
-        requestParams.put("album_id", PARAM_REQUEST_ALBUMID);
+        //requestParams.put("album_id", PARAM_REQUEST_ALBUMID);
     }
 
     void loadData() {

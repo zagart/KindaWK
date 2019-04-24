@@ -1,5 +1,7 @@
 package com.vvsemir.kindawk.ui;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -150,31 +152,43 @@ public class ProfileFragment extends Fragment {
         showProgress();
         RequestParams params = new RequestParams();
         params.put(UserProfileProvider.PARAM_REQUEST_USERID, currentUserId);
+
         ProviderService.getPhotosByOwner(params, new ILoaderCallback<List<Photo>>() {
 
             @Override
             public void onResult(final List<Photo> result) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        photosRecyclerAdapter.updateItems(result);
-                        hideProgress();
-                    }
-                });
-
+                photosRecyclerAdapter.updateItems(result);
+                hideProgress();
             }
 
             @Override
             public void onError(Throwable throwable) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideProgress();
-                    }
-                });
+                hideProgress();
             }
         } );
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View newView = inflater.inflate(R.layout.fragment_profile, null);
+            ViewGroup rootView = (ViewGroup) getView();
+            rootView.removeAllViews();
+            rootView.addView(newView);
+
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View newView = inflater.inflate(R.layout.fragment_profile, null);
+            ViewGroup rootView = (ViewGroup) getView();
+            rootView.removeAllViews();
+            rootView.addView(newView);
+
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -183,6 +197,9 @@ public class ProfileFragment extends Fragment {
         if (id == R.id.action_add_photo) {
 
             return true;
+        } else if(id == R.id.action_refresh) {
+            ProviderService.reloadProfileData();
+            loadData();
         }
 
         return super.onOptionsItemSelected(item);

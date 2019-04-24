@@ -38,7 +38,7 @@ public class ImageLoader implements IImageLoader {
             return;
         }
 
-        imageView.setTag(uri);
+        imageView.setTag(uri + imageView.hashCode());
         imageView.setImageBitmap(null);
         imageView.setImageResource(R.drawable.ic_default_photo);
 
@@ -101,7 +101,7 @@ public class ImageLoader implements IImageLoader {
     }
 
     private boolean isLoadAlreadyStarted(final String uri, final ImageView imageView) {
-        if (imageView.getTag() != null /*&& pImageView.getTag().equals(pUri)*/) {
+        if (imageView.getTag() != null && imageView.getTag().equals(uri + imageView.hashCode())) {
             return true;
         }
 

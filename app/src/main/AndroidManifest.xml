@@ -25,10 +25,8 @@
         </activity>
 
         <activity android:name=".UserActivity"
+            android:configChanges="orientation"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-        <service
-            android:name=".service.ProviderIntentService">
-        </service>
         <service android:name=".service.ProviderService" android:exported="false">
         </service>
 
