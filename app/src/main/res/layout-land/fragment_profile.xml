@@ -52,22 +52,22 @@
 
     <TextView
         android:id="@+id/profStatusView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@id/guideline"
         app:layout_constraintEnd_toStartOf="@id/profPhotoList"
+        app:layout_constraintStart_toEndOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@id/profFirstNameView" />
 
     <TextView
         android:id="@+id/profPhoneView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/guideline"
@@ -78,7 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@id/profPhotoList"

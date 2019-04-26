@@ -1,7 +1,11 @@
 package com.vvsemir.kindawk;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -17,12 +21,18 @@ import android.view.View;
 
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
+import com.vvsemir.kindawk.ui.IFragment;
+import com.vvsemir.kindawk.ui.KindaFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
 import com.vvsemir.kindawk.ui.ProfileFragment;
 
 
 public class UserActivity extends AppCompatActivity{
+    private static final String CURRENT_FRAGMENT = "current_fragment";
+    KindaFragment currentFragment;
     public BottomNavigationView bottomNavigationView;
+    ProviderService providerService;
+    boolean isServiceBound = false;
 
 
     @Override
@@ -41,8 +51,24 @@ public class UserActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.user_top, menu);
-        //return true;
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, ProviderService.class);
+        startService(intent);
+        bindService(intent , boundServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(isServiceBound) {
+            unbindService(boundServiceConnection);
+            isServiceBound = false;
+        }
     }
 
     @Override
@@ -59,12 +85,12 @@ public class UserActivity extends AppCompatActivity{
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         setBottomNavigationListener();
 
-        Intent intent = new Intent(this, ProviderService.class);
-        stopService(intent);
-        Intent intent2 = new Intent(this, ProviderService.class);
-        startService(intent2);
-
-        bottomNavigationView.setSelectedItemId(R.id.action_profile);
+        if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_FRAGMENT)) {
+            String currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT);
+            currentFragment = (KindaFragment) getSupportFragmentManager().findFragmentByTag(currentFragmentTag);
+        } else {
+            currentFragment = ProfileFragment.newInstance();
+        }
     }
 
     @Override
@@ -73,8 +99,8 @@ public class UserActivity extends AppCompatActivity{
             //ProviderService.deleteTempFiles(getCacheDir());
         //}
 
-        Intent intent = new Intent(this, ProviderService.class);
-        stopService(intent);
+        //Intent intent = new Intent(this, ProviderService.class);
+        //stopService(intent);
         super.onDestroy();
     }
 
@@ -115,28 +141,28 @@ public class UserActivity extends AppCompatActivity{
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Fragment fragment = null;
                     switch (item.getItemId()) {
                         case R.id.action_profile:
-                            fragment = ProfileFragment.newInstance();
+                            currentFragment = ProfileFragment.newInstance();
                             break;
                         case R.id.action_newsfeed:
-                            fragment = NewsFragment.newInstance();
+                            currentFragment = NewsFragment.newInstance();
                             break;
                         case R.id.action_friends:
-                            fragment = FriendsFragment.newInstance();;
+                            currentFragment = FriendsFragment.newInstance();
                             break;
                     }
 
-                    return loadFragment(fragment);
+                    loadCurrentFragment();
+                    return false;
                 }
             });
     }
 
-    private boolean loadFragment(Fragment fragment) {
-        if (fragment != null) {
+    private boolean loadCurrentFragment() {
+        if (currentFragment != null && !currentFragment.isInLayout() && isServiceBound) {
             getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentsContainer, fragment)
+                .replace(R.id.fragmentsContainer, currentFragment, currentFragment.getFragmentTag())
                 .addToBackStack(null)
                 .commit();
 
@@ -145,5 +171,76 @@ public class UserActivity extends AppCompatActivity{
 
         return false;
     }
+
+    void updatebottomNavigationSelection() {
+        String tag = currentFragment.getFragmentTag();
+        int selectedItemId = bottomNavigationView.getSelectedItemId();
+
+        if(tag.equals(ProfileFragment.FRAGMENT_TAG)){
+            if(selectedItemId != R.id.action_profile){
+                MenuItem item = bottomNavigationView.getMenu().findItem(R.id.action_profile);
+
+                if (item != null) {
+                    item.setChecked(true);
+                }
+            }
+        } else if(tag.equals(FriendsFragment.FRAGMENT_TAG)){
+            if(selectedItemId != R.id.action_friends){
+                MenuItem item = bottomNavigationView.getMenu().findItem(R.id.action_friends);
+
+                if (item != null) {
+                    item.setChecked(true);
+                }
+            }
+        } else if(tag.equals(NewsFragment.FRAGMENT_TAG)){
+            if(selectedItemId != R.id.action_newsfeed){
+                MenuItem item = bottomNavigationView.getMenu().findItem(R.id.action_newsfeed);
+
+                if (item != null) {
+                    item.setChecked(true);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_FRAGMENT)) {
+            String currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT);
+            currentFragment = (KindaFragment) getSupportFragmentManager().findFragmentByTag(currentFragmentTag);
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(CURRENT_FRAGMENT, currentFragment.getFragmentTag());
+    }
+
+    private ServiceConnection boundServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            ProviderService.ActivityBinder binder = (ProviderService.ActivityBinder) service ;
+            providerService = binder.getService();
+            isServiceBound = true;
+
+            updatebottomNavigationSelection();
+            loadCurrentFragment();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isServiceBound = false;
+            providerService = null;
+
+        }
+    };
+
 }
 

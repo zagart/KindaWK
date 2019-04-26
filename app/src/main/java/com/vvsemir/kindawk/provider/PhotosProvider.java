@@ -49,7 +49,7 @@ public class PhotosProvider implements Runnable {
         //requestParams.put("album_id", PARAM_REQUEST_ALBUMID);
     }
 
-    void loadData() {
+    synchronized void loadData() {
         try {
             List<Photo> apiPhotos = loadApiData();
 
@@ -101,16 +101,18 @@ public class PhotosProvider implements Runnable {
         }
     }
 
-    private List<Photo> getPhotosFromHttp(final HttpResponse httpResponse){
+    private List<Photo> getPhotosFromHttp(final HttpResponse httpResponse) {
         List<Photo> photos = null;
 
         try{
             Gson gson = new Gson().newBuilder().create();
             JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
             JsonObject response = httpObj.getAsJsonObject("response");
-            JsonArray items = response.getAsJsonArray("items");
 
-            photos = gson.fromJson(items, new TypeToken<ArrayList<Photo>>() {}.getType());
+            if(response != null) {
+                JsonArray items = response.getAsJsonArray("items");
+                photos = gson.fromJson(items, new TypeToken<ArrayList<Photo>>() {}.getType());
+            }
         } catch (Exception ex){
             ex.printStackTrace();
         } finally {

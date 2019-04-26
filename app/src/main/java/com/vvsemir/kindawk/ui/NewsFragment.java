@@ -28,7 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class NewsFragment extends Fragment {
+public class NewsFragment extends KindaFragment {
+    public static final String FRAGMENT_TAG = "NewsFragmentTag";
     private NewsRecyclerAdapter newsRecyclerAdapter;
     private ProgressBar progressBar;
     private LinearLayoutManager layoutManager;
@@ -103,7 +104,8 @@ public class NewsFragment extends Fragment {
         isLoading = false;
     }
 
-    private void loadData() {
+    @Override
+    public void loadData() {
         loadMoreItems(0, NewsWallProvider.PAGE_SIZE);
     }
 
@@ -154,4 +156,8 @@ public class NewsFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
+    @Override
+    public String getFragmentTag() {
+        return FRAGMENT_TAG;
+    }
 }

@@ -18,7 +18,8 @@ import com.vvsemir.kindawk.provider.FriendsList;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.service.ProviderService;
 
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends KindaFragment {
+    public static final String FRAGMENT_TAG = "FriendsFragmentTag";
     private ListView friendsListView;
     FriendsListAdapter adapter;
 
@@ -59,7 +60,8 @@ public class FriendsFragment extends Fragment {
         adapter.updateData((FriendsList)data);
     }
 
-    private void loadData() {
+    @Override
+    public void loadData() {
         ProviderService.getFriends(new ICallback<FriendsList>() {
             @Override
             public void onResult(FriendsList result) {
@@ -86,4 +88,8 @@ public class FriendsFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
     }
 
+    @Override
+    public String getFragmentTag() {
+        return FRAGMENT_TAG;
+    }
 }

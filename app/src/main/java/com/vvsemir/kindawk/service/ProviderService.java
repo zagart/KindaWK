@@ -2,6 +2,7 @@ package com.vvsemir.kindawk.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -31,6 +32,7 @@ import java.util.concurrent.Executors;
 public class ProviderService extends Service {
     public static final String EXCEPTION_SERVICE_NOT_STARTED = "Sorry, Provider Service not started";
 
+    private final IBinder binder = new ActivityBinder();
     private static ProviderService instance;
     private ExecutorService executorService;
     private DbManager dbManager;
@@ -38,8 +40,8 @@ public class ProviderService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        return START_NOT_STICKY;
+        return super.onStartCommand(intent, flags, startId);
+        //return START_NOT_STICKY;
     }
 
     @Override
@@ -60,17 +62,27 @@ public class ProviderService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
     }
 
     public static void getAccountProfileInfo(final ICallback<UserProfile> callback) {
         if (instance == null) {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            /*new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     callback.onError(new CallbackExceptionFactory.Companion.ServiceException(EXCEPTION_SERVICE_NOT_STARTED));
                 }
-            }, 300);
+            }, 300);*/
 
             return;
         }
@@ -131,6 +143,12 @@ public class ProviderService extends Service {
 
     public DbManager getDbManager() {
         return dbManager;
+    }
+
+    public class ActivityBinder extends Binder {
+        public   ProviderService getService() {
+            return ProviderService.this;
+        }
     }
 
     /*

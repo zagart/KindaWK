@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +35,9 @@ import com.vvsemir.kindawk.service.RequestParams;
 
 import java.util.List;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends KindaFragment  {
+    public static final String FRAGMENT_TAG = "ProfileFragmentTag";
+
     ImageView profilePhotoView;
     TextView firstNameView;
     TextView lastNameView;
@@ -56,6 +60,7 @@ public class ProfileFragment extends Fragment {
         currentUserId = AuthManager.getCurrentToken().getUserId();
         photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        //setRetainInstance(true);
     }
 
     @Override
@@ -87,6 +92,13 @@ public class ProfileFragment extends Fragment {
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(photosRecyclerAdapter);
+
+        //if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        //    layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        //} else {
+        //    layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+       // }
+
 
         loadData();
 
@@ -124,6 +136,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @Override
     public void loadData() {
         ProviderService.getAccountProfileInfo(new ICallback<UserProfile>() {
             @Override
@@ -168,9 +181,20 @@ public class ProfileFragment extends Fragment {
         } );
     }
 
+/*
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
+        final FragmentManager fm = getActivity().getSupportFragmentManager();
+        ProfileFragment ef = (ProfileFragment) fm.findFragmentByTag(ProfileFragment.FRAGMENT_TAG);
+        if( ef != null ) {  // for small screens the fragment is not embedded in this activity
+            final FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(ef);
+            ft.commit();
+            ef = null;
+            fm.executePendingTransactions();
+        }
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -178,6 +202,7 @@ public class ProfileFragment extends Fragment {
             ViewGroup rootView = (ViewGroup) getView();
             rootView.removeAllViews();
             rootView.addView(newView);
+            //layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
             LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -185,10 +210,10 @@ public class ProfileFragment extends Fragment {
             ViewGroup rootView = (ViewGroup) getView();
             rootView.removeAllViews();
             rootView.addView(newView);
-
+            //layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         }
     }
-
+*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -215,6 +240,11 @@ public class ProfileFragment extends Fragment {
         if (progressView.getVisibility() != View.VISIBLE) {
             progressView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public String getFragmentTag() {
+        return FRAGMENT_TAG;
     }
 }
 

@@ -29,7 +29,6 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-        Log.d("FF PHOTO", "onBindViewHolder= " + photos.get(i).getPhotoId() + " " + photos.get(i).getUrlByType(PHOTO_TYPE_SMALL));
         imageLoader.loadAndShow((ImageView) viewHolder.itemView, photos.get(i).getUrlByType(PHOTO_TYPE_SMALL));
     }
 
@@ -47,9 +46,6 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
     public void updateItems(final List<Photo> items) {
        //photos.clear();
         photos.addAll(items);
-        for(Photo photo : photos){
-            Log.d("FF UPDATEITs", "updateItems= " + photo.getPhotoId() + " " + photo.getUrlByType(PHOTO_TYPE_SMALL));
-        }
         notifyDataSetChanged(); //TODO DiffUtils
     }
 }
