@@ -90,16 +90,14 @@ public class ProfileFragment extends KindaFragment  {
         recyclerView = view.findViewById(R.id.profPhotoList);
         progressView = view.findViewById(R.id.profPhotoProgress);
 
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        } else {
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        }
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(photosRecyclerAdapter);
-
-        //if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        //    layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //} else {
-        //    layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-       // }
-
-
         loadData();
 
         return view;
@@ -181,39 +179,6 @@ public class ProfileFragment extends KindaFragment  {
         } );
     }
 
-/*
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        final FragmentManager fm = getActivity().getSupportFragmentManager();
-        ProfileFragment ef = (ProfileFragment) fm.findFragmentByTag(ProfileFragment.FRAGMENT_TAG);
-        if( ef != null ) {  // for small screens the fragment is not embedded in this activity
-            final FragmentTransaction ft = fm.beginTransaction();
-            ft.remove(ef);
-            ft.commit();
-            ef = null;
-            fm.executePendingTransactions();
-        }
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View newView = inflater.inflate(R.layout.fragment_profile, null);
-            ViewGroup rootView = (ViewGroup) getView();
-            rootView.removeAllViews();
-            rootView.addView(newView);
-            //layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View newView = inflater.inflate(R.layout.fragment_profile, null);
-            ViewGroup rootView = (ViewGroup) getView();
-            rootView.removeAllViews();
-            rootView.addView(newView);
-            //layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        }
-    }
-*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
