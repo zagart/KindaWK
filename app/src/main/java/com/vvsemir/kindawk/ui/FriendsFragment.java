@@ -11,9 +11,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.vvsemir.kindawk.R;
+import com.vvsemir.kindawk.UserActivity;
+import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.provider.FriendsList;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.service.ProviderService;
@@ -42,10 +45,23 @@ public class FriendsFragment extends KindaFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_friends, container, false);
         friendsListView = (ListView) view.findViewById(R.id.friendsListView);
-
         adapter = new FriendsListAdapter(getContext());
-
         friendsListView.setAdapter(adapter);
+        friendsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Friend friend = (Friend)adapter.getItem(position);
+
+                if( friend != null && friend.getUserId() != 0) {
+                    ((UserActivity)getActivity()).loadProfile(friend);
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
 
         loadData();
 

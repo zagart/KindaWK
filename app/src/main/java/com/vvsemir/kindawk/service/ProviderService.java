@@ -75,7 +75,7 @@ public class ProviderService extends Service {
         super.onRebind(intent);
     }
 
-    public static void getAccountProfileInfo(final ICallback<UserProfile> callback) {
+    public static void getAccountProfileInfo(final RequestParams params, final ICallback<UserProfile> callback) {
         if (instance == null) {
             /*new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
@@ -88,7 +88,7 @@ public class ProviderService extends Service {
         }
 
         UserProfileProvider dataProvider = new UserProfileProvider(callback);
-        dataProvider.setRequestParams(null);
+        dataProvider.setRequestParams(params);
         instance.executorService.execute(dataProvider);
     }
 
@@ -102,7 +102,7 @@ public class ProviderService extends Service {
         instance.executorService.execute(dataProvider);
     }
 
-    public static void getWall(ICallback<NewsWall> callback, final RequestParams params) {
+    public static void getWall(final RequestParams params, ICallback<NewsWall> callback) {
         if (instance == null) {
             return;
         }

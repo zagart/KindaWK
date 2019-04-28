@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="@color/colorSelected" android:state_selected="true" />
-    <item android:color="@color/colorSelected" android:state_activated="true" />
+    <item android:color="@color/colorActivated" android:state_activated="true" />
     <item android:color="@color/colorEnable" android:state_enabled="true" />
     <item android:color="@color/colorDisable" android:state_enabled="false"/>
 </selector>

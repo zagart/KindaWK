@@ -3,16 +3,19 @@
     <item
         android:id="@+id/action_profile"
         android:icon="@drawable/ic_person"
+        android:enabled="true"
         android:title="@string/profile"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_newsfeed"
         android:icon="@drawable/ic_news"
+        android:enabled="true"
         android:title="@string/news"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_friends"
         android:icon="@drawable/ic_friends"
+        android:enabled="true"
         android:title="@string/friends"
         app:showAsAction="ifRoom"/>
 </menu>

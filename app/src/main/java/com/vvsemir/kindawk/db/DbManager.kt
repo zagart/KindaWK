@@ -180,6 +180,7 @@ class DbManager (context : Context) {
                 if (cursor.getCount() > 0) {
                     do {
                         var friend = Friend()
+                        friend.userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id"))
                         friend.firstName = cursor.getString(cursor.getColumnIndexOrThrow("first_name"))
                         friend.lastName = cursor.getString(cursor.getColumnIndexOrThrow("last_name"))
                         friend.birthDate = cursor.getString(cursor.getColumnIndexOrThrow("bdate"))

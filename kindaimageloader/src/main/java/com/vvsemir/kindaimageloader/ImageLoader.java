@@ -1,5 +1,6 @@
 package com.vvsemir.kindaimageloader;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -16,25 +17,30 @@ public class ImageLoader implements IImageLoader {
     private static ImageLoader instance;
 
     private final Executor executor = Executors.newCachedThreadPool();
+    private final IDiskCache<String, Bitmap> diskCache;
     private final LruCache<String, Bitmap> lruCache = new LruCache<String, Bitmap>((int) (Runtime.getRuntime().maxMemory() / 1024 / 2)) {
-
         @Override
         protected int sizeOf(final String key, final Bitmap value) {
             return value.getByteCount() / 1024;
         }
     };
 
+    public ImageLoader(final Context context) {
+        diskCache = new BitmapDiskCache(context);
+    }
 
-    public static synchronized ImageLoader getInstance() {
+
+    public static synchronized ImageLoader getInstance(final Context context) {
         if (instance == null) {
-            instance = new ImageLoader();
+            instance = new ImageLoader(context);
         }
         return instance;
     }
 
+
     @Override
     public void loadAndShow(final ImageView imageView, final String uri) {
-        if (uri.isEmpty() || isLoadAlreadyStarted(uri, imageView)) {
+        if (uri == null || uri.isEmpty() || isLoadAlreadyStarted(uri, imageView)) {
             return;
         }
 

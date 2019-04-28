@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
 import com.vvsemir.kindawk.ui.IFragment;
@@ -154,7 +155,7 @@ public class UserActivity extends AppCompatActivity{
                     }
 
                     loadCurrentFragment();
-                    return false;
+                    return true;
                 }
             });
     }
@@ -170,6 +171,16 @@ public class UserActivity extends AppCompatActivity{
         }
 
         return false;
+    }
+
+    public void loadProfile(Friend friend) {
+        if (currentFragment != null && (currentFragment instanceof ProfileFragment) == false ) {
+            currentFragment = ProfileFragment.newInstance();
+        }
+
+        ((ProfileFragment)currentFragment).setFriendProfile(friend);
+        loadCurrentFragment();
+        updatebottomNavigationSelection();
     }
 
     void updatebottomNavigationSelection() {

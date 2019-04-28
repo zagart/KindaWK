@@ -118,7 +118,7 @@ public class NewsFragment extends KindaFragment {
         params.put(NewsWallProvider.PARAM_REQUEST_RANGE_START, startPosition);
         params.put(NewsWallProvider.PARAM_REQUEST_RANGE_END, endPosition);
 
-        ProviderService.getWall(new ICallback<NewsWall>() {
+        ProviderService.getWall( params, new ICallback<NewsWall>() {
             @Override
             public void onResult(NewsWall result) {
                 updateViewsWithData(result);
@@ -141,7 +141,7 @@ public class NewsFragment extends KindaFragment {
 
                 Log.d("WWRonError", "getWall : loading exception!!!" + throwable.getMessage() );
             }
-        }, params);
+        });
     }
 
     void showProgressView(boolean show) {

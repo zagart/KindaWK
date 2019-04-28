@@ -24,7 +24,9 @@ import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.UserActivity;
 import com.vvsemir.kindawk.auth.AuthManager;
+import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.provider.Photo;
+import com.vvsemir.kindawk.provider.PhotosProvider;
 import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.provider.UserProfileProvider;
 import com.vvsemir.kindawk.service.CallbackExceptionFactory;
@@ -42,12 +44,13 @@ public class ProfileFragment extends KindaFragment  {
     TextView firstNameView;
     TextView lastNameView;
     TextView countryView;
-    TextView birthDateView;
+    TextView cityView;
     TextView statusView;
     TextView phoneView;
     RecyclerView recyclerView;
     View progressView;
-    int currentUserId;
+    int currentUserId = 0;
+    Friend friend = null;
 
     private LinearLayoutManager layoutManager;
     PhotosRecyclerAdapter photosRecyclerAdapter;
@@ -57,7 +60,11 @@ public class ProfileFragment extends KindaFragment  {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-        currentUserId = AuthManager.getCurrentToken().getUserId();
+
+        if(currentUserId == 0 || friend == null) {
+            currentUserId = AuthManager.getCurrentToken().getUserId();
+        }
+
         photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         //setRetainInstance(true);
@@ -84,6 +91,7 @@ public class ProfileFragment extends KindaFragment  {
         profilePhotoView = view.findViewById(R.id.profilePhotoView);
         firstNameView = view.findViewById(R.id.profFirstNameView);
         lastNameView = view.findViewById(R.id.profLastNameView);
+        cityView = view.findViewById(R.id.profCityView);
         countryView = view.findViewById(R.id.profCountryView);
         statusView  = view.findViewById(R.id.profStatusView);
         phoneView  = view.findViewById(R.id.profPhoneView);
@@ -112,6 +120,7 @@ public class ProfileFragment extends KindaFragment  {
             UserProfile  profile = (UserProfile)data;
             checkSetText(firstNameView, profile.getFirstName());
             checkSetText(lastNameView, profile.getLastName());
+            checkSetText(cityView, profile.getCity().getTitle());
             checkSetText(countryView, profile.getCountry().getTitle());
             checkSetText(statusView, profile.getStatus());
             checkSetText(phoneView, profile.getPhone());
@@ -128,6 +137,22 @@ public class ProfileFragment extends KindaFragment  {
         }
     }
 
+    public void updateViewsWithFriendData(Friend friend) {
+        checkSetText(firstNameView, friend.getFirstName());
+        checkSetText(lastNameView, friend.getLastName());
+        checkSetText(cityView, friend.getCity().getTitle());
+        checkSetText(countryView, friend.getCountry().getTitle());
+        checkSetText(statusView, friend.getStatus());
+
+        if(friend.getPhotoBytes() != null) {
+            byte[] imageBytes = friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES);
+
+            if (imageBytes != null && imageBytes.length > 0) {
+                profilePhotoView.setImageBitmap(ImageLoader.getInstance().getBitmapFromBytes(imageBytes));
+            }
+        }
+    }
+
     private void checkSetText(TextView view, String txt) {
         if(txt != null && txt.isEmpty() == false){
             view.setText(txt);
@@ -136,35 +161,41 @@ public class ProfileFragment extends KindaFragment  {
 
     @Override
     public void loadData() {
-        ProviderService.getAccountProfileInfo(new ICallback<UserProfile>() {
-            @Override
-            public void onResult(UserProfile result) {
-                updateViewsWithData(result);
-            }
-
-            @Override
-            public void onNotify(UserProfile result) {
-                //to do
-                Log.d("getAccountProfileInfo", "getAccountProfileInfo : notification refresh!!!");
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                if(throwable instanceof CallbackExceptionFactory.Companion.ServiceException){
-                    ((UserActivity)getActivity()).bottomNavigationView.setSelectedItemId(R.id.action_profile);
-
-                    return;
+        if(currentUserId == AuthManager.getCurrentToken().getUserId()) {
+            RequestParams params = null;
+            ProviderService.getAccountProfileInfo(params, new ICallback<UserProfile>() {
+                @Override
+                public void onResult(UserProfile result) {
+                    updateViewsWithData(result);
                 }
 
-                Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage() );
-            }
-        } );
+                @Override
+                public void onNotify(UserProfile result) {
+                    //to do
+                    Log.d("getAccountProfileInfo", "getAccountProfileInfo : notification refresh!!!");
+                }
 
-        showProgress();
-        RequestParams params = new RequestParams();
-        params.put(UserProfileProvider.PARAM_REQUEST_USERID, currentUserId);
+                @Override
+                public void onError(Throwable throwable) {
+                    if (throwable instanceof CallbackExceptionFactory.Companion.ServiceException) {
+                        ((UserActivity) getActivity()).bottomNavigationView.setSelectedItemId(R.id.action_profile);
 
-        ProviderService.getPhotosByOwner(params, new ILoaderCallback<List<Photo>>() {
+                        return;
+                    }
+
+                    Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage());
+                }
+            });
+
+            showProgress();
+        } else if(currentUserId != 0 && friend != null) {
+            updateViewsWithFriendData(friend);
+        }
+
+        RequestParams photoParams = new RequestParams();
+        photoParams.put(PhotosProvider.PARAM_REQUEST_OWNERID, currentUserId);
+
+        ProviderService.getPhotosByOwner(photoParams, new ILoaderCallback<List<Photo>>() {
 
             @Override
             public void onResult(final List<Photo> result) {
@@ -211,6 +242,20 @@ public class ProfileFragment extends KindaFragment  {
     public String getFragmentTag() {
         return FRAGMENT_TAG;
     }
+
+    public void setFriendProfile(Friend friend) {
+        currentUserId = friend.getUserId();
+        this.friend = friend;
+    }
+
+    public int getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public void setCurrentUserId(int currentUserId) {
+        this.currentUserId = currentUserId;
+    }
+
 }
 
 
