@@ -1,6 +1,7 @@
 package com.vvsemir.kindawk.provider;
 
 import com.google.gson.annotations.SerializedName;
+import com.vvsemir.kindawk.ui.IFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,10 @@ public class Photo {
             if(Character.compare(photoSize.type.charAt(0),type) == 0){
                 return photoSize.url;
             }
+        }
+
+        if(photoSizes.size() > 0) {
+            return photoSizes.get(photoSizes.size() - 1).url;
         }
 
         return null;

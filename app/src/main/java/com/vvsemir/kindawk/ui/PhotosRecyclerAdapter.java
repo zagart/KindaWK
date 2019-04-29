@@ -20,10 +20,11 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
 
     private final LayoutInflater layoutInflater;
     private final List<Photo> photos = new ArrayList<>();
-    private final ImageLoader imageLoader = ImageLoader.getInstance();
+    private final ImageLoader imageLoader;
 
     public PhotosRecyclerAdapter(final Context context) {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        imageLoader = ImageLoader.getInstance(context);
     }
 
 

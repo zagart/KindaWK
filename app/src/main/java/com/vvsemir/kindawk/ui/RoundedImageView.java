@@ -24,8 +24,6 @@ import android.widget.ImageView;
 import com.vvsemir.kindawk.R;
 
 public class RoundedImageView extends ImageView {
-    private static final int DEF_PRESS_HIGHLIGHT_COLOR = 0x32000000;
-
     private Shader mBitmapShader;
     private Matrix mShaderMatrix;
 
@@ -36,11 +34,8 @@ public class RoundedImageView extends ImageView {
 
     private Paint mBitmapPaint;
     private Paint mStrokePaint;
-    private Paint mPressedPaint;
 
     private boolean mInitialized;
-    private boolean mPressed;
-    private boolean mHighlightEnable;
 
     public RoundedImageView(Context context) {
         this(context, null);
@@ -51,8 +46,6 @@ public class RoundedImageView extends ImageView {
 
         int strokeColor = Color.TRANSPARENT;
         float strokeWidth = 0;
-        boolean highlightEnable = true;
-        int highlightColor = DEF_PRESS_HIGHLIGHT_COLOR;
 
         if (attrs != null) {
             //TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircleImageView, 0, 0);
@@ -74,11 +67,6 @@ public class RoundedImageView extends ImageView {
         mStrokePaint.setStyle(Paint.Style.STROKE);
         mStrokePaint.setStrokeWidth(strokeWidth);
 
-        mPressedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPressedPaint.setColor(highlightColor);
-        mPressedPaint.setStyle(Paint.Style.FILL);
-
-        mHighlightEnable = highlightEnable;
         mInitialized = true;
 
         setupBitmap();
@@ -128,24 +116,8 @@ public class RoundedImageView extends ImageView {
         drawHighlight(canvas);
     }
 
-    public boolean isHighlightEnable() {
-        return mHighlightEnable;
-    }
 
-    public void setHighlightEnable(boolean enable) {
-        mHighlightEnable = enable;
-        invalidate();
-    }
 
-    @ColorInt
-    public int getHighlightColor() {
-        return mPressedPaint.getColor();
-    }
-
-    public void setHighlightColor(@ColorInt int color) {
-        mPressedPaint.setColor(color);
-        invalidate();
-    }
 
     @ColorInt
     public int getStrokeColor() {
@@ -168,9 +140,9 @@ public class RoundedImageView extends ImageView {
     }
 
     protected void drawHighlight(Canvas canvas) {
-        if (mHighlightEnable && mPressed) {
-            canvas.drawOval(mBitmapDrawBounds, mPressedPaint);
-        }
+        //if (mHighlightEnable && mPressed) {
+         //   canvas.drawOval(mBitmapDrawBounds, mPressedPaint);
+        //}
     }
 
     protected void drawStroke(Canvas canvas) {

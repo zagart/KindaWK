@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class BitmapDiskCache implements IDiskCache<String, Bitmap> {
+public class BitmapDiskCache implements IDiskCache<String, Bitmap, byte[]> {
     private final String diskCachePath;
 
     public BitmapDiskCache(final Context context) {
@@ -21,12 +21,11 @@ public class BitmapDiskCache implements IDiskCache<String, Bitmap> {
     }
 
     @Override
-    public boolean save(final String key, final Bitmap value) {
+    public boolean save(String key, byte[] data) {
         try {
             final File file = new File(diskCachePath, Uri.parse(key).getLastPathSegment());
             final FileOutputStream stream = new FileOutputStream(file);
-
-            value.compress(Bitmap.CompressFormat.JPEG, 100, stream); //TODO Handle image size compression
+            stream.write(data);
             stream.flush();
             stream.close();
 
@@ -38,7 +37,7 @@ public class BitmapDiskCache implements IDiskCache<String, Bitmap> {
     }
 
     @Override
-    public Bitmap load(final String key) {
-        return BitmapFactory.decodeFile(new File(diskCachePath, Uri.parse(key).getLastPathSegment()).toString());
+    public Bitmap load(String key) {
+        return BitmapFactory.decodeFile(new File(diskCachePath, Uri.parse(key).getLastPathSegment()).getPath());
     }
 }

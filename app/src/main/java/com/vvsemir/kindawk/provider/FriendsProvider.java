@@ -159,7 +159,7 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
                 String photoUrl = friend.getPhotoUrl();
 
                 if (!photoUrl.isEmpty()) {
-                    byte[] imageBytes = ImageLoader.getInstance().getBytesFromNetworkFile(new URL(photoUrl));
+                    byte[] imageBytes = ImageLoader.getBytesFromNetworkFile(new URL(photoUrl));
                     if (imageBytes != null && imageBytes.length > 0) {
                         ContentValues contentPhotoBytes = new ContentValues();
                         contentPhotoBytes.put(Friend.PHOTO_BYTES, imageBytes);

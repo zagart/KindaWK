@@ -33,13 +33,15 @@ public class FriendsListAdapter extends BaseAdapter {
         if(friendsList != null){
             Friend friend = friendsList.getItem(position);
             ((TextView) view.findViewById(R.id.friendFirstNameView)).setText(friend.getFirstName());
+            ((TextView) view.findViewById(R.id.friendLastNameView)).setText(friend.getLastName());
+            ((TextView) view.findViewById(R.id.friendCityView)).setText(friend.getCity().getTitle());
             ((TextView) view.findViewById(R.id.friendCountryView)).setText(friend.getCountry().getTitle());
+            ((TextView) view.findViewById(R.id.friendStatusView)).setText(friend.getStatus());
 
             ImageView avatarView = view.findViewById(R.id.friendPhotoView);
             //avatarView.setImageResource(R.drawable.ic_person);
             avatarView.setImageBitmap(
-                    ImageLoader.getInstance().
-                    getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES)));
+                    ImageLoader.getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES)));
 
             Log.d("ZZZadapter", "  view success" );
         }

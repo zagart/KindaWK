@@ -72,7 +72,12 @@ public class NewsItemView extends RelativeLayout {
     }
 
     public NewsItemView setPostPhoto(final Bitmap photo) {
-        postPhotoView.setImageBitmap(photo);
+        if(photo != null) {
+            postPhotoView.setMaxWidth(140);
+            postPhotoView.setImageBitmap(photo);
+        } else {
+            postPhotoView.setMaxWidth(0);
+        }
         return this;
     }
 }

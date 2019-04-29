@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -39,6 +40,8 @@ import java.util.List;
 
 public class ProfileFragment extends KindaFragment  {
     public static final String FRAGMENT_TAG = "ProfileFragmentTag";
+    private static final String CURRENT_USER = "CurrentUser";
+
 
     ImageView profilePhotoView;
     TextView firstNameView;
@@ -61,8 +64,17 @@ public class ProfileFragment extends KindaFragment  {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
 
-        if(currentUserId == 0 || friend == null) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_USER)) {
+            Parcelable data = savedInstanceState.getParcelable(CURRENT_USER);
+             if(data instanceof Friend) {
+                 friend = (Friend)data;
+                 currentUserId = friend.getUserId();
+             }
+        }
+
+        if(currentUserId == 0) {
             currentUserId = AuthManager.getCurrentToken().getUserId();
+            friend = null;
         }
 
         photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
@@ -129,7 +141,7 @@ public class ProfileFragment extends KindaFragment  {
                 byte[] imageBytes = ((UserProfile) data).getProfilePhotoBytes().getAsByteArray(UserProfile.PHOTO_BYTES);
 
                 if (imageBytes != null && imageBytes.length > 0) {
-                    profilePhotoView.setImageBitmap(ImageLoader.getInstance().getBitmapFromBytes(imageBytes));
+                    profilePhotoView.setImageBitmap(ImageLoader.getBitmapFromBytes(imageBytes));
                 }
             }
         } catch (Exception ex) {
@@ -148,7 +160,7 @@ public class ProfileFragment extends KindaFragment  {
             byte[] imageBytes = friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES);
 
             if (imageBytes != null && imageBytes.length > 0) {
-                profilePhotoView.setImageBitmap(ImageLoader.getInstance().getBitmapFromBytes(imageBytes));
+                profilePhotoView.setImageBitmap(ImageLoader.getBitmapFromBytes(imageBytes));
             }
         }
     }
@@ -254,6 +266,12 @@ public class ProfileFragment extends KindaFragment  {
 
     public void setCurrentUserId(int currentUserId) {
         this.currentUserId = currentUserId;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(CURRENT_USER, friend);
     }
 
 }

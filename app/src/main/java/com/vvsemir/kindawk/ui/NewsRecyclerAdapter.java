@@ -44,13 +44,15 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             if(newsPost.getSourcePhoto() != null) {
                 byte[] imageBytes = newsPost.getSourcePhoto().getAsByteArray(NewsPost.PHOTO_BYTES);
                 if(imageBytes != null && imageBytes.length > 0){
-                    itemView.setSourcePhoto(ImageLoader.getInstance().getBitmapFromBytes(imageBytes));
+                    itemView.setSourcePhoto(ImageLoader.getBitmapFromBytes(imageBytes));
                 }
             }
             if(newsPost.getPostPhoto() != null) {
                 byte[] imageBytes = newsPost.getPostPhoto().getAsByteArray(NewsPost.PHOTO_BYTES);
                 if(imageBytes != null && imageBytes.length > 0) {
-                    itemView.setPostPhoto(ImageLoader.getInstance().getBitmapFromBytes(imageBytes));
+                    itemView.setPostPhoto(ImageLoader.getBitmapFromBytes(imageBytes));
+                } else {
+                    itemView.setPostPhoto(null);
                 }
             }
         }
