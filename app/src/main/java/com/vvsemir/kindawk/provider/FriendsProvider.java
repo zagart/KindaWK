@@ -43,16 +43,15 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
             DbManager.DbResponse dbResponse = getDataFromDb();
             Log.d("FF getDatFromDb", "  response = " + dbResponse);
 
+            List<Friend> friends = null;
+
             if (dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR ||
                     dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE) {
                 friendsList.removeAllFriends();
 
-                List<Friend> friends = loadApiData();
+                friends = loadApiData();
 
                 if (friends != null && friends.size() > 0) {
-
-                    putDataInDb(friends);
-
                     friendsList.append(friends);
                 }
             }
@@ -64,6 +63,9 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
                 }
             });
 
+            if (friends != null && friends.size() > 0) {
+                putDataInDb(friends);
+            }
         } catch (Exception ex){
             ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {

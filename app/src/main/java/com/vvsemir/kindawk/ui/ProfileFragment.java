@@ -231,7 +231,7 @@ public class ProfileFragment extends KindaFragment  {
 
             return true;
         } else if(id == R.id.action_refresh) {
-            ProviderService.reloadProfileData();
+            ProviderService.cleanProfileData();
             loadData();
         }
 

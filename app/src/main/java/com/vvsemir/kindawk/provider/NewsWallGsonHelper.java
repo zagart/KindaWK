@@ -22,6 +22,7 @@ import java.util.List;
 
 public class NewsWallGsonHelper {
     public static final String EXCEPTION_PARSING_API_RESPONSE = "Sorry, can not read posts from API";
+    public static final int MAX_PHOTO_WIDTH = 240;
     private final NewsWallProvider newsWallProvider;
 
     private NewsWallGsonHelper(final NewsWallProvider newsWallProvider) {
@@ -62,16 +63,18 @@ public class NewsWallGsonHelper {
 
                 if(attachments != null && attachments.size() > 0){
                     NewsPost.AttachPhoto photo = attachments.get(0).photo;
-                    if(photo != null) {
-                        post.setPostPhotoUrl(photo.sizes.get(0).url);
+                    int index = getPhotoIdxByWidth(photo.sizes);
+                    if(photo != null && index >= 0) {
+                        post.setPostPhotoUrl(photo.sizes.get(index).url);
                     }
                 } else if(copyHistory!= null && copyHistory.size() > 0) {
                     post.setPostText(copyHistory.get(0).text);
                     List<NewsPost.Attachment> copyAttachments = copyHistory.get(0).attachments;
                     if(copyAttachments != null && copyAttachments.size() > 0){
                         NewsPost.AttachPhoto copyPhoto = copyAttachments.get(0).photo;
-                        if(copyPhoto != null) {
-                            post.setPostPhotoUrl(copyPhoto.sizes.get(0).url);
+                        int index = getPhotoIdxByWidth(copyPhoto.sizes);
+                        if(copyPhoto != null && index >= 0) {
+                            post.setPostPhotoUrl(copyPhoto.sizes.get(index).url);
                             Log.d("WWW copyHistory", " setPostPhotoUrl" + copyPhoto.sizes.get(0).url);
                         }
                     }
@@ -91,6 +94,18 @@ public class NewsWallGsonHelper {
         } finally {
             return posts;
         }
+    }
+
+    private int getPhotoIdxByWidth(List<NewsPost.AttachPhotoSizes> list){
+        if(list != null && list.size() > 0){
+            for(int i = list.size() - 1; i >= 0; i --){
+                if(list.get(i).width < MAX_PHOTO_WIDTH){
+                    return i;
+                }
+            }
+        }
+
+        return -1;
     }
 
     class DataProfileIdPhotourl{

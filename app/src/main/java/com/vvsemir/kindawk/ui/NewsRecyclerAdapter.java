@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.R;
@@ -23,10 +24,11 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     private NewsWall news = new NewsWall();
     private boolean showLoading = false;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault());
+    private final ImageLoader imageLoader;
 
     public NewsRecyclerAdapter(final Context context) {
-        super();
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        imageLoader = ImageLoader.getInstance(context);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             itemView.setPostId(String.valueOf(newsPost.getPostId()));
             itemView.setSourceName(newsPost.getSourceName());
 
-            if(newsPost.getSourcePhoto() != null) {
+            /*if(newsPost.getSourcePhoto() != null) {
                 byte[] imageBytes = newsPost.getSourcePhoto().getAsByteArray(NewsPost.PHOTO_BYTES);
                 if(imageBytes != null && imageBytes.length > 0){
                     itemView.setSourcePhoto(ImageLoader.getBitmapFromBytes(imageBytes));
@@ -54,6 +56,19 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
                 } else {
                     itemView.setPostPhoto(null);
                 }
+            }*/
+
+            if(newsPost.getSourcePhotoUrl() != null && !newsPost.getSourcePhotoUrl().isEmpty()) {
+                imageLoader.loadAndShow(itemView.getSourcePhotoView(), newsPost.getSourcePhotoUrl());
+            }
+
+            ImageView postView = itemView.getPostPhotoView();
+
+            if(newsPost.getPostPhotoUrl() != null && !newsPost.getPostPhotoUrl().isEmpty()) {
+                postView.setMaxWidth(140);
+                imageLoader.loadAndShow(postView, newsPost.getPostPhotoUrl());
+            } else {
+                postView.setMaxWidth(0);
             }
         }
     }
@@ -80,15 +95,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
         }
         Log.d("WWRR getItemCount", "count = " + news.getCount());
         return news.getCount();
-        /*if(news == null){
-            return showLoading ? 1 : 0;
-        }
-
-        if (showLoading) {
-            return news.getCount() + 1;
-        } else {
-            return news.getCount();
-        }*/
     }
 
     @Override

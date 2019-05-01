@@ -38,17 +38,18 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
             DbManager.DbResponse dbResponse = getDataFromDb();
             Log.d("UU getDatFromDb", "  response = " + dbResponse);
 
+            boolean saveToDb = false;
+
             if (dbResponse != DbManager.DbResponse.DB_RESPONSE_STATUS_SUCCESS) {
-                    loadApiData();
+                loadApiData();
 
-                    if (userProfile != null) {
-                        putDataInDb();
-                    } else {
-                        throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_USERPROFILE_API);
-                    }
-
+                if (userProfile != null) {
+                    saveToDb = true;
+                } else {
+                    throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_USERPROFILE_API);
                 }
 
+            }
 
             ProviderService.getInstance().getHandler().post(new Runnable() {
                 @Override
@@ -56,6 +57,11 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
                     callback.onResult(userProfile);
                 }
             });
+
+            if(saveToDb) {
+                putDataInDb();
+            }
+
         } catch (Exception ex){
             ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {

@@ -13,6 +13,8 @@ import com.vvsemir.kindawk.R;
 public class NewsItemView extends RelativeLayout {
     private ImageView sourcePhotoView;
     private ImageView postPhotoView;
+
+
     private TextView sourceNameView;
     private TextView postIdView;
     private TextView postTextView;
@@ -79,5 +81,13 @@ public class NewsItemView extends RelativeLayout {
             postPhotoView.setMaxWidth(0);
         }
         return this;
+    }
+
+    public ImageView getSourcePhotoView() {
+        return sourcePhotoView;
+    }
+
+    public ImageView getPostPhotoView() {
+        return postPhotoView;
     }
 }

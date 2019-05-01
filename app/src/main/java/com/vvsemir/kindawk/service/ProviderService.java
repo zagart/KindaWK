@@ -83,7 +83,6 @@ public class ProviderService extends Service {
                     callback.onError(new CallbackExceptionFactory.Companion.ServiceException(EXCEPTION_SERVICE_NOT_STARTED));
                 }
             }, 300);*/
-
             return;
         }
 
@@ -92,12 +91,12 @@ public class ProviderService extends Service {
         instance.executorService.execute(dataProvider);
     }
 
-    public static void reloadProfileData() {
+    public static void cleanProfileData() {
         DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_PROFILE));
         instance.executorService.execute(dataProvider);
     }
 
-    public static void reloadNewsWall() {
+    public static void cleanNewsWall() {
         DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_NEWSFEED));
         instance.executorService.execute(dataProvider);
     }

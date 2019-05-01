@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -45,6 +46,7 @@ public class NewsFragment extends KindaFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
         newsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
@@ -148,6 +150,18 @@ public class NewsFragment extends KindaFragment {
         //progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.action_refresh) {
+            ProviderService.cleanNewsWall();
+            loadData();
+        }
+
+        return super.onOptionsItemSelected(item);
+
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

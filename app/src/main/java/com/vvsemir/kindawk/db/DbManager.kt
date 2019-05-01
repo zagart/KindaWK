@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_FRIENDS
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_NEWSFEED
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_PROFILE
@@ -12,12 +13,14 @@ import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import java.util.concurrent.locks.ReentrantLock
 
 class DbManager (context : Context) {
     private var appContext: Context
     var dbHelper : DbOpenHelper
     private var db : SQLiteDatabase? = null
     val  executorService = Executors.newSingleThreadExecutor()
+    private val accessLock = ReentrantLock()
 
     init {
         appContext = context
@@ -87,8 +90,17 @@ class DbManager (context : Context) {
     }
 
     fun insertNewsWall(posts: List<NewsPost>) {
+        var postId = 1;
+        val cursor : Cursor? = query("SELECT MAX(_id) FROM $DB_TABLE_NEWSFEED")
+
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            postId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"))
+        }
+
         posts.forEach(){
             val values = ContentValues()
+            values.put("_id" , postId++)
             values.put("type" , it.type)
             values.put("source_id" , it.sourceId)
             values.put("date" , it.dateUnixTime.time)
@@ -110,8 +122,6 @@ class DbManager (context : Context) {
 
             if(response == null || response < 0){
                 removeAllNews()
-
-                return
             }
         }
     }
@@ -207,8 +217,8 @@ class DbManager (context : Context) {
     }
 
     fun getUserProfile(userId : Int) : UserProfile? {
-        val resCurosor : Cursor? = query(prepareSqlGetUserProfile(userId))
-        var result : UserProfile? = null
+        var futureResult : UserProfile? = null
+        val resCurosor: Cursor? = query(prepareSqlGetUserProfile(userId))
 
         try {
             val cursor = resCurosor;
@@ -216,25 +226,25 @@ class DbManager (context : Context) {
             if (cursor != null && cursor.getCount() != 0) {
                 cursor.moveToFirst();
                 val userProfile = UserProfile()
-                userProfile.firstName= cursor.getString(cursor.getColumnIndexOrThrow("first_name"))
-                userProfile.lastName= cursor.getString(cursor.getColumnIndexOrThrow("last_name"))
-                userProfile.birthDate= cursor.getString(cursor.getColumnIndexOrThrow("bdate"))
-                userProfile.city.title= cursor.getString(cursor.getColumnIndexOrThrow("city"))
-                userProfile.country.title= cursor.getString(cursor.getColumnIndexOrThrow("country"))
+                userProfile.firstName = cursor.getString(cursor.getColumnIndexOrThrow("first_name"))
+                userProfile.lastName = cursor.getString(cursor.getColumnIndexOrThrow("last_name"))
+                userProfile.birthDate = cursor.getString(cursor.getColumnIndexOrThrow("bdate"))
+                userProfile.city.title = cursor.getString(cursor.getColumnIndexOrThrow("city"))
+                userProfile.country.title = cursor.getString(cursor.getColumnIndexOrThrow("country"))
                 userProfile.status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
                 userProfile.phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"))
                 userProfile.profilePhoto = cursor.getString(cursor.getColumnIndexOrThrow("photo_url"))
                 val profilePhotoBytes = ContentValues()
                 profilePhotoBytes.put(UserProfile.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("photo_bytes")))
                 userProfile.profilePhotoBytes = profilePhotoBytes
-                result = userProfile
+                futureResult = userProfile
             }
-
         } finally {
-            resCurosor?.close();
-            return result
+            resCurosor?.close()
+            return futureResult
         }
     }
+
 
     fun onDestroy(){
         executorService.shutdownNow()
@@ -248,10 +258,10 @@ class DbManager (context : Context) {
                     instance ?: DbManager(context)
                 }
 
-        fun runTask(){
-            //val callFuture : Future<Any?>? = instance?.executorService?.submit( Callable<> )
-            //val result = callFuture?.get()
-        }
+        /*fun runTask(){
+            val callFuture : Future<Any?>? = instance?.executorService?.submit( Callable<> )
+            val result = callFuture?.get()
+        }*/
 
 
     }
@@ -263,3 +273,42 @@ class DbManager (context : Context) {
         DB_RESPONSE_STATUS_EMPTY_CURSOR
     }
 }
+
+/*
+    fun getUserProfile(userId : Int) : UserProfile? {
+
+        val callFuture : Future<UserProfile>? = executorService.submit( object : Callable<UserProfile> {
+            override fun call() : UserProfile? {
+                var futureResult : UserProfile? = null
+                val resCurosor: Cursor? = query(prepareSqlGetUserProfile(userId))
+
+                try {
+                    val cursor = resCurosor;
+
+                    if (cursor != null && cursor.getCount() != 0) {
+                        cursor.moveToFirst();
+                        val userProfile = UserProfile()
+                        userProfile.firstName = cursor.getString(cursor.getColumnIndexOrThrow("first_name"))
+                        userProfile.lastName = cursor.getString(cursor.getColumnIndexOrThrow("last_name"))
+                        userProfile.birthDate = cursor.getString(cursor.getColumnIndexOrThrow("bdate"))
+                        userProfile.city.title = cursor.getString(cursor.getColumnIndexOrThrow("city"))
+                        userProfile.country.title = cursor.getString(cursor.getColumnIndexOrThrow("country"))
+                        userProfile.status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
+                        userProfile.phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"))
+                        userProfile.profilePhoto = cursor.getString(cursor.getColumnIndexOrThrow("photo_url"))
+                        val profilePhotoBytes = ContentValues()
+                        profilePhotoBytes.put(UserProfile.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("photo_bytes")))
+                        userProfile.profilePhotoBytes = profilePhotoBytes
+                        futureResult = userProfile
+                        Log.d("FF UU CC", "futureResult" + userProfile.lastName)
+                    }
+
+                } finally {
+                    resCurosor?.close();
+                    return@call futureResult
+                }
+            }
+        } )
+
+        return callFuture?.get()
+    }*/

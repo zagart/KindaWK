@@ -29,8 +29,8 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     public static final int PAGE_SIZE = 10;
     public static final int MAX_TOTAL_POSTS = 100;
 
-    public static final String PARAM_REQUEST_RANGE_START = "wall.get.range.start";
-    public static final String PARAM_REQUEST_RANGE_END = "wall.get.range.end";
+    public static final String PARAM_REQUEST_RANGE_START = "range.start";
+    public static final String PARAM_REQUEST_RANGE_END = "range.end";
 
     private RangeHelper rangeHelper  = new RangeHelper();
     private NewsWall newsWall = new NewsWall();
@@ -79,22 +79,21 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         loadData();
     }
 
-    void loadData() {
+    synchronized void loadData() {
         try {
             DbManager.DbResponse dbResponse = getDataFromDb();
             Log.d("WWW getDatFromDb", "  response = " + dbResponse);
+
+            List<NewsPost> posts = null;
 
             if (dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR ||
                     dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE) {
                 newsWall.removeAllNews();
 
                 if (rangeHelper.checkNextApiRequest()) {
-                    List<NewsPost> posts = loadApiData();
+                    posts = loadApiData();
 
                     if (posts != null && posts.size() > 0) {
-
-                        putDataInDb(posts);
-
                         newsWall.appendPosts(posts);
                     }
                 }
@@ -106,6 +105,11 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
                     callback.onResult(newsWall);
                 }
             });
+
+            if (posts != null && posts.size() > 0) {
+                putDataInDb(posts);
+            }
+
         } catch (Exception ex){
             ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {
@@ -128,9 +132,9 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
             if (httpResponse != null) {
                 posts = NewsWallGsonHelper.createInstance(this).getPostsFromHttp(httpResponse);
 
-                if(posts != null && posts.size() > 0) {
-                    loadApiImagesForRange(posts);
-                }
+                //if(posts != null && posts.size() > 0) {
+                //    loadApiImagesForRange(posts);
+                //}
             }
 
             Log.d("WWW loadApiData", "  loadApiData");
@@ -187,11 +191,9 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     private DbManager.DbResponse getDataFromDb(){
         DbManager dbManager = ProviderService.getInstance().getDbManager();
 
-        if(rangeHelper.startPos == 0) {
-            newsWall.removeAllNews();
-            Log.d("WWW getDatFromDb", " rangeHelper.startPos=" + rangeHelper.startPos +
-                    " rangeHelper.endPos=" + rangeHelper.endPos );
-        }
+        Log.d("WWW getDatFromDb", " rangeHelper.startPos=" + rangeHelper.startPos +
+                " rangeHelper.endPos=" + rangeHelper.endPos );
+        newsWall.removeAllNews();
 
         Log.d("WWW getDatFromDb"," newsWall.hash=" + newsWall.hashCode() );
 
@@ -201,7 +203,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
             return DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR;
         }
 
-        if(posts.size() > 0){
+        if(posts != null && posts.size() > 0){
             Log.d("WWW getDatFromDb", "  newsWall. old size = " + newsWall.getCount());
             newsWall.appendPosts(posts);
             Log.d("WWW getDatFromDb", "  getDataFromDb success, db posts size = " + posts.size() +
@@ -209,13 +211,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
 
             return DbManager.DbResponse.DB_RESPONSE_STATUS_SUCCESS;
         } else {
-
-            if(rangeHelper.startPos == 0) {
-                return DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE;
-            }
-            else{
-                return DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_CURSOR;
-            }
+            return DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE;
         }
     }
 
