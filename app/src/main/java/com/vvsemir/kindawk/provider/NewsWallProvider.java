@@ -45,7 +45,8 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         }
 
         requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
-        requestParams.put("count", rangeHelper.endPos - rangeHelper.startPos + 1);
+        //requestParams.put("count", rangeHelper.endPos - rangeHelper.startPos + 1);
+        requestParams.put("count", 100);
         requestParams.put("max_photos",ARG_PARAM_REQUEST_MAX_PHOTOS);
         requestParams.put("filters",ARG_PARAM_REQUEST_FILTERS);
         requestParams.put("fields",ARG_PARAM_REQUEST_FIELDS);
@@ -137,7 +138,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
                 //}
             }
 
-            Log.d("WWW loadApiData", "  loadApiData");
+            Log.d("WWW loadApiData", "  loadApiData count:" + posts.size());
         } catch (Exception ex){
             ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {

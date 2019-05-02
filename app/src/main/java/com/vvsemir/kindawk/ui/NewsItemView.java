@@ -20,6 +20,8 @@ public class NewsItemView extends RelativeLayout {
     private TextView postTextView;
     private TextView postDateView;
 
+    public TextView postUrlView;
+    public TextView sourceUrlView;
 
     public NewsItemView(Context context) {
         super(context);
@@ -45,6 +47,10 @@ public class NewsItemView extends RelativeLayout {
             sourceNameView = findViewById(R.id.postSourceNameView);
             sourcePhotoView = findViewById(R.id.userPhotoView);
             postPhotoView = findViewById(R.id.postPhotoView);
+
+            postUrlView = findViewById(R.id.postUrlView);
+            sourceUrlView = findViewById(R.id.sourceUrlView);
+
         }
     }
 

@@ -16,8 +16,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,6 +38,9 @@ import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class ProfileFragment extends KindaFragment  {
@@ -79,7 +84,6 @@ public class ProfileFragment extends KindaFragment  {
 
         photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        //setRetainInstance(true);
     }
 
     @Override
@@ -118,6 +122,28 @@ public class ProfileFragment extends KindaFragment  {
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(photosRecyclerAdapter);
+
+        int[] resIds = {R.id.selectPhotoBox};
+        recyclerView.addOnItemTouchListener(new PhotoRecyclerViewItemTouchListener(recyclerView,
+                resIds, new PhotoRecyclerViewItemTouchListener.SelectionClickListener() {
+            @Override
+            public void onSelectClick(@NotNull View view, int position) {
+                final CheckBox checkBox = (CheckBox) view.findViewById(R.id.selectPhotoBox);
+                checkBox.setChecked(!checkBox.isChecked());
+            }
+
+            @Override
+            public void onClick(@NotNull View view, int position) {
+
+            }
+
+            @Override
+            public void onLongClick(@NotNull View view, int position) {
+
+            }
+        }));
+
+
         loadData();
 
         return view;

@@ -73,6 +73,7 @@ public class FriendsListAdapter extends BaseAdapter {
     }
 
     public void updateData(FriendsList data){
+        friendsList.removeAllFriends();
         friendsList.append(data.getList());
         notifyDataSetChanged();
     }

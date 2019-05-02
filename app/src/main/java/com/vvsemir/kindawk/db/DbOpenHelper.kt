@@ -48,7 +48,7 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
                 "photo_bytes BLOB" +
                 ")"
         const val DB_TABLE_NEWSFEED_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_NEWSFEED " +
-                "(_id INTEGER PRIMARY KEY, " +
+                "(indx INTEGER PRIMARY KEY, " +
                 "post_id INTEGER, " +
                 "type TEXT," +
                 "source_id INTEGER," +

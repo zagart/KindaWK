@@ -101,6 +101,11 @@ public class ProviderService extends Service {
         instance.executorService.execute(dataProvider);
     }
 
+    public static void cleanFriends() {
+        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_FRIENDS));
+        instance.executorService.execute(dataProvider);
+    }
+
     public static void getWall(final RequestParams params, ICallback<NewsWall> callback) {
         if (instance == null) {
             return;

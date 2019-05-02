@@ -23,7 +23,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     private final LayoutInflater inflater;
     private NewsWall news = new NewsWall();
     private boolean showLoading = false;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault());
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
     private final ImageLoader imageLoader;
 
     public NewsRecyclerAdapter(final Context context) {
@@ -39,36 +39,33 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             NewsPost newsPost = (NewsPost)news.getItem(position);
 
             itemView.setPostText(newsPost.getPostText());
+            if(newsPost.getDateUnixTime() != null )
             itemView.setPostDate(simpleDateFormat.format(newsPost.getDateUnixTime()));
             itemView.setPostId(String.valueOf(newsPost.getPostId()));
             itemView.setSourceName(newsPost.getSourceName());
 
-            /*if(newsPost.getSourcePhoto() != null) {
-                byte[] imageBytes = newsPost.getSourcePhoto().getAsByteArray(NewsPost.PHOTO_BYTES);
-                if(imageBytes != null && imageBytes.length > 0){
-                    itemView.setSourcePhoto(ImageLoader.getBitmapFromBytes(imageBytes));
-                }
-            }
-            if(newsPost.getPostPhoto() != null) {
-                byte[] imageBytes = newsPost.getPostPhoto().getAsByteArray(NewsPost.PHOTO_BYTES);
-                if(imageBytes != null && imageBytes.length > 0) {
-                    itemView.setPostPhoto(ImageLoader.getBitmapFromBytes(imageBytes));
-                } else {
-                    itemView.setPostPhoto(null);
-                }
-            }*/
+            itemView.postUrlView.setText(newsPost.getPostPhotoUrl());
+            itemView.sourceUrlView.setText(newsPost.getSourcePhotoUrl());
 
+            Log.d("WWRR BIND", "postid:" + newsPost.getPostId() + " sorceURL:" + newsPost.getSourcePhotoUrl() +" postURL:" + newsPost.getPostPhotoUrl());
             if(newsPost.getSourcePhotoUrl() != null && !newsPost.getSourcePhotoUrl().isEmpty()) {
                 imageLoader.loadAndShow(itemView.getSourcePhotoView(), newsPost.getSourcePhotoUrl());
             }
 
             ImageView postView = itemView.getPostPhotoView();
+            postView.setImageBitmap(null);
 
             if(newsPost.getPostPhotoUrl() != null && !newsPost.getPostPhotoUrl().isEmpty()) {
-                postView.setMaxWidth(140);
+                if(newsPost.getPostText().isEmpty()){
+                    postView.getLayoutParams().width = 400;
+                } else {
+                    postView.getLayoutParams().width = 240;
+                }
+
                 imageLoader.loadAndShow(postView, newsPost.getPostPhotoUrl());
             } else {
-                postView.setMaxWidth(0);
+                postView.getLayoutParams().width = 0;
+                postView.getLayoutParams().height = 0;
             }
         }
     }
@@ -127,6 +124,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             Log.d("WWRR updateItems", "count new= " + news.getCount() + "hash =" + news.hashCode());
             //notifyDataSetChanged();
         }
+    }
+
+    public void cleanWall() {
+        news.removeAllNews();
     }
 
 

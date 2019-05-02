@@ -30,7 +30,8 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-        imageLoader.loadAndShow((ImageView) viewHolder.itemView, photos.get(i).getUrlByType(PHOTO_TYPE_SMALL));
+        ImageView imageView = viewHolder.itemView.findViewById(R.id.photoItemView);
+        imageLoader.loadAndShow(imageView, photos.get(i).getUrlByType(PHOTO_TYPE_SMALL));
     }
 
     @NonNull

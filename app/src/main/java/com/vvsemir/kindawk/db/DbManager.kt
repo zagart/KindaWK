@@ -90,17 +90,17 @@ class DbManager (context : Context) {
     }
 
     fun insertNewsWall(posts: List<NewsPost>) {
-        var postId = 1;
-        val cursor : Cursor? = query("SELECT MAX(_id) FROM $DB_TABLE_NEWSFEED")
+        var indx = 1;
+        val cursor : Cursor? = query("SELECT MAX(indx) FROM $DB_TABLE_NEWSFEED")
 
         if (cursor != null && cursor.getCount() != 0) {
             cursor.moveToFirst();
-            postId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"))
+            indx = cursor.getInt(0)
         }
 
         posts.forEach(){
             val values = ContentValues()
-            values.put("_id" , postId++)
+            values.put("indx" , indx++)
             values.put("type" , it.type)
             values.put("source_id" , it.sourceId)
             values.put("date" , it.dateUnixTime.time)
@@ -110,13 +110,14 @@ class DbManager (context : Context) {
             values.put("source_photo_url" , it.sourcePhotoUrl)
             values.put("post_photo_url" , it.postPhotoUrl)
 
+            /*
             if(it.sourcePhoto != null) {
                 values.put("source_photo_bytes", it.sourcePhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
             }
 
             if(it.postPhoto != null) {
                 values.put("post_photo_bytes", it.postPhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
-            }
+            }*/
 
             val response = insert( DbOpenHelper.DB_TABLE_NEWSFEED, values )
 
@@ -136,7 +137,7 @@ class DbManager (context : Context) {
     }
 
     private  fun prepareSqlGetNewsWall(startId : Int, endId : Int): String {
-        return "SELECT * FROM $DB_TABLE_NEWSFEED WHERE _id BETWEEN $startId AND $endId"
+        return "SELECT * FROM $DB_TABLE_NEWSFEED WHERE indx BETWEEN $startId AND $endId"
     }
 
     fun getNewsWallRange(startId : Int, endId : Int) : List<NewsPost> {
@@ -160,13 +161,13 @@ class DbManager (context : Context) {
                         post.sourcePhotoUrl = cursor.getString(cursor.getColumnIndexOrThrow("source_photo_url"))
                         post.postPhotoUrl = cursor.getString(cursor.getColumnIndexOrThrow("post_photo_url"))
 
-                        val sourcePhotoBytes = ContentValues()
+                        /*val sourcePhotoBytes = ContentValues()
                         sourcePhotoBytes.put(NewsPost.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("source_photo_bytes")))
                         post.sourcePhoto = sourcePhotoBytes
 
                         val postPhotoBytes = ContentValues()
                         postPhotoBytes.put(NewsPost.PHOTO_BYTES, cursor.getBlob(cursor.getColumnIndexOrThrow("post_photo_bytes")))
-                        post.postPhoto = postPhotoBytes
+                        post.postPhoto = postPhotoBytes */
 
                         posts.add(post)
 

@@ -40,4 +40,27 @@ public class BitmapDiskCache implements IDiskCache<String, Bitmap, byte[]> {
     public Bitmap load(String key) {
         return BitmapFactory.decodeFile(new File(diskCachePath, Uri.parse(key).getLastPathSegment()).getPath());
     }
+
+    public void clearCacheDir(){
+        deleteTempFiles(new File(diskCachePath), false);
+    }
+
+    public static void deleteTempFiles(File file, boolean deleteRoot) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        deleteTempFiles(f, true);
+                    } else {
+                        f.delete();
+                    }
+                }
+            }
+        }
+
+        if(deleteRoot){
+            file.delete();
+        }
+    }
 }

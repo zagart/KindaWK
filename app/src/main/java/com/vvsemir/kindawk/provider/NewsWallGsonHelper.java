@@ -16,13 +16,14 @@ import com.vvsemir.kindawk.utils.Utilits;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 
 
 public class NewsWallGsonHelper {
     public static final String EXCEPTION_PARSING_API_RESPONSE = "Sorry, can not read posts from API";
-    public static final int MAX_PHOTO_WIDTH = 240;
+    public static final int MAX_PHOTO_WIDTH = 320;
     private final NewsWallProvider newsWallProvider;
 
     private NewsWallGsonHelper(final NewsWallProvider newsWallProvider) {
@@ -50,7 +51,8 @@ public class NewsWallGsonHelper {
 
             HashMap<Integer, DataIdPhotourl> mapIdsPhotos = getIdAvatarPhotoMap(response, gson);
 
-            for(NewsPost post : posts){
+            for (Iterator<NewsPost> iterator = posts.iterator(); iterator.hasNext();) {
+                NewsPost post = iterator.next();
                 int sourceId = post.getSourceId();
 
                 if(mapIdsPhotos.containsKey(sourceId)){
@@ -63,22 +65,36 @@ public class NewsWallGsonHelper {
 
                 if(attachments != null && attachments.size() > 0){
                     NewsPost.AttachPhoto photo = attachments.get(0).photo;
-                    int index = getPhotoIdxByWidth(photo.sizes);
-                    if(photo != null && index >= 0) {
-                        post.setPostPhotoUrl(photo.sizes.get(index).url);
+
+                    if(photo != null) {
+                        int index = getPhotoIdxByWidth(photo.sizes);
+
+                        if (index >= 0) {
+                            post.setPostPhotoUrl(photo.sizes.get(index).url);
+                        }
                     }
                 } else if(copyHistory!= null && copyHistory.size() > 0) {
                     post.setPostText(copyHistory.get(0).text);
                     List<NewsPost.Attachment> copyAttachments = copyHistory.get(0).attachments;
+
                     if(copyAttachments != null && copyAttachments.size() > 0){
                         NewsPost.AttachPhoto copyPhoto = copyAttachments.get(0).photo;
-                        int index = getPhotoIdxByWidth(copyPhoto.sizes);
-                        if(copyPhoto != null && index >= 0) {
-                            post.setPostPhotoUrl(copyPhoto.sizes.get(index).url);
-                            Log.d("WWW copyHistory", " setPostPhotoUrl" + copyPhoto.sizes.get(0).url);
+
+                        if(copyPhoto != null) {
+                            int index = getPhotoIdxByWidth(copyPhoto.sizes);
+
+                            if (index >= 0) {
+                                post.setPostPhotoUrl(copyPhoto.sizes.get(index).url);
+                            }
                         }
                     }
                 }
+
+                if(post.getPostText() == null || post.getPostText().isEmpty() ||
+                        post.getPostPhotoUrl() == null || post.getPostPhotoUrl().isEmpty()){
+                    iterator.remove();
+                }
+                Log.d("WWW: ", " PostURL:" + post.getPostPhotoUrl() + "!" + post.getSourcePhotoUrl());
             }
 
             String  nextFrom = "";
@@ -99,7 +115,7 @@ public class NewsWallGsonHelper {
     private int getPhotoIdxByWidth(List<NewsPost.AttachPhotoSizes> list){
         if(list != null && list.size() > 0){
             for(int i = list.size() - 1; i >= 0; i --){
-                if(list.get(i).width < MAX_PHOTO_WIDTH){
+                if(list.get(i).width <= MAX_PHOTO_WIDTH){
                     return i;
                 }
             }

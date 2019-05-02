@@ -71,6 +71,23 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
+        android:background="@color/colorBgFragments"
         android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/sourceUrlView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/postTextView"
+        android:layout_alignParentStart="true"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/postUrlView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sourceUrlView"
+        android:layout_alignParentStart="true"
+        android:textColor="@android:color/black" />
 
 </RelativeLayout>

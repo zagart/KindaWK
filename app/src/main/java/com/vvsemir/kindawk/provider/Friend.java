@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 public class Friend implements Parcelable {
     public static final String PHOTO_BYTES = "FriendPhotoBytes";
 
-    @SerializedName("user_id")
+    @SerializedName("id")
     private int userId;
     @SerializedName("first_name")
     private String firstName;

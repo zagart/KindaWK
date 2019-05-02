@@ -73,6 +73,7 @@ public class ImageLoader implements IImageLoader {
                                                  public void onResult(final Bitmap networkBitmap) {
                                                      if (networkBitmap == null) {
                                                          showErrorImage(uri, imageView);
+                                                         Log.d("PHOT net", "err:" + uri);
                                                      } else {
                                                          showImage(uri, imageView, networkBitmap); // From network
                                                      }
@@ -175,6 +176,7 @@ public class ImageLoader implements IImageLoader {
                 public void run() {
                     imageView.setBackground(null);
                     imageView.setImageBitmap(bitmap);
+                    imageView.invalidate();
                 }
             });
         }
@@ -196,7 +198,14 @@ public class ImageLoader implements IImageLoader {
         //return imageView.getTag() != null && uri.equals(imageView.getTag());
     }
 
-
+    public void cleanCache() {
+        synchronized (lruCache) {
+            lruCache.evictAll();
+        }
+        synchronized (diskCache) {
+            ((BitmapDiskCache)diskCache).clearCacheDir();
+        }
+    }
 
 /////////////////////////////////////
     public static Uri createTempPhotoFile(URL url) {

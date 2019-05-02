@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.provider.NewsPost;
 import com.vvsemir.kindawk.provider.NewsWall;
@@ -70,7 +71,7 @@ public class NewsFragment extends KindaFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_news, container, false);
-        //progressBar =  view.findViewById(R.id.progressBarNews);
+        progressBar =  view.findViewById(R.id.progressBarNews);
         recyclerView = view.findViewById(R.id.newsList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsRecyclerAdapter);
@@ -147,7 +148,7 @@ public class NewsFragment extends KindaFragment {
     }
 
     void showProgressView(boolean show) {
-        //progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -156,6 +157,8 @@ public class NewsFragment extends KindaFragment {
 
         if(id == R.id.action_refresh) {
             ProviderService.cleanNewsWall();
+            ImageLoader.getInstance(getContext()).cleanCache();
+            newsRecyclerAdapter.cleanWall();
             loadData();
         }
 
