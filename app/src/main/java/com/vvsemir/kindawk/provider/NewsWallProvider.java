@@ -22,6 +22,8 @@ import java.util.List;
 
 public class NewsWallProvider extends BaseProvider<NewsWall> {
     public static final String EXCEPTION_LOADING_API = "Sorry, can not read posts from API";
+    public static final String EXCEPTION_READING_DB = "Sorry, can not read posts from DB";
+
     static final String ARG_PARAM_REQUEST_METHOD = "newsfeed.get";
     static final String ARG_PARAM_REQUEST_FILTERS = "post";
     static final String ARG_PARAM_REQUEST_FIELDS = "photo_100";
@@ -46,7 +48,8 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
 
         requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
         //requestParams.put("count", rangeHelper.endPos - rangeHelper.startPos + 1);
-        requestParams.put("count", 100);
+        //requestParams.put("count", 100);
+        requestParams.put("start_time",1120117972);
         requestParams.put("max_photos",ARG_PARAM_REQUEST_MAX_PHOTOS);
         requestParams.put("filters",ARG_PARAM_REQUEST_FILTERS);
         requestParams.put("fields",ARG_PARAM_REQUEST_FIELDS);
@@ -54,7 +57,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         if(rangeHelper.startPos > 0 && rangeHelper.nextFromChainRequest != null &&
                 !rangeHelper.nextFromChainRequest.isEmpty()){
             requestParams.put("start_from", rangeHelper.nextFromChainRequest);
-            Log.d("WWW NEXT CHAIN", "  NEXT CHAIN");
+            Log.d("WWW NEXT CHAIN", "  NEXT CHAIN:" + rangeHelper.nextFromChainRequest);
         }
     }
 
@@ -83,13 +86,10 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     synchronized void loadData() {
         try {
             DbManager.DbResponse dbResponse = getDataFromDb();
-            Log.d("WWW getDatFromDb", "  response = " + dbResponse);
 
             List<NewsPost> posts = null;
 
-            if (dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR ||
-                    dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE) {
-                newsWall.removeAllNews();
+            if ( dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE ) {
 
                 if (rangeHelper.checkNextApiRequest()) {
                     posts = loadApiData();
@@ -189,26 +189,22 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         Log.d("WWW putDataFromDb", "  putDataInDb success");
     }
 
-    private DbManager.DbResponse getDataFromDb(){
+    private DbManager.DbResponse getDataFromDb() throws Exception {
         DbManager dbManager = ProviderService.getInstance().getDbManager();
 
-        Log.d("WWW getDatFromDb", " rangeHelper.startPos=" + rangeHelper.startPos +
-                " rangeHelper.endPos=" + rangeHelper.endPos );
         newsWall.removeAllNews();
-
-        Log.d("WWW getDatFromDb"," newsWall.hash=" + newsWall.hashCode() );
 
         List<NewsPost> posts = dbManager.getNewsWallRange(rangeHelper.startPos + 1, rangeHelper.endPos + 1); //rawid started witn 1 not 0
 
         if(posts == null){
-            return DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR;
+            throw new Exception(EXCEPTION_READING_DB);
         }
 
         if(posts != null && posts.size() > 0){
-            Log.d("WWW getDatFromDb", "  newsWall. old size = " + newsWall.getCount());
             newsWall.appendPosts(posts);
             Log.d("WWW getDatFromDb", "  getDataFromDb success, db posts size = " + posts.size() +
-                    "  newsWall. new size = " + newsWall.getCount());
+                    "  newsWall. new size = " + newsWall.getCount() + " rangeHelper.startPos=" + rangeHelper.startPos +
+                    " rangeHelper.endPos=" + rangeHelper.endPos );
 
             return DbManager.DbResponse.DB_RESPONSE_STATUS_SUCCESS;
         } else {
@@ -223,6 +219,8 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     }
 
     public void setNextFromChainRequest(String nextFrom) {
+        DbManager dbManager = ProviderService.getInstance().getDbManager();
+        dbManager.insertNewsWallOffset(nextFrom);
         rangeHelper.nextFromChainRequest = nextFrom;
     }
 
@@ -230,6 +228,11 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         int startPos = 0;
         int endPos = 0;
         String nextFromChainRequest;
+
+        public RangeHelper() {
+            DbManager dbManager = ProviderService.getInstance().getDbManager();
+            nextFromChainRequest = dbManager.getNewsWallOffset();
+        }
 
         void setRange(int startPos, int endPos) {
             this.startPos = startPos;

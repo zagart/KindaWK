@@ -91,18 +91,18 @@ public class ProviderService extends Service {
         instance.executorService.execute(dataProvider);
     }
 
-    public static void cleanProfileData() {
-        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_PROFILE));
+    public static void cleanProfileData(final ICallback<Integer> callback) {
+        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_PROFILE), callback);
         instance.executorService.execute(dataProvider);
     }
 
-    public static void cleanNewsWall() {
-        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_NEWSFEED));
+    public static void cleanNewsWall(final ICallback<Integer> callback) {
+        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_NEWSFEED), callback);
         instance.executorService.execute(dataProvider);
     }
 
-    public static void cleanFriends() {
-        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_FRIENDS));
+    public static void cleanFriends(final ICallback<Integer> callback) {
+        DbCleanerProvider dataProvider = new DbCleanerProvider(Arrays.asList(DbOpenHelper.DB_TABLE_FRIENDS), callback);
         instance.executorService.execute(dataProvider);
     }
 
@@ -155,20 +155,4 @@ public class ProviderService extends Service {
         }
     }
 
-    /*
-    public static void deleteTempFiles(File file) {
-        if (file.isDirectory()) {
-            File[] files = file.listFiles();
-            if (files != null) {
-                for (File f : files) {
-                    if (f.isDirectory()) {
-                        deleteTempFiles(f);
-                    } else {
-                        f.delete();
-                    }
-                }
-            }
-        }
-        file.delete();
-    }*/
 }

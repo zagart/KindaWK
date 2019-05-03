@@ -9,7 +9,7 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
         db?.execSQL(DB_TABLE_PROFILE_CREATE)
         db?.execSQL(DB_TABLE_FRIENDS_CREATE)
         db?.execSQL(DB_TABLE_NEWSFEED_CREATE)
-        db?.execSQL(DB_TABLE_PHOTOS_CREATE)
+        db?.execSQL(DB_TABLE_NEWSFEED_OFFSET_CREATE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -22,6 +22,7 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
         const val DB_TABLE_FRIENDS = "friends"
         const val DB_TABLE_PHOTOS = "photos"
         const val DB_TABLE_NEWSFEED = "newsfeed"
+        const val DB_TABLE_NEWSFEED_OFFSET= "newsfeed_offset"
 
 
 
@@ -60,14 +61,17 @@ class DbOpenHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
                 "source_photo_url TEXT, " +
                 "source_photo_bytes BLOB" +
                 ")"
-        const val DB_TABLE_PHOTOS_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_PHOTOS " +
+        const val DB_TABLE_NEWSFEED_OFFSET_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_NEWSFEED_OFFSET " +
+                "(new_offset TEXT PRIMARY KEY " +
+                ")"
+        /*const val DB_TABLE_PHOTOS_CREATE = "CREATE TABLE IF NOT EXISTS $DB_TABLE_PHOTOS " +
                 "(photo_id INTEGER PRIMARY KEY, " +
                 "photo_url TEXT UNIQUE, " +
                 "width INTEGER, " +
                 "height INTEGER, " +
                 "user_id INTEGER, " +
                 "photo_bytes BLOB" +
-                ")"
+                ")"*/
 
     }
 }

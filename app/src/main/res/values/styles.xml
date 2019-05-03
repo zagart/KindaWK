@@ -9,4 +9,9 @@
         <item name="android:itemBackground">@color/colorPrimaryDark</item>
         <item name="android:divider">@color/colorPrimary</item>
     </style>
+    <style name="PhotoCheckBoxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="colorControlNormal">@color/colorPrimary</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="android:colorControlHighlight">@color/colorSelected</item>
+    </style>
 </resources>

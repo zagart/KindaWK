@@ -34,7 +34,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (news != null && getItemViewType(position) == ViewType.POST) {
-            Log.d("WWRR onBindViewHolder", "position = " + position + " total = " + news.getCount());
             NewsItemView itemView = (NewsItemView) viewHolder.itemView;
             NewsPost newsPost = (NewsPost)news.getItem(position);
 
@@ -47,7 +46,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             itemView.postUrlView.setText(newsPost.getPostPhotoUrl());
             itemView.sourceUrlView.setText(newsPost.getSourcePhotoUrl());
 
-            Log.d("WWRR BIND", "postid:" + newsPost.getPostId() + " sorceURL:" + newsPost.getSourcePhotoUrl() +" postURL:" + newsPost.getPostPhotoUrl());
             if(newsPost.getSourcePhotoUrl() != null && !newsPost.getSourcePhotoUrl().isEmpty()) {
                 imageLoader.loadAndShow(itemView.getSourcePhotoView(), newsPost.getSourcePhotoUrl());
             }
@@ -79,7 +77,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
 
             return viewHolder;
         } else {
-            Log.d("WWRR HolderALARM ", "NO PROGRESS holder");
             return new BaseViewHolder<>(inflater.inflate( R.layout.layout_progress, viewGroup, false));
         }
     }
@@ -87,20 +84,16 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     @Override
     public int getItemCount() {
         if(news == null){
-            Log.d("WWRR getItemCount", "count = 0");
             return 0;
         }
-        Log.d("WWRR getItemCount", "count = " + news.getCount());
         return news.getCount();
     }
 
     @Override
     public int getItemViewType(int position) {
         if (news  != null && position < news.getCount()) {
-            Log.d("WWRR getItemViewType ", "position " +  position);
             return ViewType.POST;
         } else {
-            Log.d("WWRR getItemViewType ", "ALARM NO PROGRESS TYPE");
             return ViewType.LOADING;
         }
     }
@@ -116,10 +109,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
 
     public void updateItems(final NewsWall posts) {
         if(posts !=  null) {
-            if(news != null )
-                Log.d("WWRR updateItems", "count old= " + news.getCount() + "hash =" + news.hashCode());
-            else
-                Log.d("WWRR updateItems", "news old= 0");
             news.appendPosts(posts.getNews());
             Log.d("WWRR updateItems", "count new= " + news.getCount() + "hash =" + news.hashCode());
             //notifyDataSetChanged();

@@ -55,6 +55,7 @@ public class NewsFragment extends KindaFragment {
         recyclerViewOnScrollListener = new BaseRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.d("NEWS onLoadMore", "onLoadMore:page: " + page + "total:" +totalItemsCount);
                 loadMoreItems(totalItemsCount, totalItemsCount + NewsWallProvider.PAGE_SIZE);
             }
 
@@ -127,11 +128,6 @@ public class NewsFragment extends KindaFragment {
                 updateViewsWithData(result);
             }
 
-            @Override
-            public void onNotify(NewsWall result) {
-                //to do
-                Log.d("WWRgetWall", "getNewsFeed: notification refresh!!!");
-            }
 
             @Override
             public void onError(Throwable throwable) {
@@ -156,10 +152,21 @@ public class NewsFragment extends KindaFragment {
         int id = item.getItemId();
 
         if(id == R.id.action_refresh) {
-            ProviderService.cleanNewsWall();
             ImageLoader.getInstance(getContext()).cleanCache();
-            newsRecyclerAdapter.cleanWall();
-            loadData();
+            ProviderService.cleanNewsWall(new ICallback<Integer>() {
+                @Override
+                public void onResult(Integer result) {
+                    newsRecyclerAdapter.cleanWall();
+                    loadData();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+            });
+
+
         }
 
         return super.onOptionsItemSelected(item);

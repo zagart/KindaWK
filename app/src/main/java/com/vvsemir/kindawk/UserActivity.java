@@ -9,6 +9,7 @@ import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
@@ -25,6 +26,7 @@ import com.vvsemir.kindawk.ui.FriendsFragment;
 import com.vvsemir.kindawk.ui.IFragment;
 import com.vvsemir.kindawk.ui.KindaFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
+import com.vvsemir.kindawk.ui.PhotoBigFragment;
 import com.vvsemir.kindawk.ui.ProfileFragment;
 
 
@@ -79,9 +81,11 @@ public class UserActivity extends AppCompatActivity{
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //ActionBar actionbar = getSupportActionBar();
+        ActionBar actionbar = getSupportActionBar();
+
         //actionbar.setDisplayHomeAsUpEnabled(true);
         //actionbar.setHomeAsUpIndicator(R.drawable.ic_exit);
+
 
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         setBottomNavigationListener();
@@ -92,6 +96,8 @@ public class UserActivity extends AppCompatActivity{
         } else {
             currentFragment = ProfileFragment.newInstance();
         }
+
+        //actionbar.setDisplayHomeAsUpEnabled(currentFragment.getTag().equals(PhotoBigFragment.FRAGMENT_TAG));
     }
 
     @Override
@@ -181,6 +187,14 @@ public class UserActivity extends AppCompatActivity{
         ((ProfileFragment)currentFragment).setFriendProfile(friend);
         loadCurrentFragment();
         updatebottomNavigationSelection();
+    }
+
+    public void loadPhotoFragment(String uri) {
+        if (currentFragment != null && (currentFragment instanceof PhotoBigFragment) == false ) {
+            currentFragment = PhotoBigFragment.newInstance(uri);
+        }
+
+        loadCurrentFragment();
     }
 
     void updatebottomNavigationSelection() {

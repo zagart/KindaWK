@@ -21,6 +21,6 @@
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:theme="@android:style/Widget.CompoundButton.CheckBox" />
+        android:theme="@style/PhotoCheckBoxStyle" />
 
 </RelativeLayout>

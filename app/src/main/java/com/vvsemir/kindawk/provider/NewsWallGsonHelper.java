@@ -94,8 +94,9 @@ public class NewsWallGsonHelper {
                         post.getPostPhotoUrl() == null || post.getPostPhotoUrl().isEmpty()){
                     iterator.remove();
                 }
-                Log.d("WWW: ", " PostURL:" + post.getPostPhotoUrl() + "!" + post.getSourcePhotoUrl());
             }
+
+            Log.d("NEWS HTTP", "posts:count:" + posts.size() );
 
             String  nextFrom = "";
             JsonPrimitive element = response.getAsJsonPrimitive("next_from");
@@ -105,6 +106,8 @@ public class NewsWallGsonHelper {
             }
 
             newsWallProvider.setNextFromChainRequest(nextFrom);
+
+            Log.d("NEWS HTTP", "posts:count:" + posts.size()  + "next:" + nextFrom);
         } catch (Exception ex){
             ex.printStackTrace();
         } finally {

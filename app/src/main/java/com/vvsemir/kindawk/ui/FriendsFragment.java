@@ -87,12 +87,6 @@ public class FriendsFragment extends KindaFragment {
             }
 
             @Override
-            public void onNotify(FriendsList result) {
-                //to do
-                Log.d("getFriends", "getFriends : notification refresh!!!");
-            }
-
-            @Override
             public void onError(Throwable throwable) {
                 //to do
                 Log.d("getFriends", "getFriends : loading exception!!!" + throwable.getMessage() );
@@ -106,9 +100,18 @@ public class FriendsFragment extends KindaFragment {
         int id = item.getItemId();
 
         if(id == R.id.action_refresh) {
-            ProviderService.cleanFriends();
-            friendsListView.setScrollY(0);
-            loadData();
+            ProviderService.cleanFriends(new ICallback<Integer>() {
+                @Override
+                public void onResult(Integer result) {
+                    friendsListView.setScrollY(0);
+                    loadData();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+            });
         }
 
         return super.onOptionsItemSelected(item);

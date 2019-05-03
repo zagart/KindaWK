@@ -45,6 +45,11 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
         return photos.size();
     }
 
+    public String getItemUriScreen(int position) {
+        return photos.get(position).getUrlByType('z');
+    }
+
+
     public void updateItems(final List<Photo> items) {
        //photos.clear();
         photos.addAll(items);

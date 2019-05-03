@@ -134,7 +134,7 @@ public class ProfileFragment extends KindaFragment  {
 
             @Override
             public void onClick(@NotNull View view, int position) {
-
+                ((UserActivity)getActivity()).loadPhotoFragment(photosRecyclerAdapter.getItemUriScreen(position));
             }
 
             @Override
@@ -208,12 +208,6 @@ public class ProfileFragment extends KindaFragment  {
                 }
 
                 @Override
-                public void onNotify(UserProfile result) {
-                    //to do
-                    Log.d("getAccountProfileInfo", "getAccountProfileInfo : notification refresh!!!");
-                }
-
-                @Override
                 public void onError(Throwable throwable) {
                     if (throwable instanceof CallbackExceptionFactory.Companion.ServiceException) {
                         ((UserActivity) getActivity()).bottomNavigationView.setSelectedItemId(R.id.action_profile);
@@ -257,8 +251,17 @@ public class ProfileFragment extends KindaFragment  {
 
             return true;
         } else if(id == R.id.action_refresh) {
-            ProviderService.cleanProfileData();
-            loadData();
+            ProviderService.cleanProfileData(new ICallback<Integer>() {
+                @Override
+                public void onResult(Integer result) {
+                    loadData();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+            });
         }
 
         return super.onOptionsItemSelected(item);

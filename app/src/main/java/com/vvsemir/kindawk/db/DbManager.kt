@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_FRIENDS
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_NEWSFEED
+import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_NEWSFEED_OFFSET
 import com.vvsemir.kindawk.db.DbOpenHelper.Companion.DB_TABLE_PROFILE
 import com.vvsemir.kindawk.provider.*
 import java.util.*
@@ -109,7 +110,6 @@ class DbManager (context : Context) {
             values.put("source_name" , it.sourceName)
             values.put("source_photo_url" , it.sourcePhotoUrl)
             values.put("post_photo_url" , it.postPhotoUrl)
-
             /*
             if(it.sourcePhoto != null) {
                 values.put("source_photo_bytes", it.sourcePhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
@@ -118,15 +118,18 @@ class DbManager (context : Context) {
             if(it.postPhoto != null) {
                 values.put("post_photo_bytes", it.postPhoto.getAsByteArray(NewsPost.PHOTO_BYTES))
             }*/
-
-            val response = insert( DbOpenHelper.DB_TABLE_NEWSFEED, values )
-
-            if(response == null || response < 0){
-                removeAllNews()
-            }
+            insert( DbOpenHelper.DB_TABLE_NEWSFEED, values )
         }
     }
 
+    fun insertNewsWallOffset(offset: String) : Long?  {
+        deleteAll(DbOpenHelper.DB_TABLE_NEWSFEED_OFFSET)
+        val values = ContentValues()
+        values.put("new_offset" , offset)
+
+        return insert( DbOpenHelper.DB_TABLE_NEWSFEED_OFFSET, values )
+
+    }
 
     private  fun prepareSqlGetUserProfile(userId : Int): String {
         return "SELECT * FROM $DB_TABLE_PROFILE WHERE user_id = $userId"
@@ -138,6 +141,10 @@ class DbManager (context : Context) {
 
     private  fun prepareSqlGetNewsWall(startId : Int, endId : Int): String {
         return "SELECT * FROM $DB_TABLE_NEWSFEED WHERE indx BETWEEN $startId AND $endId"
+    }
+
+    private  fun prepareSqlGetNewsWallOffset(): String {
+        return "SELECT new_offset FROM $DB_TABLE_NEWSFEED_OFFSET "
     }
 
     fun getNewsWallRange(startId : Int, endId : Int) : List<NewsPost> {
@@ -243,6 +250,21 @@ class DbManager (context : Context) {
         } finally {
             resCurosor?.close()
             return futureResult
+        }
+    }
+
+    fun getNewsWallOffset() : String? {
+        var offset : String? = null
+        val resCurosor: Cursor? = query(prepareSqlGetNewsWallOffset())
+
+        try {
+            if (resCurosor != null && resCurosor.getCount() != 0) {
+                resCurosor.moveToFirst();
+                offset = resCurosor.getString(0)
+            }
+        } finally {
+            resCurosor?.close()
+            return offset
         }
     }
 
