@@ -25,7 +25,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     public static final String EXCEPTION_READING_DB = "Sorry, can not read posts from DB";
 
     static final String ARG_PARAM_REQUEST_METHOD = "newsfeed.get";
-    static final String ARG_PARAM_REQUEST_FILTERS = "post";
+    static final String ARG_PARAM_REQUEST_FILTERS = "post,photo,photo_tag, wall_photo";
     static final String ARG_PARAM_REQUEST_FIELDS = "photo_100";
     static final int ARG_PARAM_REQUEST_MAX_PHOTOS = 1;
     public static final int PAGE_SIZE = 10;

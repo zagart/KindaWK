@@ -9,16 +9,21 @@ import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.service.ProviderService;
@@ -32,8 +37,9 @@ import com.vvsemir.kindawk.ui.ProfileFragment;
 
 public class UserActivity extends AppCompatActivity{
     private static final String CURRENT_FRAGMENT = "current_fragment";
-    KindaFragment currentFragment;
+    public KindaFragment currentFragment;
     public BottomNavigationView bottomNavigationView;
+    MenuNavigationState menuNavigationState = MenuNavigationState.SHOW;
     ProviderService providerService;
     boolean isServiceBound = false;
 
@@ -54,6 +60,37 @@ public class UserActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.user_top, menu);
+        ActionBar actionbar = getSupportActionBar();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        if(menuNavigationState == MenuNavigationState.HIDE) {
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow);
+            actionbar.setTitle("");
+            menu.setGroupVisible(R.id.topMenuHidableItems, false);
+            toolbar.getBackground().setAlpha(77);
+
+            FrameLayout frameLayout = findViewById(R.id.fragmentsContainer);
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) frameLayout.getLayoutParams();
+            params.setMargins(0, 0, 0,0);
+            frameLayout.requestLayout();
+
+        } else {
+            actionbar.setDisplayHomeAsUpEnabled(false);
+            actionbar.setTitle(R.string.app_name);
+            menu.setGroupVisible(R.id.topMenuHidableItems, true);
+            toolbar.getBackground().setAlpha(255);
+
+            FrameLayout frameLayout = findViewById(R.id.fragmentsContainer);
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) frameLayout.getLayoutParams();
+
+            TypedValue typedValue = new TypedValue();
+            getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true);
+            int actionBarHeight = getResources().getDimensionPixelSize(typedValue.resourceId);
+            params.setMargins(0, actionBarHeight, 0,0);
+            frameLayout.requestLayout();
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -81,11 +118,6 @@ public class UserActivity extends AppCompatActivity{
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-
-        //actionbar.setDisplayHomeAsUpEnabled(true);
-        //actionbar.setHomeAsUpIndicator(R.drawable.ic_exit);
-
 
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         setBottomNavigationListener();
@@ -96,8 +128,6 @@ public class UserActivity extends AppCompatActivity{
         } else {
             currentFragment = ProfileFragment.newInstance();
         }
-
-        //actionbar.setDisplayHomeAsUpEnabled(currentFragment.getTag().equals(PhotoBigFragment.FRAGMENT_TAG));
     }
 
     @Override
@@ -106,8 +136,6 @@ public class UserActivity extends AppCompatActivity{
             //ProviderService.deleteTempFiles(getCacheDir());
         //}
 
-        //Intent intent = new Intent(this, ProviderService.class);
-        //stopService(intent);
         super.onDestroy();
     }
 
@@ -160,18 +188,23 @@ public class UserActivity extends AppCompatActivity{
                             break;
                     }
 
-                    loadCurrentFragment();
+                    loadCurrentFragment(true);
                     return true;
                 }
             });
     }
 
-    private boolean loadCurrentFragment() {
+    public boolean loadCurrentFragment(boolean putToBackStack) {
         if (currentFragment != null && !currentFragment.isInLayout() && isServiceBound) {
-            getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentsContainer, currentFragment, currentFragment.getFragmentTag())
-                .addToBackStack(null)
-                .commit();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentsContainer, currentFragment, currentFragment.getFragmentTag());
+
+            if(putToBackStack) {
+                fragmentTransaction.addToBackStack(currentFragment.getFragmentTag());
+            }
+
+            fragmentTransaction.commit();
 
             return true;
         }
@@ -185,7 +218,7 @@ public class UserActivity extends AppCompatActivity{
         }
 
         ((ProfileFragment)currentFragment).setFriendProfile(friend);
-        loadCurrentFragment();
+        loadCurrentFragment(true);
         updatebottomNavigationSelection();
     }
 
@@ -194,7 +227,7 @@ public class UserActivity extends AppCompatActivity{
             currentFragment = PhotoBigFragment.newInstance(uri);
         }
 
-        loadCurrentFragment();
+        loadCurrentFragment(true);
     }
 
     void updatebottomNavigationSelection() {
@@ -229,6 +262,28 @@ public class UserActivity extends AppCompatActivity{
     }
 
     @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager =  getSupportFragmentManager();
+        if (fragmentManager.popBackStackImmediate()) {
+
+            if( fragmentManager.getBackStackEntryCount() == 0 ){
+                return;
+            }
+
+            FragmentManager.BackStackEntry backEntry = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1);
+            if(backEntry != null){
+                String tag = backEntry.getName();
+                Fragment fragment = fragmentManager.findFragmentByTag(tag);
+
+                if( fragment != null && fragment instanceof KindaFragment ){
+                    currentFragment = (KindaFragment)fragment;
+                    updateMenuForFragment();
+                }
+            }
+        }
+    }
+
+    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_FRAGMENT)) {
@@ -243,6 +298,20 @@ public class UserActivity extends AppCompatActivity{
         outState.putString(CURRENT_FRAGMENT, currentFragment.getFragmentTag());
     }
 
+    public void updateMenuForFragment(){
+        String tag = currentFragment.getFragmentTag();
+
+        if( tag.equals(PhotoBigFragment.FRAGMENT_TAG) ) {
+            menuNavigationState = MenuNavigationState.HIDE;
+            bottomNavigationView.setVisibility(View.GONE);
+        } else {
+            menuNavigationState = MenuNavigationState.SHOW;
+            bottomNavigationView.setVisibility(View.VISIBLE);
+        }
+
+        invalidateOptionsMenu();
+    }
+
     private ServiceConnection boundServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -251,7 +320,7 @@ public class UserActivity extends AppCompatActivity{
             isServiceBound = true;
 
             updatebottomNavigationSelection();
-            loadCurrentFragment();
+            loadCurrentFragment(true);
         }
 
         @Override
@@ -262,5 +331,8 @@ public class UserActivity extends AppCompatActivity{
         }
     };
 
+    enum MenuNavigationState{
+        SHOW, HIDE
+    }
 }
 

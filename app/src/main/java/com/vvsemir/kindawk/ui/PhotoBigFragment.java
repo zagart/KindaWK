@@ -4,9 +4,13 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +25,8 @@ import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.provider.FriendsList;
 import com.vvsemir.kindawk.service.ICallback;
 import com.vvsemir.kindawk.service.ProviderService;
+
+import static android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 public class PhotoBigFragment extends KindaFragment {
     public static final String FRAGMENT_TAG = "PhotoBigFragment";
@@ -39,6 +45,7 @@ public class PhotoBigFragment extends KindaFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
     }
 
@@ -61,12 +68,20 @@ public class PhotoBigFragment extends KindaFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.action_refresh) {
+        if(id == android.R.id.home) {
+            ((UserActivity)getActivity()).onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);
 
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        ((UserActivity)getActivity()).updateMenuForFragment();
+    }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);

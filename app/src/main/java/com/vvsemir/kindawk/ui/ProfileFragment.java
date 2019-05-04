@@ -83,7 +83,6 @@ public class ProfileFragment extends KindaFragment  {
         }
 
         photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
-        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
     }
 
     @Override
@@ -113,6 +112,8 @@ public class ProfileFragment extends KindaFragment  {
         phoneView  = view.findViewById(R.id.profPhoneView);
         recyclerView = view.findViewById(R.id.profPhotoList);
         progressView = view.findViewById(R.id.profPhotoProgress);
+
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
