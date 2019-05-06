@@ -10,5 +10,8 @@
     <string name="edit">Edit</string>
     <string name="refresh">Refresh</string>
     <string name="add_photo">Add Photo</string>
+    <string name="delete_photo">Delete Photo</string>
     <string name="settings">Settings</string>
+    <string name="options">Options</string>
+    <string name="confirm_delete_photos">Delete selected photos?</string>
 </resources>

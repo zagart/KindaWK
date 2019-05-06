@@ -20,6 +20,7 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
 
     private final LayoutInflater layoutInflater;
     private final List<Photo> photos = new ArrayList<>();
+    private final List<Integer> photosIdsToDelete = new ArrayList<>();
     private final ImageLoader imageLoader;
 
     public PhotosRecyclerAdapter(final Context context) {
@@ -51,8 +52,20 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
 
 
     public void updateItems(final List<Photo> items) {
-       //photos.clear();
         photos.addAll(items);
         notifyDataSetChanged(); //TODO DiffUtils
+    }
+
+    public void addPhotoToDelete(int position, boolean add) {
+        Integer photoId = photos.get(position).getPhotoId();
+        if(add) {
+            photosIdsToDelete.add(photoId);
+        } else {
+            photosIdsToDelete.remove(photoId);
+        }
+    }
+
+    public boolean hasPhotoToDelete() {
+        return photosIdsToDelete.size() > 0;
     }
 }

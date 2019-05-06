@@ -32,12 +32,14 @@ import java.util.ListIterator;
 
 public class NewsFragment extends KindaFragment {
     public static final String FRAGMENT_TAG = "NewsFragmentTag";
+    private static final String CURRENT_POSITION = "CurrentPosition";
+
     private NewsRecyclerAdapter newsRecyclerAdapter;
     private ProgressBar progressBar;
     private LinearLayoutManager layoutManager;
     RecyclerView recyclerView;
     BaseRecyclerViewScrollListener recyclerViewOnScrollListener;
-    private boolean isLoading = false;
+    private int currentPosition;
 
     public static NewsFragment newInstance() {
         NewsFragment fragment = new NewsFragment();
@@ -49,10 +51,9 @@ public class NewsFragment extends KindaFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-        newsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
-        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
 
-        recyclerViewOnScrollListener = new BaseRecyclerViewScrollListener(layoutManager) {
+        newsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
+        recyclerViewOnScrollListener = new BaseRecyclerViewScrollListener() {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d("NEWS onLoadMore", "onLoadMore:page: " + page + "total:" +totalItemsCount);
@@ -64,7 +65,6 @@ public class NewsFragment extends KindaFragment {
                 super.onScrollStateChanged(recyclerView, newState);
             }
         };
-
     }
 
 
@@ -74,6 +74,9 @@ public class NewsFragment extends KindaFragment {
         View view =  inflater.inflate(R.layout.fragment_news, container, false);
         progressBar =  view.findViewById(R.id.progressBarNews);
         recyclerView = view.findViewById(R.id.newsList);
+
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        recyclerViewOnScrollListener.initLayoutManager(layoutManager);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsRecyclerAdapter);
 
@@ -83,6 +86,10 @@ public class NewsFragment extends KindaFragment {
         recyclerView.addOnScrollListener(recyclerViewOnScrollListener);
         loadData();
 
+        if(savedInstanceState != null && savedInstanceState.containsKey(CURRENT_POSITION)){
+            currentPosition = savedInstanceState.getInt(CURRENT_POSITION);
+        }
+
         return view;
     }
 
@@ -91,21 +98,16 @@ public class NewsFragment extends KindaFragment {
             return;
         }
         NewsWall freshNewsWall =  (NewsWall)data;
-        //newsRecyclerAdapter.setShowLoadingProgress(false);
         showProgressView(false);
-        Log.d("WWR updateViewsWithData", "here!!! " + data.hashCode());
-        //recyclerView.post(new Runnable() {
-        //    @Override
-        //    public void run() {
+
         if(freshNewsWall.getCount() > 0) {
             newsRecyclerAdapter.updateItems(freshNewsWall);
             newsRecyclerAdapter.notifyDataSetChanged();
-        }
-                //newsRecyclerAdapter.notifyItemRangeInserted(curSize, allContacts.size() - 1);
 
-          //  }
-        //});
-        isLoading = false;
+            if(currentPosition > 0 && currentPosition < newsRecyclerAdapter.getItemCount()) {
+                recyclerView.scrollToPosition(currentPosition);
+            }
+        }
     }
 
     @Override
@@ -114,8 +116,6 @@ public class NewsFragment extends KindaFragment {
     }
 
     private void loadMoreItems(final int startPosition, final int endPosition) {
-        isLoading = true;
-        //newsRecyclerAdapter.setShowLoadingProgress(true);
         showProgressView(true);
 
         RequestParams params = new RequestParams();
@@ -128,17 +128,9 @@ public class NewsFragment extends KindaFragment {
                 updateViewsWithData(result);
             }
 
-
             @Override
             public void onError(Throwable throwable) {
-
-                NewsWall errorNews = new NewsWall();
-                NewsPost errorPost = new NewsPost();
-                errorPost.setPostText(NewsWallProvider.EXCEPTION_LOADING_API);
-                errorNews.addPost(errorPost);
-                updateViewsWithData(errorNews);
-
-                Log.d("WWRonError", "getWall : loading exception!!!" + throwable.getMessage() );
+                Log.d(FRAGMENT_TAG, NewsWallProvider.EXCEPTION_LOADING_API);
             }
         });
     }
@@ -165,12 +157,17 @@ public class NewsFragment extends KindaFragment {
 
                 }
             });
-
-
         }
 
         return super.onOptionsItemSelected(item);
 
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        currentPosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+        outState.putInt(CURRENT_POSITION, currentPosition);
     }
 
     @Override

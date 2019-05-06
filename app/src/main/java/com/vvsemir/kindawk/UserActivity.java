@@ -48,8 +48,8 @@ public class UserActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_menu) {
-            showPopupMenu(this, findViewById(R.id.action_menu));
+        if (id == R.id.action_options) {
+            showPopupMenu(this, findViewById(R.id.action_options));
 
             return true;
         }
@@ -267,6 +267,7 @@ public class UserActivity extends AppCompatActivity{
         if (fragmentManager.popBackStackImmediate()) {
 
             if( fragmentManager.getBackStackEntryCount() == 0 ){
+                finish();
                 return;
             }
 

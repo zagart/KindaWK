@@ -195,7 +195,7 @@ public class ImageLoader implements IImageLoader {
 
     private boolean isViewTagValid(final String uri, final ImageView imageView) {
         return imageView.getTag() == null || (imageView.getTag() != null && uri.equals(imageView.getTag()));
-        //return imageView.getTag() != null && uri.equals(imageView.getTag());
+
     }
 
     public void cleanCache() {

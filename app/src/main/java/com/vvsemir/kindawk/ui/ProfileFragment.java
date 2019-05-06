@@ -1,6 +1,7 @@
 package com.vvsemir.kindawk.ui;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -9,8 +10,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,6 +49,7 @@ import java.util.List;
 public class ProfileFragment extends KindaFragment  {
     public static final String FRAGMENT_TAG = "ProfileFragmentTag";
     private static final String CURRENT_USER = "CurrentUser";
+    private static final String CURRENT_POSITION = "CurrentPosition";
 
 
     ImageView profilePhotoView;
@@ -58,6 +62,7 @@ public class ProfileFragment extends KindaFragment  {
     RecyclerView recyclerView;
     View progressView;
     int currentUserId = 0;
+    int currentPhotoPosition = 0;
     Friend friend = null;
 
     private LinearLayoutManager layoutManager;
@@ -71,9 +76,14 @@ public class ProfileFragment extends KindaFragment  {
 
         if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_USER)) {
             Parcelable data = savedInstanceState.getParcelable(CURRENT_USER);
+
              if(data instanceof Friend) {
                  friend = (Friend)data;
                  currentUserId = friend.getUserId();
+             }
+
+             if (savedInstanceState.containsKey(CURRENT_POSITION)) {
+                 currentPhotoPosition = savedInstanceState.getInt(CURRENT_POSITION);
              }
         }
 
@@ -83,12 +93,6 @@ public class ProfileFragment extends KindaFragment  {
         }
 
         photosRecyclerAdapter = new PhotosRecyclerAdapter(getActivity());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().getMenuInflater().inflate(R.menu.user_top_profile, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     public ProfileFragment() {
@@ -113,16 +117,16 @@ public class ProfileFragment extends KindaFragment  {
         recyclerView = view.findViewById(R.id.profPhotoList);
         progressView = view.findViewById(R.id.profPhotoProgress);
 
+
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(photosRecyclerAdapter);
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         } else {
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         }
-
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(photosRecyclerAdapter);
 
         int[] resIds = {R.id.selectPhotoBox};
         recyclerView.addOnItemTouchListener(new PhotoRecyclerViewItemTouchListener(recyclerView,
@@ -131,6 +135,8 @@ public class ProfileFragment extends KindaFragment  {
             public void onSelectClick(@NotNull View view, int position) {
                 final CheckBox checkBox = (CheckBox) view.findViewById(R.id.selectPhotoBox);
                 checkBox.setChecked(!checkBox.isChecked());
+                photosRecyclerAdapter.addPhotoToDelete(position, checkBox.isChecked());
+                updateMenuOnSelectPhotos();
             }
 
             @Override
@@ -143,7 +149,6 @@ public class ProfileFragment extends KindaFragment  {
 
             }
         }));
-
 
         loadData();
 
@@ -234,15 +239,32 @@ public class ProfileFragment extends KindaFragment  {
             public void onResult(final List<Photo> result) {
                 photosRecyclerAdapter.updateItems(result);
                 hideProgress();
+
+                if(currentPhotoPosition > 0 && currentPhotoPosition < photosRecyclerAdapter.getItemCount()) {
+                    recyclerView.scrollToPosition(currentPhotoPosition);
+                }
+
+                updateMenuOnSelectPhotos();
             }
 
             @Override
             public void onError(Throwable throwable) {
+                //To do show in recyle error
                 hideProgress();
             }
         } );
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().getMenuInflater().inflate(R.menu.user_top_profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public void updateMenuOnSelectPhotos(){
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(photosRecyclerAdapter.hasPhotoToDelete());
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -263,7 +285,10 @@ public class ProfileFragment extends KindaFragment  {
 
                 }
             });
+        } else if(id == R.id.action_delete_photo) {
+            showAlertDeletePhoto();
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -278,6 +303,23 @@ public class ProfileFragment extends KindaFragment  {
         if (progressView.getVisibility() != View.VISIBLE) {
             progressView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showAlertDeletePhoto() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.confirm_delete_photos);
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
@@ -302,8 +344,9 @@ public class ProfileFragment extends KindaFragment  {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(CURRENT_USER, friend);
+        currentPhotoPosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+        outState.putInt(CURRENT_POSITION, currentPhotoPosition);
     }
-
 }
 
 

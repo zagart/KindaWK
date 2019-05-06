@@ -12,7 +12,10 @@ public abstract class BaseRecyclerViewScrollListener extends RecyclerView.OnScro
 
     RecyclerView.LayoutManager layoutManager;
 
-    public BaseRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+    public BaseRecyclerViewScrollListener() {
+    }
+
+    public void initLayoutManager(final LinearLayoutManager layoutManager)  {
         this.layoutManager = layoutManager;
     }
 

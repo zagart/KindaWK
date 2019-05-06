@@ -2,14 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBgFragments">
+    android:background="@color/colorPrimaryDark">
 
     <ImageView
         android:id="@+id/photoBigView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription=""
         android:cropToPadding="true"
-        android:scaleType="centerCrop"
-        android:contentDescription="" />
+        android:scaleType="fitCenter" />
 
 </FrameLayout>

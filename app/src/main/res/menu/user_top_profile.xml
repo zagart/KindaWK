@@ -6,14 +6,14 @@
         android:icon="@drawable/ic_add_photo"
         android:title="@string/add_photo"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_edit"
-        android:icon="@drawable/ic_edit"
-        android:title="@string/edit"
+        android:id="@+id/action_delete_photo"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/delete_photo"
         android:visible="false"
         android:orderInCategory="2"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>

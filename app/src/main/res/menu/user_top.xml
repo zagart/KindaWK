@@ -6,13 +6,13 @@
             android:id="@+id/action_refresh"
             android:icon="@drawable/ic_refresh"
             android:title="@string/refresh"
-            android:orderInCategory="5"
-            app:showAsAction="ifRoom" />
+            android:orderInCategory="100"
+            app:showAsAction="always" />
 
-        <item android:id="@+id/action_menu"
+        <item android:id="@+id/action_options"
             android:icon="@drawable/ic_menu"
-            android:title="@string/app_name"
-            android:orderInCategory="6"
+            android:title="@string/options"
+            android:orderInCategory="101"
             style ="@style/OptionsPopupMenu"
             app:showAsAction="always">
         </item>
