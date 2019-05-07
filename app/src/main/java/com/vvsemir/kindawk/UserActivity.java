@@ -151,7 +151,7 @@ public class UserActivity extends AppCompatActivity{
         PopupMenu popup = new PopupMenu(wrapper, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.user_options_popup, popup.getMenu());
-        popup.show();
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -161,14 +161,18 @@ public class UserActivity extends AppCompatActivity{
                     AuthManager.userLogout();
                     Intent intent=new Intent(this, LoginActivity.class);
                     startActivity(intent);
+                    closeOptionsMenu();
                     finish();*/
                 }
                 else if(id == R.id.action_settings){
                     //loadFragment(ProfileFragment.newInstance());
                 }
-                return false;
+
+                return true;
             }
         });
+
+        popup.show();
     }
 
     private void setBottomNavigationListener(){

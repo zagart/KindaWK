@@ -8,8 +8,11 @@ public class Utilits {
     public static String extractPattern(String str, String extStr){
         Pattern pattern = Pattern.compile(extStr);
         Matcher match = pattern.matcher(str);
-        if (match.find())
+
+        if (match.find()) {
             return match.toMatchResult().group(1);
+        }
+
         return null;
      }
 
@@ -17,6 +20,7 @@ public class Utilits {
         final int length = arr.length;
         arr = Arrays.copyOf(arr, length + 1);
         arr[length] = element;
+
         return arr;
     }
 }

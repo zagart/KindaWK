@@ -37,19 +37,23 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             NewsItemView itemView = (NewsItemView) viewHolder.itemView;
             NewsPost newsPost = (NewsPost)news.getItem(position);
 
-            itemView.setPostText(newsPost.getPostText());
-            if(newsPost.getDateUnixTime() != null )
-            itemView.setPostDate(simpleDateFormat.format(newsPost.getDateUnixTime()));
+            if(newsPost.getDateUnixTime() != null ) {
+                itemView.setPostDate(simpleDateFormat.format(newsPost.getDateUnixTime()));
+            }
+
             itemView.setPostId(String.valueOf(newsPost.getPostId()));
             itemView.setSourceName(newsPost.getSourceName());
 
-            itemView.postUrlView.setText(newsPost.getPostPhotoUrl());
-            itemView.sourceUrlView.setText(newsPost.getSourcePhotoUrl());
+            itemView.setPostBody(newsPost.getPostText(), newsPost.getPostPhotoUrl());
+
+            //itemView.postUrlView.setText(newsPost.getPostPhotoUrl());
+            //itemView.sourceUrlView.setText(newsPost.getSourcePhotoUrl());
 
             if(newsPost.getSourcePhotoUrl() != null && !newsPost.getSourcePhotoUrl().isEmpty()) {
                 imageLoader.loadAndShow(itemView.getSourcePhotoView(), newsPost.getSourcePhotoUrl());
             }
 
+            /*
             ImageView postView = itemView.getPostPhotoView();
             postView.setImageBitmap(null);
 
@@ -64,7 +68,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             } else {
                 postView.getLayoutParams().width = 0;
                 postView.getLayoutParams().height = 0;
-            }
+            }*/
         }
     }
 

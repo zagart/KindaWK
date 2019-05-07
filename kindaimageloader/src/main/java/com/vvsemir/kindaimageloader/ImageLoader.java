@@ -42,12 +42,70 @@ public class ImageLoader implements IImageLoader {
         return instance;
     }
 
+    @Override
+    public void loadAndReturnBitmap(final String uri, final ILoaderCallback<Bitmap> callback) {
+        if (uri == null || uri.isEmpty()) {
+            callback.onResult(null);
+
+            return;
+        }
+
+        loadFromMemoryCache(uri, new ILoaderCallback<Bitmap>() {
+
+            @Override
+            public void onResult(Bitmap cachedBitmap) {
+                if (cachedBitmap == null) {
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadFromDiskCache(uri, new ILoaderCallback<Bitmap>(){
+                                @Override
+                                public void onResult(Bitmap diskBitmap) {
+                                    if (diskBitmap == null) {
+                                        try {
+                                            loadFromNetwork(uri, new ILoaderCallback<Bitmap>() {
+
+                                                @Override
+                                                public void onResult(final Bitmap networkBitmap) {
+                                                    callback.onResult(networkBitmap);
+                                                }
+
+                                                @Override
+                                                public void onError(final Throwable throwable) {
+                                                    callback.onResult(null);
+                                                }
+                                            });
+                                        } catch (IOException ex) {
+                                            callback.onResult(null);
+                                        }
+                                    } else {
+                                        callback.onResult(diskBitmap);
+                                    }
+                                }
+
+                                @Override
+                                public void onError(Throwable throwable) {
+
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    callback.onResult(cachedBitmap);
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+            }
+        });
+    }
 
     @Override
     public void loadAndShow(final ImageView imageView, final String uri) {
         if (uri == null || uri.isEmpty()) {
             imageView.setImageResource(R.drawable.ic_error_photo);
-            Log.d("PHOT loadAndShow", "nO uri");
+
             return;
         }
 

@@ -20,8 +20,8 @@ public class NewsItemView extends RelativeLayout {
     private TextView postTextView;
     private TextView postDateView;
 
-    public TextView postUrlView;
-    public TextView sourceUrlView;
+    //public TextView postUrlView;
+    //public TextView sourceUrlView;
 
     public NewsItemView(Context context) {
         super(context);
@@ -48,34 +48,49 @@ public class NewsItemView extends RelativeLayout {
             sourcePhotoView = findViewById(R.id.userPhotoView);
             postPhotoView = findViewById(R.id.postPhotoView);
 
-            postUrlView = findViewById(R.id.postUrlView);
-            sourceUrlView = findViewById(R.id.sourceUrlView);
+            //postUrlView = findViewById(R.id.postUrlView);
+            //sourceUrlView = findViewById(R.id.sourceUrlView);
 
         }
     }
 
     public NewsItemView setPostText(final String post) {
         postTextView.setText(post);
+
+        return this;
+    }
+
+    public NewsItemView setPostBody(final String postText, final String imageUri) {
+        if(imageUri == null || imageUri.isEmpty()) {
+            postTextView.setText(postText);
+        } else {
+            ((ResizableTextView)postTextView).setBody(postText, imageUri);
+        }
+
         return this;
     }
 
     public NewsItemView setPostDate(final String post) {
         postDateView.setText(post);
+
         return this;
     }
 
     public NewsItemView setSourceName(final String name) {
         sourceNameView.setText(name);
+
         return this;
     }
 
     public NewsItemView setPostId(final String id) {
         postIdView.setText(id);
+
         return this;
     }
 
     public NewsItemView setSourcePhoto(final Bitmap avatar) {
         sourcePhotoView.setImageBitmap(avatar);
+
         return this;
     }
 
@@ -86,6 +101,7 @@ public class NewsItemView extends RelativeLayout {
         } else {
             postPhotoView.setMaxWidth(0);
         }
+
         return this;
     }
 

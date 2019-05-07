@@ -25,6 +25,8 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
     static final String EXCEPTION_LOADING_USERPROFILE_API = "Sorry, can not read profile from API";
     static final String ARG_PARAM_REQUEST_METHOD = "account.getProfileInfo";
     static final String ARG_PARAM_REQUEST_PHOTO_METHOD = "getProfiles";
+    static final String PARAM_REQUEST_PROFILE_PHOTO_SIZE = "photo_big";
+
     public static final String PARAM_REQUEST_USERID = "userId";
 
     private UserProfile userProfile = null;
@@ -93,7 +95,7 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
             userProfile.setUserId(userId);
             RequestParams requestPhotoParams = new RequestParams();
             requestPhotoParams.put("uids", userId.toString());
-            requestPhotoParams.put("fields", "photo_medium");
+            requestPhotoParams.put("fields", PARAM_REQUEST_PROFILE_PHOTO_SIZE);
 
             HttpResponse httpPhotoResponse = new HttpRequestTask().execute(
                     new HttpRequest(ARG_PARAM_REQUEST_PHOTO_METHOD, false, requestPhotoParams), null);
@@ -170,7 +172,7 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
             Gson gson = new Gson().newBuilder().create();;
             JsonObject httpObj = gson.fromJson(((HttpResponse)httpResponse).getResponseAsString(), JsonObject.class);
             JsonArray response = httpObj.getAsJsonArray("response");
-            String url =  (response).get(0).getAsJsonObject().get("photo_medium").getAsString();
+            String url =  (response).get(0).getAsJsonObject().get(PARAM_REQUEST_PROFILE_PHOTO_SIZE).getAsString();
 
             return url;
 

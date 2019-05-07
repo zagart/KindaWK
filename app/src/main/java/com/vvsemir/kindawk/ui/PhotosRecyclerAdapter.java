@@ -17,6 +17,7 @@ import java.util.List;
 
 public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.ViewHolder> {
     private final char PHOTO_TYPE_SMALL = 'p';
+    private final char PHOTO_TYPE_BIG = 'z';
 
     private final LayoutInflater layoutInflater;
     private final List<Photo> photos = new ArrayList<>();
@@ -47,12 +48,16 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
     }
 
     public String getItemUriScreen(int position) {
-        return photos.get(position).getUrlByType('z');
+        return photos.get(position).getUrlByType(PHOTO_TYPE_BIG);
     }
-
 
     public void updateItems(final List<Photo> items) {
         photos.addAll(items);
+        notifyDataSetChanged(); //TODO DiffUtils
+    }
+
+    public void removeAllItems() {
+        photos.clear();
         notifyDataSetChanged(); //TODO DiffUtils
     }
 

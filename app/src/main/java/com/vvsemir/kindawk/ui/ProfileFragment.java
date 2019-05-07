@@ -259,6 +259,12 @@ public class ProfileFragment extends KindaFragment  {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         getActivity().getMenuInflater().inflate(R.menu.user_top_profile, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
+        boolean ownerMenuVsisble = currentUserId == AuthManager.getCurrentToken().getUserId();
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(ownerMenuVsisble);
+        toolbar.getMenu().findItem(R.id.action_add_photo).setVisible(ownerMenuVsisble);
+        toolbar.getMenu().findItem(R.id.action_refresh).setVisible(ownerMenuVsisble);
     }
 
     public void updateMenuOnSelectPhotos(){
@@ -277,6 +283,7 @@ public class ProfileFragment extends KindaFragment  {
             ProviderService.cleanProfileData(new ICallback<Integer>() {
                 @Override
                 public void onResult(Integer result) {
+                    photosRecyclerAdapter.removeAllItems();
                     loadData();
                 }
 
@@ -330,14 +337,6 @@ public class ProfileFragment extends KindaFragment  {
     public void setFriendProfile(Friend friend) {
         currentUserId = friend.getUserId();
         this.friend = friend;
-    }
-
-    public int getCurrentUserId() {
-        return currentUserId;
-    }
-
-    public void setCurrentUserId(int currentUserId) {
-        this.currentUserId = currentUserId;
     }
 
     @Override

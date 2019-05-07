@@ -8,4 +8,6 @@ import java.net.URL;
 
 public interface IImageLoader {
     void loadAndShow(final ImageView pImageView, final String uri);
+
+    void loadAndReturnBitmap(final String uri, ILoaderCallback<Bitmap> callback);
 }
