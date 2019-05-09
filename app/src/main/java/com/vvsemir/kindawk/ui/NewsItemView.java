@@ -2,6 +2,7 @@ package com.vvsemir.kindawk.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -60,12 +61,8 @@ public class NewsItemView extends RelativeLayout {
         return this;
     }
 
-    public NewsItemView setPostBody(final String postText, final String imageUri) {
-        if(imageUri == null || imageUri.isEmpty()) {
-            postTextView.setText(postText);
-        } else {
-            ((ResizableTextView)postTextView).setBody(postText, imageUri);
-        }
+    public NewsItemView setPostBody(final String postText) {
+        ((ResizableTextView)postTextView).setBody(postText);
 
         return this;
     }
@@ -95,12 +92,7 @@ public class NewsItemView extends RelativeLayout {
     }
 
     public NewsItemView setPostPhoto(final Bitmap photo) {
-        if(photo != null) {
-            postPhotoView.setMaxWidth(140);
-            postPhotoView.setImageBitmap(photo);
-        } else {
-            postPhotoView.setMaxWidth(0);
-        }
+        postPhotoView.setImageBitmap(photo);
 
         return this;
     }

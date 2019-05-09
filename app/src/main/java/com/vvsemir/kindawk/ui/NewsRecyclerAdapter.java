@@ -1,6 +1,7 @@
 package com.vvsemir.kindawk.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.R;
 import com.vvsemir.kindawk.provider.NewsPost;
@@ -34,8 +36,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (news != null && getItemViewType(position) == ViewType.POST) {
-            NewsItemView itemView = (NewsItemView) viewHolder.itemView;
-            NewsPost newsPost = (NewsPost)news.getItem(position);
+            final NewsItemView itemView = (NewsItemView) viewHolder.itemView;
+            final NewsPost newsPost = (NewsPost)news.getItem(position);
 
             if(newsPost.getDateUnixTime() != null ) {
                 itemView.setPostDate(simpleDateFormat.format(newsPost.getDateUnixTime()));
@@ -44,8 +46,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             itemView.setPostId(String.valueOf(newsPost.getPostId()));
             itemView.setSourceName(newsPost.getSourceName());
 
-            itemView.setPostBody(newsPost.getPostText(), newsPost.getPostPhotoUrl());
-
             //itemView.postUrlView.setText(newsPost.getPostPhotoUrl());
             //itemView.sourceUrlView.setText(newsPost.getSourcePhotoUrl());
 
@@ -53,22 +53,28 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
                 imageLoader.loadAndShow(itemView.getSourcePhotoView(), newsPost.getSourcePhotoUrl());
             }
 
-            /*
-            ImageView postView = itemView.getPostPhotoView();
+            itemView.setPostBody(newsPost.getPostText());
+
+            final ImageView postView = itemView.getPostPhotoView();
             postView.setImageBitmap(null);
 
             if(newsPost.getPostPhotoUrl() != null && !newsPost.getPostPhotoUrl().isEmpty()) {
-                if(newsPost.getPostText().isEmpty()){
-                    postView.getLayoutParams().width = 400;
-                } else {
-                    postView.getLayoutParams().width = 240;
-                }
+                imageLoader.loadAndReturnBitmap(newsPost.getPostPhotoUrl(), new ILoaderCallback<Bitmap>() {
+                    @Override
+                    public void onResult(Bitmap result) {
+                        postView.setImageBitmap(result);
+                        postView.invalidate();
+                    }
 
-                imageLoader.loadAndShow(postView, newsPost.getPostPhotoUrl());
+                    @Override
+                    public void onError(Throwable throwable) {
+
+                    }
+                });
+
             } else {
-                postView.getLayoutParams().width = 0;
                 postView.getLayoutParams().height = 0;
-            }*/
+            }
         }
     }
 

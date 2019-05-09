@@ -3,15 +3,29 @@ package com.vvsemir.kindawk.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.Editable;
 import android.text.Html;
+import android.text.Layout;
 import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.LeadingMarginSpan;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 
 import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindaimageloader.ImageLoader;
+import com.vvsemir.kindawk.R;
+
+import org.xml.sax.XMLReader;
+
+
 
 public class ResizableTextView extends AppCompatTextView{
     private static final int MAX_LINES_NORMAL = 10;
@@ -34,15 +48,22 @@ public class ResizableTextView extends AppCompatTextView{
         this.context = context;
     }
 
-    public void setBody(String text, String imageUri) {
-        //<img src="image.jpg" style="float:right" /><div>text</div>
-        ImageLoaderGetter imageGetter = new ImageLoaderGetter(this, context);
+    public void setBody(final String text) {
 
-        String content = "<img src=\""+ imageUri + "\" style=\"float:right\" /><div>" + text + "</div>" ;
+        /*DisplayMetrics metrics = context.getResources().getSystem().getDisplayMetrics();
 
-        Spannable html = (Spannable) Html.fromHtml(content, imageGetter, null);
+        int originalWidthScaled = (int) (bitmap.getWidth() * metrics.density);
+        int originalHeightScaled = (int) (bitmap.getHeight() * metrics.density);
+        if (originalWidthScaled > (metrics.widthPixels * 70) / 100) {
+            width = (metrics.widthPixels * 70) / 100;
 
-        setText(html);
+            height = bitmap.getHeight() * width
+                    / bitmap.getWidth();
+        } else {
+            height = originalHeightScaled;
+            width = originalWidthScaled;
+        }*/
+        setText(text);
     }
 
     @Override
@@ -50,53 +71,6 @@ public class ResizableTextView extends AppCompatTextView{
         super.onTextChanged(text, start, lengthBefore, lengthAfter);
         setMaxLines(extended? MAX_LINES_EXTENDED : MAX_LINES_NORMAL);
     }
-
-    public class ImageLoaderGetter implements Html.ImageGetter {
-        private ResizableTextView textView = null;
-        Context context = null;
-
-        public ImageLoaderGetter() {
-
-        }
-
-        public ImageLoaderGetter(ResizableTextView target, Context context) {
-            textView = target;
-            this.context = context;
-        }
-
-        @Override
-        public Drawable getDrawable(String source) {
-            final UriBitmapDrawable uriBitmapDrawable = new UriBitmapDrawable();
-            ImageLoader.getInstance(context).loadAndReturnBitmap(source, new ILoaderCallback<Bitmap>() {
-
-                @Override
-                public void onResult(Bitmap bitmap) {
-                    BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), bitmap);
-                    bitmapDrawable.setBounds(0, 0, bitmapDrawable.getIntrinsicWidth(), bitmapDrawable.getIntrinsicHeight());
-                    uriBitmapDrawable.drawable = bitmapDrawable;
-                    textView.invalidate();
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-            });
-
-            return uriBitmapDrawable;
-        }
-
-        private class UriBitmapDrawable extends BitmapDrawable {
-
-            protected Drawable drawable;
-
-            @Override
-            public void draw(final Canvas canvas) {
-                if (drawable != null) {
-                    drawable.draw(canvas);
-                }
-            }
-
-        }
-    }
 }
+
+

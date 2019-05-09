@@ -269,7 +269,9 @@ public class ProfileFragment extends KindaFragment  {
 
     public void updateMenuOnSelectPhotos(){
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(photosRecyclerAdapter.hasPhotoToDelete());
+        if(toolbar.getMenu() != null) {
+            toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(photosRecyclerAdapter.hasPhotoToDelete());
+        }
     }
 
     @Override

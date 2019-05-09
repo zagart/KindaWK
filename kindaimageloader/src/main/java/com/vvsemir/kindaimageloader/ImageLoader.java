@@ -67,19 +67,19 @@ public class ImageLoader implements IImageLoader {
 
                                                 @Override
                                                 public void onResult(final Bitmap networkBitmap) {
-                                                    callback.onResult(networkBitmap);
+                                                    runLoaderCallbackOnUi(callback,  networkBitmap);
                                                 }
 
                                                 @Override
                                                 public void onError(final Throwable throwable) {
-                                                    callback.onResult(null);
+                                                    runLoaderCallbackOnUi(callback,  null);
                                                 }
                                             });
                                         } catch (IOException ex) {
-                                            callback.onResult(null);
+                                            runLoaderCallbackOnUi(callback,  null);
                                         }
                                     } else {
-                                        callback.onResult(diskBitmap);
+                                        runLoaderCallbackOnUi(callback,  diskBitmap);
                                     }
                                 }
 
@@ -225,6 +225,15 @@ public class ImageLoader implements IImageLoader {
         }
     }
 
+
+    private <T> void runLoaderCallbackOnUi(final ILoaderCallback<T> callback,  final T result) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onResult(result);
+            }
+        });
+    }
 
     void showImage(final String uri, final ImageView imageView, final Bitmap bitmap) {
         if ( isViewTagValid (uri, imageView)) {
