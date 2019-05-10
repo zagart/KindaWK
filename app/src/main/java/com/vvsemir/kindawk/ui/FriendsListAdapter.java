@@ -42,8 +42,6 @@ public class FriendsListAdapter extends BaseAdapter {
             //avatarView.setImageResource(R.drawable.ic_person);
             avatarView.setImageBitmap(
                     ImageLoader.getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES)));
-
-            Log.d("ZZZadapter", "  view success" );
         }
 
         return view;

@@ -57,7 +57,6 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         if(rangeHelper.startPos > 0 && rangeHelper.nextFromChainRequest != null &&
                 !rangeHelper.nextFromChainRequest.isEmpty()){
             requestParams.put("start_from", rangeHelper.nextFromChainRequest);
-            Log.d("WWW NEXT CHAIN", "  NEXT CHAIN:" + rangeHelper.nextFromChainRequest);
         }
     }
 
@@ -86,7 +85,6 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     synchronized void loadData() {
         try {
             DbManager.DbResponse dbResponse = getDataFromDb();
-
             List<NewsPost> posts = null;
 
             if ( dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_EMPTY_TABLE ) {
@@ -137,8 +135,6 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
                 //    loadApiImagesForRange(posts);
                 //}
             }
-
-            Log.d("WWW loadApiData", "  loadApiData count:" + posts.size());
         } catch (Exception ex){
             ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {
@@ -186,12 +182,10 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     private void putDataInDb(List<NewsPost> posts){
         DbManager dbManager = ProviderService.getInstance().getDbManager();
         dbManager.insertNewsWall(posts);
-        Log.d("WWW putDataFromDb", "  putDataInDb success");
     }
 
     private DbManager.DbResponse getDataFromDb() throws Exception {
         DbManager dbManager = ProviderService.getInstance().getDbManager();
-
         newsWall.removeAllNews();
 
         List<NewsPost> posts = dbManager.getNewsWallRange(rangeHelper.startPos + 1, rangeHelper.endPos + 1); //rawid started witn 1 not 0
@@ -245,10 +239,6 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
             if(startPos == 0 || (nextFromChainRequest != null && !nextFromChainRequest.isEmpty()) ) {
                 checkNext = true;
             }
-            if(nextFromChainRequest != null)
-                Log.d("WWW checkNextApiRequest", " nextFromChainRequest=" + nextFromChainRequest);
-            else
-                Log.d("WWW checkNextApiRequest", " nextFromChainRequest= 0");
 
             return checkNext;
         }

@@ -205,7 +205,7 @@ public class ProfileFragment extends KindaFragment  {
 
     @Override
     public void loadData() {
-        if(currentUserId == AuthManager.getCurrentToken().getUserId()) {
+        if(!isCurrentUserFriend()) {
             RequestParams params = null;
             ProviderService.getAccountProfileInfo(params, new ICallback<UserProfile>() {
                 @Override
@@ -220,8 +220,6 @@ public class ProfileFragment extends KindaFragment  {
 
                         return;
                     }
-
-                    Log.d("getAccountProfileInfo", "getAccountProfileInfo : loading exception!!!" + throwable.getMessage());
                 }
             });
 
@@ -260,7 +258,7 @@ public class ProfileFragment extends KindaFragment  {
         getActivity().getMenuInflater().inflate(R.menu.user_top_profile, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        boolean ownerMenuVsisble = currentUserId == AuthManager.getCurrentToken().getUserId();
+        boolean ownerMenuVsisble = (isCurrentUserFriend() == false);
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(ownerMenuVsisble);
         toolbar.getMenu().findItem(R.id.action_add_photo).setVisible(ownerMenuVsisble);
@@ -268,6 +266,10 @@ public class ProfileFragment extends KindaFragment  {
     }
 
     public void updateMenuOnSelectPhotos(){
+        if(isCurrentUserFriend()) {
+            return;
+        }
+
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         if(toolbar.getMenu() != null) {
             toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(photosRecyclerAdapter.hasPhotoToDelete());
@@ -347,6 +349,10 @@ public class ProfileFragment extends KindaFragment  {
         outState.putParcelable(CURRENT_USER, friend);
         currentPhotoPosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
         outState.putInt(CURRENT_POSITION, currentPhotoPosition);
+    }
+
+    private boolean isCurrentUserFriend() {
+        return currentUserId != AuthManager.getCurrentToken().getUserId();
     }
 }
 

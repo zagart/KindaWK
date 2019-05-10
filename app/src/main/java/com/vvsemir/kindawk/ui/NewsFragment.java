@@ -56,7 +56,6 @@ public class NewsFragment extends KindaFragment {
         recyclerViewOnScrollListener = new BaseRecyclerViewScrollListener() {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                Log.d("NEWS onLoadMore", "onLoadMore:page: " + page + "total:" +totalItemsCount);
                 loadMoreItems(totalItemsCount, totalItemsCount + NewsWallProvider.PAGE_SIZE);
             }
 

@@ -41,8 +41,6 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
     void loadData() {
         try {
             DbManager.DbResponse dbResponse = getDataFromDb();
-            Log.d("FF getDatFromDb", "  response = " + dbResponse);
-
             List<Friend> friends = null;
 
             if (dbResponse == DbManager.DbResponse.DB_RESPONSE_STATUS_ERROR ||
@@ -115,7 +113,6 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
         DbManager dbManager = ProviderService.getInstance().getDbManager();
         dbManager.removeAllFriends();
         dbManager.insertFriends(friends);
-        Log.d("ZZZgetDataFromDb", "  putDataInDb success");
     }
 
     private DbManager.DbResponse getDataFromDb() {

@@ -38,8 +38,6 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
     void loadData() {
         try {
             DbManager.DbResponse dbResponse = getDataFromDb();
-            Log.d("UU getDatFromDb", "  response = " + dbResponse);
-
             boolean saveToDb = false;
 
             if (dbResponse != DbManager.DbResponse.DB_RESPONSE_STATUS_SUCCESS) {
@@ -114,7 +112,6 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
                     }
                 }
             }
-            Log.d("GGGgetDataFromDb", " loadApiData  success");
         } catch (Exception ex){
             ex.printStackTrace();
             throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_USERPROFILE_API);
@@ -125,7 +122,6 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
         DbManager dbManager = ProviderService.getInstance().getDbManager();
         dbManager.removeAllUserProfile();
         dbManager.insertUserProfile(userProfile);
-        Log.d("GGGgetDataFromDb", "  putDataInDb success");
     }
 
     private DbManager.DbResponse getDataFromDb(){

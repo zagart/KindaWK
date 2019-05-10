@@ -206,7 +206,6 @@ class DbManager (context : Context) {
                         friend.city.title= cursor.getString(cursor.getColumnIndexOrThrow("city"))
                         friend.country.title= cursor.getString(cursor.getColumnIndexOrThrow("country"))
                         friend.status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
-                        //friend.phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"))
                         friend.photoUrl = cursor.getString(cursor.getColumnIndexOrThrow("photo_url"))
 
                         val profilePhotoBytes = ContentValues()

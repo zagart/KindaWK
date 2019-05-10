@@ -23,7 +23,7 @@ import java.util.List;
 
 public class NewsWallGsonHelper {
     public static final String EXCEPTION_PARSING_API_RESPONSE = "Sorry, can not read posts from API";
-    public static final int MAX_PHOTO_WIDTH = 320;
+    public static final int MAX_PHOTO_WIDTH = 360;
     private final NewsWallProvider newsWallProvider;
 
     private NewsWallGsonHelper(final NewsWallProvider newsWallProvider) {
@@ -96,8 +96,6 @@ public class NewsWallGsonHelper {
                 }
             }
 
-            Log.d("NEWS HTTP", "posts:count:" + posts.size() );
-
             String  nextFrom = "";
             JsonPrimitive element = response.getAsJsonPrimitive("next_from");
 
@@ -107,7 +105,6 @@ public class NewsWallGsonHelper {
 
             newsWallProvider.setNextFromChainRequest(nextFrom);
 
-            Log.d("NEWS HTTP", "posts:count:" + posts.size()  + "next:" + nextFrom);
         } catch (Exception ex){
             ex.printStackTrace();
         } finally {

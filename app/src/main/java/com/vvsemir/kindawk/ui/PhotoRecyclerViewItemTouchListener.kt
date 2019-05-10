@@ -13,7 +13,7 @@ open class PhotoRecyclerViewItemTouchListener(@NotNull recycleView: RecyclerView
     : BaseRecyclerViewItemTouchListener<PhotoRecyclerViewItemTouchListener.SelectionClickListener >(recycleView, specialIds, clickListener) {
 
     companion object {
-        private const val SPECIAL_VIEW_CLICK_AREA_EXTENSION = 8//this is gonna be converted to 8dp
+        private const val SPECIAL_VIEW_CLICK_AREA_EXTENSION = 8
     }
 
     private var clickPadding: Int

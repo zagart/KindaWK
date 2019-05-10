@@ -108,20 +108,9 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
         }
     }
 
-    public void setShowLoadingProgress(final boolean show) {
-        if (show != showLoading) {
-            showLoading = show;
-
-            final int position = news == null ? 0 : news.getCount();
-            notifyItemInserted(position);
-        }
-    }
-
     public void updateItems(final NewsWall posts) {
         if(posts !=  null) {
             news.appendPosts(posts.getNews());
-            Log.d("WWRR updateItems", "count new= " + news.getCount() + "hash =" + news.hashCode());
-            //notifyDataSetChanged();
         }
     }
 
@@ -147,9 +136,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
             if (getAdapterPosition() == RecyclerView.NO_POSITION) {
                 return;
             }
-            //notifyItemChanged(selectPosition);
-            //selectPosition = getAdapterPosition();
-            //notifyItemChanged(selectPosition);
         }
     }
 }

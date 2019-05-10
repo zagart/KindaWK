@@ -28,7 +28,6 @@ public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpRespo
             connection.setRequestMethod(httpRequest.getRequestMethod());
             connection.setDoOutput(httpRequest.isPostRequest());
 
-            // Send post request
             if (httpRequest.isPostRequest()) {
                 connection.getOutputStream().write(httpRequest.getBodyRequest().getBytes("UTF-8"));
             }
@@ -39,8 +38,6 @@ public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpRespo
                 throw new IOException();
             }
 
-            //read response
-            //StringBuffer strBuffer = new StringBuffer();
             StringBuilder stringBuilder = new StringBuilder();
             InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(streamReader);
