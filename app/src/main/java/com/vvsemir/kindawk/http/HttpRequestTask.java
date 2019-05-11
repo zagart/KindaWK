@@ -1,5 +1,6 @@
 package com.vvsemir.kindawk.http;
 
+import com.vvsemir.kindawk.service.CallbackExceptionFactory;
 import com.vvsemir.kindawk.service.ICallback;
 
 import java.io.BufferedReader;
@@ -9,14 +10,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpResponse, Integer>{
-    private static final int READ_TIMEOUT = 15000;
-    private static final int CONNECTION_TIMEOUT = 15000;
+    private static final String EXCEPTION_NETWORK_CONNECTION = "Please, check network connection";
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECTION_TIMEOUT = 7000;
 
     public HttpRequestTask(){
     }
 
     @Override
-    public HttpResponse execute(final HttpRequest httpRequest, ICallback<Integer> callbackOnResult) {
+    public HttpResponse execute(final HttpRequest httpRequest, ICallback<Integer> callbackOnResult) throws Exception {
         HttpURLConnection connection = null;
         HttpResponse result = null;
 
@@ -57,6 +59,7 @@ public class HttpRequestTask implements IHttpRequestTask <HttpRequest, HttpRespo
 
         } catch (IOException ex) {
             ex.printStackTrace();
+            throw new CallbackExceptionFactory.Companion.NetworkException(EXCEPTION_NETWORK_CONNECTION);
         } finally {
             if (connection != null) {
                 connection.disconnect();

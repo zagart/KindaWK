@@ -1,38 +1,36 @@
 package com.vvsemir.kindawk.auth
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.webkit.CookieManager
 import com.vvsemir.kindawk.utils.Utilits
 
 class AuthManager private constructor(context : Context) {
-    var appContext: Context
-    var accessToken: AccessToken
+    val appContext: Context
+    val accessToken: AccessToken
+    val preferenceHelper : PreferenceHelper
 
     init {
         appContext = context
+        preferenceHelper = PreferenceHelper(context, PREFERENCE_APP_NAME)
         accessToken = getTokenFromPreferences()
     }
 
     private fun isLoggedIn(): Boolean = accessToken.isValid()
 
     private fun logout() {
-        getPreferences().edit().clear().apply();
+        preferenceHelper.clear()
         CookieManager.getInstance().removeAllCookie();
         accessToken.updateToken()
     }
 
     private fun saveTokenInPreferences(url : String) {
         val params = parseUrlForToken(url)
-
-        val editor : SharedPreferences.Editor = getPreferences().edit()
         val token = params[PREFERENCE_ACCESS_TOKEN]
         val userId = params[PREFERENCE_USER_ID]
 
         if (token != null && userId != null) {
-            editor.putString(PREFERENCE_ACCESS_TOKEN, token);
-            editor.putString(PREFERENCE_USER_ID, userId);
-            editor.apply();
+            preferenceHelper.set(PREFERENCE_ACCESS_TOKEN, token)
+            preferenceHelper.set(PREFERENCE_USER_ID, userId)
             accessToken.updateToken(Integer.parseInt(userId), token)
         }
     }
@@ -53,21 +51,23 @@ class AuthManager private constructor(context : Context) {
     }
 
     private fun getTokenFromPreferences(): AccessToken {
-        if(!getPreferences().contains(PREFERENCE_USER_ID) || !getPreferences().contains(PREFERENCE_ACCESS_TOKEN) ) {
+        if(!preferenceHelper.contains(PREFERENCE_USER_ID) || !preferenceHelper.contains(PREFERENCE_ACCESS_TOKEN) ) {
             return AccessToken()
         }
 
-        return AccessToken(Integer.parseInt(getPreferences().getString(PREFERENCE_USER_ID, "") ?: "0"),
-                getPreferences().getString(PREFERENCE_ACCESS_TOKEN, ""));
+        return AccessToken(Integer.parseInt(preferenceHelper.get(PREFERENCE_USER_ID, "") ?: "0"),
+                preferenceHelper.get(PREFERENCE_ACCESS_TOKEN, ""));
     }
 
-    private fun getPreferences() = appContext.getSharedPreferences(PREFERENCE_APP_NAME, Context.MODE_PRIVATE)
+    //private fun getPreferences() = appContext.getSharedPreferences(PREFERENCE_APP_NAME, Context.MODE_PRIVATE)
+    //private fun getPreferences() = preferenceHelper.sharedPreferences
 
 
     companion object : SingletonHolder<AuthManager, Context>(::AuthManager){
         const val PREFERENCE_APP_NAME = "com.vvsemir.kindawk.app_prefs"
         const val PREFERENCE_USER_ID = "user_id"
         const val PREFERENCE_ACCESS_TOKEN = "token"
+        const val PREFERENCE_NEWS_DATE_POSTED = "news_posted_range"
         const val URL_TOKEN_PATTERN = "_token=(.*?)&"
         const val URL_USERID_PATTERN = "user_id=(\\d*)"
         const val APP_VKCLIENT_ID = "6870401"
@@ -80,6 +80,9 @@ class AuthManager private constructor(context : Context) {
 
         @JvmStatic
         fun getCurrentContext()  = getInstance()?.appContext
+
+        @JvmStatic
+        fun getAppPreferences()  = getInstance()?.preferenceHelper
 
         @JvmStatic
         fun getTokenVersionString()  = getInstance()?.accessToken?.accessTokenToString() + "&" + APP_VKCLIENT_API_V

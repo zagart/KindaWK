@@ -33,6 +33,7 @@ import com.vvsemir.kindawk.ui.KindaFragment;
 import com.vvsemir.kindawk.ui.NewsFragment;
 import com.vvsemir.kindawk.ui.PhotoBigFragment;
 import com.vvsemir.kindawk.ui.ProfileFragment;
+import com.vvsemir.kindawk.ui.SettingsDialogFragment;
 
 
 public class UserActivity extends AppCompatActivity{
@@ -148,7 +149,7 @@ public class UserActivity extends AppCompatActivity{
 
     public void showPopupMenu(Context context, View view){
         Context wrapper = new ContextThemeWrapper(context, R.style.OptionsPopupMenu);
-        PopupMenu popup = new PopupMenu(wrapper, view);
+        final PopupMenu popup = new PopupMenu(wrapper, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.user_options_popup, popup.getMenu());
 
@@ -166,6 +167,10 @@ public class UserActivity extends AppCompatActivity{
                 }
                 else if(id == R.id.action_settings){
                     //loadFragment(ProfileFragment.newInstance());
+                    SettingsDialogFragment settingsDialogFragment = new SettingsDialogFragment();
+                    settingsDialogFragment.show(getSupportFragmentManager(), "");
+
+                    popup.dismiss();
                 }
 
                 return true;

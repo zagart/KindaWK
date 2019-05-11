@@ -64,11 +64,19 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
 
         } catch (Exception ex){
             ex.printStackTrace();
+            final Throwable throwable;
+
+            if(ex instanceof CallbackExceptionFactory.Companion.NetworkException) {
+                throwable = ex;
+            } else {
+                throwable = CallbackExceptionFactory.Companion.createException
+                        (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_USERPROFILE_API);
+            }
+
             ProviderService.getInstance().getHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    callback.onError(CallbackExceptionFactory.Companion.createException
-                            (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_USERPROFILE_API));
+                    callback.onError(throwable);
                 }
             });
         }
@@ -112,6 +120,8 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
                     }
                 }
             }
+        } catch (CallbackExceptionFactory.Companion.NetworkException ex){
+            throw ex;
         } catch (Exception ex){
             ex.printStackTrace();
             throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_USERPROFILE_API);

@@ -52,6 +52,7 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
     }
 
     public void updateItems(final List<Photo> items) {
+        photos.clear();
         photos.addAll(items);
         notifyDataSetChanged(); //TODO DiffUtils
     }

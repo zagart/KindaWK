@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vvsemir.kindaimageloader.ILoaderCallback;
 import com.vvsemir.kindaimageloader.ImageLoader;
@@ -150,9 +151,15 @@ public class ProfileFragment extends KindaFragment  {
             }
         }));
 
-        loadData();
+
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        loadData();
+        super.onResume();
     }
 
     public void updateViewsWithData(Parcelable data) {
@@ -248,6 +255,9 @@ public class ProfileFragment extends KindaFragment  {
             @Override
             public void onError(Throwable throwable) {
                 //To do show in recyle error
+                photosRecyclerAdapter.removeAllItems();
+                Toast toast = Toast.makeText(getActivity(), throwable.getMessage(),Toast.LENGTH_SHORT);
+                toast.show();
                 hideProgress();
             }
         } );

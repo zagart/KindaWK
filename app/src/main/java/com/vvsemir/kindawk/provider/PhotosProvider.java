@@ -65,11 +65,20 @@ public class PhotosProvider implements Runnable {
             });
         } catch (Exception ex){
             ex.printStackTrace();
+            final Throwable throwable;
+
+            if(ex instanceof CallbackExceptionFactory.Companion.NetworkException) {
+                throwable = ex;
+            } else {
+                throwable = CallbackExceptionFactory.Companion.createException
+                        (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_API);
+            }
+
+            ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    callback.onError(CallbackExceptionFactory.Companion.createException
-                            (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_API));
+                    callback.onError(throwable);
                 }
             });
         }
@@ -82,20 +91,12 @@ public class PhotosProvider implements Runnable {
             HttpResponse httpResponse = new HttpRequestTask().execute(
                     new HttpRequest(ARG_PARAM_REQUEST_METHOD, false, requestParams), null);
 
-            if (httpResponse == null) {
-                throw new CallbackExceptionFactory.Companion.HttpException(EXCEPTION_LOADING_API);
-            }
-
             photos = getPhotosFromHttp(httpResponse);
+        } catch (CallbackExceptionFactory.Companion.NetworkException ex){
+            throw ex;
         } catch (Exception ex){
             ex.printStackTrace();
-            ProviderService.getInstance().getHandler().post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onError(CallbackExceptionFactory.Companion.createException
-                            (CallbackExceptionFactory.THROWABLE_TYPE_EXCEPTION_HTTP, EXCEPTION_LOADING_API));
-                }
-            });
+            throw new Exception(EXCEPTION_LOADING_API);
         } finally {
             return photos;
         }

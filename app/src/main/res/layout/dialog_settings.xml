@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark">
+
+    <ImageView
+        android:id="@+id/settingsIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/settings"
+        android:tint="@color/colorEnable"
+        app:srcCompat="@drawable/ic_settings" />
+
+    <TextView
+        android:id="@+id/settingsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/settingsIcon"
+        android:layout_gravity="center"
+        android:layout_toEndOf="@id/settingsIcon"
+        android:text="@string/settings"
+        android:textColor="@color/colorEnable"
+        android:textSize="24sp" />
+
+    <View
+        android:id="@+id/titleDivider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/settingsTitle"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="?android:attr/listDivider"
+        android:outlineAmbientShadowColor="@color/colorEnable" />
+
+    <TextView
+        android:id="@+id/settingsNewsDatePosted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/titleDivider"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/settingsDatePosted"
+        android:textColor="@color/colorEnable"
+        android:textSize="18sp" />
+
+    <Spinner
+        android:id="@+id/spinnerDateRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/settingsNewsDatePosted"
+        android:layout_marginLeft="16dp"
+        android:layout_toEndOf="@id/settingsNewsDatePosted" />
+
+
+</RelativeLayout>
