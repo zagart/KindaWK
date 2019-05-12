@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.provider.Friend;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
@@ -38,6 +39,8 @@ import com.vvsemir.kindawk.ui.SettingsDialogFragment;
 
 public class UserActivity extends AppCompatActivity{
     private static final String CURRENT_FRAGMENT = "current_fragment";
+    private static final String DIALOG_TAG = "dialog_tag";
+
     public KindaFragment currentFragment;
     public BottomNavigationView bottomNavigationView;
     MenuNavigationState menuNavigationState = MenuNavigationState.SHOW;
@@ -147,7 +150,7 @@ public class UserActivity extends AppCompatActivity{
     }
 
 
-    public void showPopupMenu(Context context, View view){
+    public void showPopupMenu(final Context context, View view){
         Context wrapper = new ContextThemeWrapper(context, R.style.OptionsPopupMenu);
         final PopupMenu popup = new PopupMenu(wrapper, view);
         MenuInflater inflater = popup.getMenuInflater();
@@ -158,17 +161,23 @@ public class UserActivity extends AppCompatActivity{
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int id = menuItem.getItemId();
                 if (id == R.id.action_logout) {
-                    /*
                     AuthManager.userLogout();
-                    Intent intent=new Intent(this, LoginActivity.class);
+                    Intent intent = new Intent(context, LoginActivity.class);
                     startActivity(intent);
                     closeOptionsMenu();
-                    finish();*/
+                    finish();
                 }
                 else if(id == R.id.action_settings){
-                    //loadFragment(ProfileFragment.newInstance());
+
+                    /*FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    Fragment prev = getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
+                    if (prev != null) {
+                        ft.remove(prev);
+                    }
+                    ft.addToBackStack(null);*/
+
                     SettingsDialogFragment settingsDialogFragment = new SettingsDialogFragment();
-                    settingsDialogFragment.show(getSupportFragmentManager(), "");
+                    settingsDialogFragment.show(getSupportFragmentManager(), DIALOG_TAG);
 
                     popup.dismiss();
                 }

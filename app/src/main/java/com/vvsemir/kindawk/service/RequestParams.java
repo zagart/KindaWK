@@ -63,7 +63,11 @@ public class RequestParams implements Parcelable {
         params.put(paramName, Integer.toString(paramValue));
     }
 
-    public void putDouble(String param_name, Double paramValue) {
+    public void put(String paramName, Long paramValue) {
+        params.put(paramName, Long.toString(paramValue));
+    }
+
+    public void put(String param_name, Double paramValue) {
         params.put(param_name, Double.toString(paramValue));
     }
 

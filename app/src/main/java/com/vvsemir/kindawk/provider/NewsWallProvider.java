@@ -17,6 +17,7 @@ import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.service.RequestParams;
 
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         requestParams.put("owner_id", AuthManager.getCurrentToken().getUserId());
         //requestParams.put("count", rangeHelper.endPos - rangeHelper.startPos + 1);
         //requestParams.put("count", 100);
-        requestParams.put("start_time",1120117972);
+        requestParams.put("start_time", getStartTimeFromPrefs());
         requestParams.put("max_photos",ARG_PARAM_REQUEST_MAX_PHOTOS);
         requestParams.put("filters",ARG_PARAM_REQUEST_FILTERS);
         requestParams.put("fields",ARG_PARAM_REQUEST_FIELDS);
@@ -216,6 +217,40 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         DbManager dbManager = ProviderService.getInstance().getDbManager();
         dbManager.insertNewsWallOffset(nextFrom);
         rangeHelper.nextFromChainRequest = nextFrom;
+    }
+
+    private long getStartTimeFromPrefs() {
+        int newsDatePostedIndx = (int)AuthManager.getAppPreferences().get(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        switch (newsDatePostedIndx) {
+            case DatePostedRange.YESTERDAY:
+                calendar.add(Calendar.DATE, -1);
+
+                break;
+            case DatePostedRange.WEEK:
+                calendar.add(Calendar.DATE, -7);
+
+                break;
+            case DatePostedRange.MONTH:
+                calendar.add(Calendar.DATE, -30);
+
+                break;
+
+        }
+
+        return calendar.getTimeInMillis()/1000;
+    }
+
+    interface DatePostedRange {
+        int TODAY = 0;
+        int YESTERDAY = 1;
+        int WEEK = 2;
+        int MONTH= 3;
     }
 
     private class RangeHelper {

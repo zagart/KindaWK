@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -31,7 +31,7 @@
         android:id="@+id/postDateView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@id/userPhotoView"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
@@ -41,15 +41,36 @@
         android:textColor="@color/colorBottomPrimaryDark"
         android:textSize="10sp" />
 
+    <ImageView
+        android:id="@+id/likesIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignStart="@id/userPhotoView"
+        android:layout_alignTop="@id/postPhotoView"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@null"
+        app:srcCompat="@drawable/ic_favorite" />
+
+    <ImageView
+        android:id="@+id/viewsIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_below="@id/likesIcon"
+        android:layout_alignStart="@id/userPhotoView"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@null"
+        app:srcCompat="@drawable/ic_eye" />
+
     <TextView
         android:id="@+id/postIdView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postSourceNameView"
-        android:layout_toEndOf="@id/userPhotoView"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"/>
+        android:layout_below="@id/viewsIcon"
+        android:layout_alignStart="@id/userPhotoView"
+        android:textSize="8sp" />
+
 
     <com.vvsemir.kindawk.ui.ResizableTextView
         android:id="@+id/postTextView"
@@ -66,13 +87,17 @@
         android:id="@+id/postPhotoView"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:layout_margin="4dp"
         android:layout_below="@+id/userPhotoView"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:adjustViewBounds="true"
         android:background="@color/colorBgFragments"
         android:contentDescription="@null"
-        android:scaleType="fitStart"/>
+        android:minWidth="48dp"
+        android:scaleType="fitStart" />
 
     <!--TextView
         android:id="@+id/sourceUrlView"

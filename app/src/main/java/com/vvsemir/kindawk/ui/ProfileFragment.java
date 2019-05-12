@@ -2,9 +2,12 @@ package com.vvsemir.kindawk.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -24,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,10 +51,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ProfileFragment extends KindaFragment  {
     public static final String FRAGMENT_TAG = "ProfileFragmentTag";
     private static final String CURRENT_USER = "CurrentUser";
     private static final String CURRENT_POSITION = "CurrentPosition";
+    static final int REQUEST_IMAGE_CAPTURE = 111;
+
 
 
     ImageView profilePhotoView;
@@ -151,14 +159,13 @@ public class ProfileFragment extends KindaFragment  {
             }
         }));
 
-
+        loadData();
 
         return view;
     }
 
     @Override
     public void onResume() {
-        loadData();
         super.onResume();
     }
 
@@ -287,10 +294,41 @@ public class ProfileFragment extends KindaFragment  {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //imageView.setImageBitmap(imageBitmap);
+            //to do
+            Context context = getActivity();
+            Toast ImageToast = new Toast(context);
+            LinearLayout toastLayout = new LinearLayout(context);
+            toastLayout.setOrientation(LinearLayout.HORIZONTAL);
+            ImageView image = new ImageView(context);
+            TextView text = new TextView(context);
+            image.setImageBitmap(imageBitmap);
+            text.setText("Capture!!!");
+            toastLayout.addView(image);
+            toastLayout.addView(text);
+            ImageToast.setView(toastLayout);
+            ImageToast.setDuration(Toast.LENGTH_LONG);
+            ImageToast.show();
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_add_photo) {
+
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
 
             return true;
         } else if(id == R.id.action_refresh) {

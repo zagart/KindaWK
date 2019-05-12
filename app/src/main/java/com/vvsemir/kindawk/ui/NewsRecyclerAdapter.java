@@ -63,6 +63,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.View
                     @Override
                     public void onResult(Bitmap result) {
                         postView.setImageBitmap(result);
+                        //postView.getLayoutParams().width = result.getWidth();
+
                         postView.invalidate();
                     }
 

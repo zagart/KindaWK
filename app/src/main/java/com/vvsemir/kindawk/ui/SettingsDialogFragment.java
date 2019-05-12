@@ -45,13 +45,12 @@ public class SettingsDialogFragment extends DialogFragment {
         newsDateSpinner = (Spinner) view.findViewById(R.id.spinnerDateRange);
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getActivity(),
-                //R.array.settingsDatePosted_array, android.R.layout.simple_spinner_item);
                 R.array.settingsDatePosted_array, R.layout.spinner_item_settings);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_settings);
         newsDateSpinner.setAdapter(spinnerAdapter);
-        newsDateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
+        newsDateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
               @Override
               public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                   int currentSpinnerPos = parent.getSelectedItemPosition();
@@ -62,7 +61,7 @@ public class SettingsDialogFragment extends DialogFragment {
               }
           });
 
-        Integer newsDatePostedIndx = (Integer)AuthManager.getAppPreferences().get(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
+        int newsDatePostedIndx = (int)AuthManager.getAppPreferences().get(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
         newsDateSpinner.setSelection(newsDatePostedIndx);
 
         return builder.create();

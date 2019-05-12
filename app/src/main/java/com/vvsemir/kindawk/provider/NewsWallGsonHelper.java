@@ -23,7 +23,8 @@ import java.util.List;
 
 public class NewsWallGsonHelper {
     public static final String EXCEPTION_PARSING_API_RESPONSE = "Sorry, can not read posts from API";
-    public static final int MAX_PHOTO_WIDTH = 360;
+    public static final int MAX_PHOTO_WIDTH = 400;
+    public static final int MIN_PHOTO_WIDTH = 300;
     private final NewsWallProvider newsWallProvider;
 
     private NewsWallGsonHelper(final NewsWallProvider newsWallProvider) {
@@ -115,10 +116,12 @@ public class NewsWallGsonHelper {
     private int getPhotoIdxByWidth(List<NewsPost.AttachPhotoSizes> list){
         if(list != null && list.size() > 0){
             for(int i = list.size() - 1; i >= 0; i --){
-                if(list.get(i).width <= MAX_PHOTO_WIDTH){
+                if(list.get(i).width <= MAX_PHOTO_WIDTH && list.get(i).width >= MIN_PHOTO_WIDTH){
                     return i;
                 }
             }
+
+            return list.size() - 1;
         }
 
         return -1;
