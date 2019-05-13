@@ -74,4 +74,9 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
     public boolean hasPhotoToDelete() {
         return photosIdsToDelete.size() > 0;
     }
+
+    public void addItem(Photo photo) {
+        photos.add(photo);
+    }
+
 }

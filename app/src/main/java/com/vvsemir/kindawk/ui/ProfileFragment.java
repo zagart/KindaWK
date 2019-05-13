@@ -5,7 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -13,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,7 +51,11 @@ import com.vvsemir.kindawk.service.RequestParams;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -73,6 +80,7 @@ public class ProfileFragment extends KindaFragment  {
     int currentUserId = 0;
     int currentPhotoPosition = 0;
     Friend friend = null;
+    String capturedPhotoPath;
 
     private LinearLayoutManager layoutManager;
     PhotosRecyclerAdapter photosRecyclerAdapter;
@@ -300,8 +308,31 @@ public class ProfileFragment extends KindaFragment  {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            RequestParams photoParams = new RequestParams();
+            photoParams.put(PhotosProvider.PARAM_REQUEST_OWNERID, currentUserId);
+
+            ProviderService.addOwnersPhoto(capturedPhotoPath, photoParams, new ILoaderCallback<List<Photo>>() {
+
+                @Override
+                public void onResult(final List<Photo> result) {
+                    photosRecyclerAdapter.addItem(result.get(0));
+
+                    if(currentPhotoPosition > 0 && currentPhotoPosition < photosRecyclerAdapter.getItemCount()) {
+                        recyclerView.scrollToPosition(photosRecyclerAdapter.getItemCount() - 1);
+                    }
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    Toast toast = Toast.makeText(getActivity(), throwable.getMessage(),Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            } );
+
             //imageView.setImageBitmap(imageBitmap);
-            //to do
+            /*
             Context context = getActivity();
             Toast ImageToast = new Toast(context);
             LinearLayout toastLayout = new LinearLayout(context);
@@ -314,7 +345,7 @@ public class ProfileFragment extends KindaFragment  {
             toastLayout.addView(text);
             ImageToast.setView(toastLayout);
             ImageToast.setDuration(Toast.LENGTH_LONG);
-            ImageToast.show();
+            ImageToast.show();*/
         }
     }
 
@@ -327,8 +358,24 @@ public class ProfileFragment extends KindaFragment  {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                File photoFile = null;
+
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    //to do
+                    return true;
+                }
+
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                            getResources().getString(R.string.app_authority),
+                            photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
             }
+
 
             return true;
         } else if(id == R.id.action_refresh) {
@@ -389,6 +436,16 @@ public class ProfileFragment extends KindaFragment  {
     public void setFriendProfile(Friend friend) {
         currentUserId = friend.getUserId();
         this.friend = friend;
+    }
+
+    private File createImageFile() throws IOException {
+       String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageFile = File.createTempFile(imageFileName, ".jpg", storageDir);
+        capturedPhotoPath = imageFile.getAbsolutePath();
+
+        return imageFile;
     }
 
     @Override

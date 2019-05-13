@@ -23,8 +23,12 @@ import com.vvsemir.kindawk.provider.PhotosProvider;
 import com.vvsemir.kindawk.provider.UserProfile;
 import com.vvsemir.kindawk.provider.UserProfileProvider;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -136,6 +140,22 @@ public class ProviderService extends Service {
         instance.executorService.execute(dataProvider);
     }
 
+    public static void addOwnersPhoto(final  String photoPath, final RequestParams params, ILoaderCallback<List<Photo>>  callback ) {
+        if (instance == null) {
+            return;
+        }
+
+        //PhotosProvider dataProvider = new PhotosProvider(callback);
+        //dataProvider.setRequestParams(params);
+        //instance.executorService.execute(dataProvider);
+        //List<Photo> photos = new ArrayList<>();
+        //Photo photo = new Photo();
+        //photo.setOwnerId(AuthManager.getCurrentToken().getUserId());
+        //List<Photo.PhotoSize> photoSizes = new ArrayList<>();
+        //photo.setPhotoSizes(photoSizes);
+        //photos.add(photo);
+        //callback.onResult(photos);
+    }
 
     public static ProviderService getInstance() {
         return instance;
