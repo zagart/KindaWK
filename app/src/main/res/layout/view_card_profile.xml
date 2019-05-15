@@ -48,21 +48,21 @@
                 android:id="@+id/profStatusView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:layout_margin="8dp"
                 android:textAlignment="center"
                 android:textColor="@color/colorTitleText"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:textSize="12sp"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
                 android:id="@+id/profFirstNameView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="8dp"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@id/card_guideline"
                 app:layout_constraintTop_toTopOf="@id/profilePhotoView" />
 
@@ -70,10 +70,10 @@
                 android:id="@+id/profLastNameView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@id/card_guideline"
                 app:layout_constraintTop_toBottomOf="@id/profFirstNameView" />
 
@@ -82,13 +82,12 @@
                 android:id="@+id/profPhoneView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="4dp"
-                android:textAlignment="textEnd"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toTopOf="@id/profCountryView"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:textSize="10sp"
+                app:layout_constraintStart_toEndOf="@id/card_guideline"
+                app:layout_constraintTop_toBottomOf="@id/profLastNameView" />
 
             <TextView
                 android:id="@+id/profCityView"
@@ -97,18 +96,18 @@
                 android:layout_marginEnd="8dp"
                 android:textAlignment="textEnd"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@id/profilePhotoView"
-                app:layout_constraintEnd_toStartOf="@id/profCountryView" />
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@id/profCountryView"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
                 android:id="@+id/profCountryView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:textAlignment="textEnd"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="@id/profilePhotoView"
                 app:layout_constraintEnd_toEndOf="parent" />
 

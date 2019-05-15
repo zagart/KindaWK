@@ -29,7 +29,9 @@ import com.vvsemir.kindawk.service.ProviderService;
 import static android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 public class PhotoBigFragment extends KindaFragment {
-    public static final String FRAGMENT_TAG = "PhotoBigFragment";
+    public static final String FRAGMENT_TAG = "photoBigFragment";
+    private static final String CURRENT_URI = "currentUri";
+
     private ImageView imageView;
     private String imageUri;
 
@@ -47,6 +49,10 @@ public class PhotoBigFragment extends KindaFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_URI)) {
+            imageUri = savedInstanceState.getString(CURRENT_URI);
+        }
     }
 
     @Nullable
@@ -90,5 +96,11 @@ public class PhotoBigFragment extends KindaFragment {
     @Override
     public String getFragmentTag() {
         return FRAGMENT_TAG;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(CURRENT_URI, imageUri);
     }
 }

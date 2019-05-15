@@ -150,6 +150,10 @@ public class ProfileFragment extends KindaFragment  {
                 resIds, new PhotoRecyclerViewItemTouchListener.SelectionClickListener() {
             @Override
             public void onSelectClick(@NotNull View view, int position) {
+                if(photosRecyclerAdapter.getPhotoId(position) == -1){
+                    return;
+                }
+
                 final CheckBox checkBox = (CheckBox) view.findViewById(R.id.selectPhotoBox);
                 checkBox.setChecked(!checkBox.isChecked());
                 photosRecyclerAdapter.addPhotoToDelete(position, checkBox.isChecked());
@@ -227,9 +231,13 @@ public class ProfileFragment extends KindaFragment  {
 
     @Override
     public void loadData() {
+        if(getProviderService() == null){
+            return;
+        }
+
         if(!isCurrentUserFriend()) {
             RequestParams params = null;
-            ProviderService.getAccountProfileInfo(params, new ICallback<UserProfile>() {
+            getProviderService().getAccountProfileInfo(params, new ICallback<UserProfile>() {
                 @Override
                 public void onResult(UserProfile result) {
                     updateViewsWithData(result);
@@ -253,7 +261,7 @@ public class ProfileFragment extends KindaFragment  {
         RequestParams photoParams = new RequestParams();
         photoParams.put(PhotosProvider.PARAM_REQUEST_OWNERID, currentUserId);
 
-        ProviderService.getPhotosByOwner(photoParams, new ILoaderCallback<List<Photo>>() {
+        getProviderService().getPhotosByOwner(photoParams, new ILoaderCallback<List<Photo>>() {
 
             @Override
             public void onResult(final List<Photo> result) {
@@ -291,13 +299,9 @@ public class ProfileFragment extends KindaFragment  {
     }
 
     public void updateMenuOnSelectPhotos(){
-        if(isCurrentUserFriend()) {
-            return;
-        }
-
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         if(toolbar.getMenu() != null) {
-            toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(photosRecyclerAdapter.hasPhotoToDelete());
+            toolbar.getMenu().findItem(R.id.action_delete_photo).setVisible(!isCurrentUserFriend() && photosRecyclerAdapter.hasPhotoToDelete());
         }
     }
 
@@ -312,7 +316,7 @@ public class ProfileFragment extends KindaFragment  {
             RequestParams photoParams = new RequestParams();
             photoParams.put(PhotosProvider.PARAM_REQUEST_OWNERID, currentUserId);
 
-            ProviderService.addOwnersPhoto(capturedPhotoPath, photoParams, new ILoaderCallback<List<Photo>>() {
+            getProviderService().addOwnersPhoto(capturedPhotoPath, photoParams, new ILoaderCallback<List<Photo>>() {
 
                 @Override
                 public void onResult(final List<Photo> result) {
@@ -379,7 +383,7 @@ public class ProfileFragment extends KindaFragment  {
 
             return true;
         } else if(id == R.id.action_refresh) {
-            ProviderService.cleanProfileData(new ICallback<Integer>() {
+            getProviderService().cleanProfileData(new ICallback<Integer>() {
                 @Override
                 public void onResult(Integer result) {
                     photosRecyclerAdapter.removeAllItems();
@@ -458,6 +462,10 @@ public class ProfileFragment extends KindaFragment  {
 
     private boolean isCurrentUserFriend() {
         return currentUserId != AuthManager.getCurrentToken().getUserId();
+    }
+
+    private final ProviderService getProviderService(){
+        return ((UserActivity)getActivity()).getProviderService();
     }
 }
 

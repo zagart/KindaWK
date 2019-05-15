@@ -43,7 +43,21 @@ class DbManager (context : Context) {
     fun removeAllUserProfile() =  deleteAll(DbOpenHelper.DB_TABLE_PROFILE)
     fun removeAllFriends() =  deleteAll(DbOpenHelper.DB_TABLE_FRIENDS)
     fun removeAllNews() =  deleteAll(DbOpenHelper.DB_TABLE_NEWSFEED)
-    fun removeAllPhotos() =  deleteAll(DbOpenHelper.DB_TABLE_PHOTOS)
+    fun removeAllOffset() =  deleteAll(DbOpenHelper.DB_TABLE_NEWSFEED_OFFSET)
+    fun cleanDb() {
+        db?.beginTransaction()
+
+        try {
+            removeAllUserProfile()
+            removeAllFriends()
+            removeAllNews()
+            removeAllOffset()
+
+            db?.setTransactionSuccessful()
+        } finally {
+            db?.endTransaction()
+        }
+    }
 
     fun insertUserProfile(userProfile : UserProfile) : Long? {
         val values = ContentValues()

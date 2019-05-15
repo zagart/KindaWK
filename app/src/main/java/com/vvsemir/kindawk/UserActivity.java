@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.PersistableBundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,18 +17,24 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vvsemir.kindawk.auth.AuthManager;
 import com.vvsemir.kindawk.provider.Friend;
+import com.vvsemir.kindawk.provider.observer.IEvent;
+import com.vvsemir.kindawk.provider.observer.IEventObserver;
 import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.ui.FriendsFragment;
 import com.vvsemir.kindawk.ui.IFragment;
@@ -37,14 +45,14 @@ import com.vvsemir.kindawk.ui.ProfileFragment;
 import com.vvsemir.kindawk.ui.SettingsDialogFragment;
 
 
-public class UserActivity extends AppCompatActivity{
+public class UserActivity extends AppCompatActivity implements IEventObserver {
     private static final String CURRENT_FRAGMENT = "current_fragment";
     private static final String DIALOG_TAG = "dialog_tag";
 
     public KindaFragment currentFragment;
     public BottomNavigationView bottomNavigationView;
     MenuNavigationState menuNavigationState = MenuNavigationState.SHOW;
-    ProviderService providerService;
+    private ProviderService providerService;
     boolean isServiceBound = false;
 
 
@@ -52,8 +60,10 @@ public class UserActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
         if (id == R.id.action_options) {
-            showPopupMenu(this, findViewById(R.id.action_options));
+            showPopupMenu(toolbar.getContext(), findViewById(R.id.action_options));
 
             return true;
         }
@@ -121,6 +131,7 @@ public class UserActivity extends AppCompatActivity{
         setContentView(R.layout.activity_user);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
 
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
@@ -139,6 +150,12 @@ public class UserActivity extends AppCompatActivity{
         //if(!isChangingConfigurations()) {
             //ProviderService.deleteTempFiles(getCacheDir());
         //}
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        View actionMenuView = toolbar.getChildAt(1);
+        if (actionMenuView != null && actionMenuView instanceof ActionMenuView) {
+            ((ActionMenuView) actionMenuView).dismissPopupMenus();
+        }
 
         super.onDestroy();
     }
@@ -161,6 +178,9 @@ public class UserActivity extends AppCompatActivity{
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int id = menuItem.getItemId();
                 if (id == R.id.action_logout) {
+                    providerService.getDbManager().cleanDb();
+                    popup.dismiss();
+
                     AuthManager.userLogout();
                     Intent intent = new Intent(context, LoginActivity.class);
                     startActivity(intent);
@@ -168,17 +188,8 @@ public class UserActivity extends AppCompatActivity{
                     finish();
                 }
                 else if(id == R.id.action_settings){
-
-                    /*FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    Fragment prev = getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
-                    if (prev != null) {
-                        ft.remove(prev);
-                    }
-                    ft.addToBackStack(null);*/
-
                     SettingsDialogFragment settingsDialogFragment = new SettingsDialogFragment();
                     settingsDialogFragment.show(getSupportFragmentManager(), DIALOG_TAG);
-
                     popup.dismiss();
                 }
 
@@ -331,6 +342,35 @@ public class UserActivity extends AppCompatActivity{
         invalidateOptionsMenu();
     }
 
+    @Override
+    public void updateOnEvent(@IEvent Integer event) {
+        switch (event) {
+            case IEvent.NEW_POST:
+                drawNotificationBadge();
+
+                break;
+            default:
+                eraseNotificationBadge();
+
+                break;
+        }
+    }
+
+    public void drawNotificationBadge() {
+        eraseNotificationBadge();
+        BottomNavigationItemView itemView = bottomNavigationView.findViewById(R.id.action_newsfeed);
+        View badge = LayoutInflater.from(this).inflate(R.layout.view_notification_badge, itemView, false);
+        itemView.addView(badge);
+    }
+
+    public void eraseNotificationBadge() {
+        BottomNavigationItemView itemView = bottomNavigationView.findViewById(R.id.action_newsfeed);
+        View badge = itemView.findViewById(R.id.notifyBadgeView);
+        if(badge != null) {
+            ((ViewGroup) badge.getParent()).removeView(badge);
+        }
+    }
+
     private ServiceConnection boundServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -338,6 +378,7 @@ public class UserActivity extends AppCompatActivity{
             providerService = binder.getService();
             isServiceBound = true;
 
+            registerAsObserver();
             updatebottomNavigationSelection();
             loadCurrentFragment(true);
         }
@@ -346,9 +387,26 @@ public class UserActivity extends AppCompatActivity{
         public void onServiceDisconnected(ComponentName name) {
             isServiceBound = false;
             providerService = null;
-
+            unregisterAsObserver();
         }
     };
+
+    void registerAsObserver() {
+        providerService.registerObserver(this);
+    }
+
+    void unregisterAsObserver() {
+        providerService.unregisterObserver(this);
+    }
+
+
+    public final ProviderService getProviderService() {
+        if(isServiceBound && providerService != null){
+            return providerService;
+        }
+
+        return null;
+    }
 
     enum MenuNavigationState{
         SHOW, HIDE

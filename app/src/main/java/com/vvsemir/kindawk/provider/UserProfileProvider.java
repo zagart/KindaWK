@@ -190,11 +190,6 @@ public class UserProfileProvider extends BaseProvider<UserProfile> {
     }
 
     @Override
-    public void resetData() {
-        //profileData.clean();
-    }
-
-    @Override
     public void run() {
         loadData();
     }

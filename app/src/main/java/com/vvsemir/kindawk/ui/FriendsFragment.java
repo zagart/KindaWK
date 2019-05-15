@@ -80,7 +80,11 @@ public class FriendsFragment extends KindaFragment {
 
     @Override
     public void loadData() {
-        ProviderService.getFriends(new ICallback<FriendsList>() {
+        if(getProviderService() == null){
+            return;
+        }
+
+        getProviderService().getFriends(new ICallback<FriendsList>() {
             @Override
             public void onResult(FriendsList result) {
                 updateViewsWithData(result);
@@ -100,7 +104,7 @@ public class FriendsFragment extends KindaFragment {
         int id = item.getItemId();
 
         if(id == R.id.action_refresh) {
-            ProviderService.cleanFriends(new ICallback<Integer>() {
+            getProviderService().cleanFriends(new ICallback<Integer>() {
                 @Override
                 public void onResult(Integer result) {
                     friendsListView.setScrollY(0);
@@ -125,5 +129,9 @@ public class FriendsFragment extends KindaFragment {
     @Override
     public String getFragmentTag() {
         return FRAGMENT_TAG;
+    }
+
+    private final ProviderService getProviderService(){
+        return ((UserActivity)getActivity()).getProviderService();
     }
 }

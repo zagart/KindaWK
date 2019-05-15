@@ -9,6 +9,7 @@
     <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_margin="8dp"
         app:layout_constraintEnd_toStartOf="@id/guideline"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,7 @@
         android:layout_width="1dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.69 "/>
+        app:layout_constraintGuide_percent="0.63 "/>
 
 
     <android.support.v7.widget.RecyclerView

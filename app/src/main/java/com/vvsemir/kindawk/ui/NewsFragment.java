@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 
 import com.vvsemir.kindaimageloader.ImageLoader;
 import com.vvsemir.kindawk.R;
+import com.vvsemir.kindawk.UserActivity;
 import com.vvsemir.kindawk.provider.NewsPost;
 import com.vvsemir.kindawk.provider.NewsWall;
 import com.vvsemir.kindawk.provider.NewsWallProvider;
@@ -111,6 +112,10 @@ public class NewsFragment extends KindaFragment {
 
     @Override
     public void loadData() {
+        if(getProviderService() == null){
+            return;
+        }
+
         loadMoreItems(0, NewsWallProvider.PAGE_SIZE);
     }
 
@@ -121,7 +126,7 @@ public class NewsFragment extends KindaFragment {
         params.put(NewsWallProvider.PARAM_REQUEST_RANGE_START, startPosition);
         params.put(NewsWallProvider.PARAM_REQUEST_RANGE_END, endPosition);
 
-        ProviderService.getWall( params, new ICallback<NewsWall>() {
+        getProviderService().getWall( params, new ICallback<NewsWall>() {
             @Override
             public void onResult(NewsWall result) {
                 updateViewsWithData(result);
@@ -144,7 +149,9 @@ public class NewsFragment extends KindaFragment {
 
         if(id == R.id.action_refresh) {
             ImageLoader.getInstance(getContext()).cleanCache();
-            ProviderService.cleanNewsWall(new ICallback<Integer>() {
+            updateNotificationBadge();
+
+            getProviderService().cleanNewsWall(new ICallback<Integer>() {
                 @Override
                 public void onResult(Integer result) {
                     newsRecyclerAdapter.cleanWall();
@@ -160,6 +167,10 @@ public class NewsFragment extends KindaFragment {
 
         return super.onOptionsItemSelected(item);
 
+    }
+
+    public void updateNotificationBadge(){
+        ((UserActivity)getActivity()).eraseNotificationBadge();
     }
 
     @Override
@@ -179,5 +190,9 @@ public class NewsFragment extends KindaFragment {
     @Override
     public String getFragmentTag() {
         return FRAGMENT_TAG;
+    }
+
+    private final ProviderService getProviderService(){
+        return ((UserActivity)getActivity()).getProviderService();
     }
 }

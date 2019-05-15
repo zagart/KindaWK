@@ -79,4 +79,11 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter <RecyclerView.Vi
         photos.add(photo);
     }
 
+    public int getPhotoId(int position) {
+        if(photos.get(position) != null) {
+            return photos.get(position).getPhotoId();
+        }
+
+        return -1;
+    }
 }

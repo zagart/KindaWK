@@ -1,6 +1,7 @@
 package com.vvsemir.kindawk.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,8 +41,12 @@ public class FriendsListAdapter extends BaseAdapter {
 
             ImageView avatarView = view.findViewById(R.id.friendPhotoView);
             //avatarView.setImageResource(R.drawable.ic_person);
-            avatarView.setImageBitmap(
-                    ImageLoader.getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES)));
+
+            Bitmap bitmap = ImageLoader.getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES));
+            avatarView.setImageDrawable(ImageLoader.getCircledDrawable(bitmap));
+
+            //avatarView.setImageBitmap(
+            //        ImageLoader.getBitmapFromBytes( friend.getPhotoBytes().getAsByteArray(Friend.PHOTO_BYTES)));
         }
 
         return view;

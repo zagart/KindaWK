@@ -68,6 +68,7 @@ class AuthManager private constructor(context : Context) {
         const val PREFERENCE_USER_ID = "user_id"
         const val PREFERENCE_ACCESS_TOKEN = "token"
         const val PREFERENCE_NEWS_DATE_POSTED = "news_posted_range"
+        const val PREFERENCE_NEWS_CHECK_DELAY = "news_posted_check_delay"
         const val URL_TOKEN_PATTERN = "_token=(.*?)&"
         const val URL_USERID_PATTERN = "user_id=(\\d*)"
         const val APP_VKCLIENT_ID = "6870401"

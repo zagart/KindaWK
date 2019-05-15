@@ -3,6 +3,7 @@ package com.vvsemir.kindaimageloader;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -318,5 +319,9 @@ public class ImageLoader implements IImageLoader {
         }
 
         return bitmap;
+    }
+
+    public static Drawable getCircledDrawable(Bitmap bitmap) {
+        return new CircleDrawable(bitmap, null, 0);
     }
 }

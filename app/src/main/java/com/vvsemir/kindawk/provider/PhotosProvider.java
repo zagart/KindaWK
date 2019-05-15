@@ -74,7 +74,6 @@ public class PhotosProvider implements Runnable {
                         (CallbackExceptionFactory.THROWABLE_TYPE_ERROR, EXCEPTION_LOADING_API);
             }
 
-            ex.printStackTrace();
             ProviderService.getInstance().getHandler().post(new Runnable() {
                 @Override
                 public void run() {

@@ -172,10 +172,6 @@ public class FriendsProvider extends BaseProvider<FriendsList> {
         }
     }
 
-    @Override
-    public void resetData() {
-        //profileData.clean();
-    }
 
     @Override
     public void run() {

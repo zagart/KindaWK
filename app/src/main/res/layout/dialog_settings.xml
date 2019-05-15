@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/settingsIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="16dp"
@@ -20,14 +20,15 @@
 
     <TextView
         android:id="@+id/settingsTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/settingsIcon"
-        android:layout_gravity="center"
+        android:layout_alignParentEnd="true"
         android:layout_toEndOf="@id/settingsIcon"
         android:text="@string/settings"
+        android:textAlignment="center"
         android:textColor="@color/colorEnable"
-        android:textSize="24sp" />
+        android:textSize="16sp" />
 
     <View
         android:id="@+id/titleDivider"
@@ -42,25 +43,44 @@
         android:outlineAmbientShadowColor="@color/colorEnable" />
 
     <TextView
-        android:id="@+id/settingsNewsDatePosted"
+        android:id="@+id/settingsNewsDatePostedView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/titleDivider"
+        android:layout_below="@+id/settingsTitle"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="@string/settingsDatePosted"
         android:textColor="@color/colorEnable"
-        android:textSize="18sp" />
+        android:textSize="13sp" />
 
     <Spinner
         android:id="@+id/spinnerDateRange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/settingsNewsDatePosted"
+        android:layout_alignBottom="@+id/settingsNewsDatePostedView"
+        android:layout_alignStart="@id/spinnerCheckDelay" />
+
+    <TextView
+        android:id="@+id/settingsCheckDelayView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="16dp"
+        android:layout_alignStart="@id/settingsNewsDatePostedView"
+        android:layout_below="@id/settingsNewsDatePostedView"
+        android:text="@string/settingsCheckDelay"
+        android:textColor="@color/colorEnable"
+        android:textSize="13sp" />
+
+    <Spinner
+        android:id="@+id/spinnerCheckDelay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/settingsCheckDelayView"
         android:layout_marginLeft="16dp"
-        android:layout_toEndOf="@id/settingsNewsDatePosted" />
+        android:layout_toEndOf="@id/settingsCheckDelayView" />
 
 
 </RelativeLayout>

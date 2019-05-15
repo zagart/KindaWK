@@ -207,12 +207,6 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
         }
     }
 
-
-    @Override
-    public void resetData() {
-        newsWall.removeAllNews();
-    }
-
     public void setNextFromChainRequest(String nextFrom) {
         DbManager dbManager = ProviderService.getInstance().getDbManager();
         dbManager.insertNewsWallOffset(nextFrom);
