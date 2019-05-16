@@ -1,17 +1,13 @@
 package com.vvsemir.kindawk.provider;
 
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.vvsemir.kindawk.http.HttpResponse;
+import com.vvsemir.kindawk.provider.gson.DateGsonAdapter;
 import com.vvsemir.kindawk.service.CallbackExceptionFactory;
-import com.vvsemir.kindawk.service.ProviderService;
 import com.vvsemir.kindawk.utils.Utilits;
 import java.util.ArrayList;
 import java.util.Date;

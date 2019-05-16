@@ -1,4 +1,4 @@
-package com.vvsemir.kindawk.provider;
+package com.vvsemir.kindawk.provider.gson;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

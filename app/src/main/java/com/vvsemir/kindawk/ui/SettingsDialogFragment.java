@@ -59,7 +59,7 @@ public class SettingsDialogFragment extends DialogFragment {
               }
           });
 
-        int newsDatePostedIndx = (int)AuthManager.getAppPreferences().get(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
+        int newsDatePostedIndx = AuthManager.getAppPreferences().getInt(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
         newsDateSpinner.setSelection(newsDatePostedIndx);
 
         newsCheckSpinner = (Spinner) view.findViewById(R.id.spinnerCheckDelay);
@@ -75,7 +75,7 @@ public class SettingsDialogFragment extends DialogFragment {
             }
         });
 
-        int newsCheckDelayIndx = (int)AuthManager.getAppPreferences().get(AuthManager.PREFERENCE_NEWS_CHECK_DELAY, 0);
+        int newsCheckDelayIndx = AuthManager.getAppPreferences().getInt(AuthManager.PREFERENCE_NEWS_CHECK_DELAY, 0);
         newsCheckSpinner.setSelection(newsCheckDelayIndx);
 
 

@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.vvsemir.kindawk.auth.AuthManager.PREFERENCE_NEWS_CHECK_DELAY;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -48,10 +49,14 @@ public class ProviderService extends Service implements IEventNotifier {
 
     private final IBinder binder = new ActivityBinder();
     private static ProviderService instance;
+
     private ExecutorService executorService;
     private ScheduledExecutorService scheduledService;
-    private DbManager dbManager;
+    private ScheduledFuture notifierScheduledFuture = null;
+    int currnetNewsDelayMinutes = 0;
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    private DbManager dbManager;
     private List<IEventObserver> eventObservers = new ArrayList<>();
 
     @Override
@@ -80,13 +85,43 @@ public class ProviderService extends Service implements IEventNotifier {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        int checkNewsDelay = AuthManager.getAppPreferences().get(PREFERENCE_NEWS_CHECK_DELAY, 1);
+        currnetNewsDelayMinutes = getMinutesForScheduleNotifier();
 
-        final ScheduledFuture notifierHandle =
-            scheduledService.scheduleAtFixedRate(new NotificationsProvider(new ICallback<Integer>() {
+        if(currnetNewsDelayMinutes != 0) {
+            runScheduledNotificationsService(currnetNewsDelayMinutes);
+        }
+
+        scheduledService.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                int checkInLoopDelay = getMinutesForScheduleNotifier();
+                if (checkInLoopDelay == 0 && notifierScheduledFuture != null && !notifierScheduledFuture.isCancelled()) {
+                    notifierScheduledFuture.cancel(true);
+                } else if (currnetNewsDelayMinutes != checkInLoopDelay) {
+                    currnetNewsDelayMinutes = checkInLoopDelay;
+
+                    if (notifierScheduledFuture != null) {
+                        notifierScheduledFuture.cancel(true);
+                    }
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            runScheduledNotificationsService(currnetNewsDelayMinutes);
+                        }
+                    });
+
+                }
+            }
+        }, currnetNewsDelayMinutes, NotificationsProvider.NOTIFIER_PREFS_MINUTES, MINUTES);
+
+        return binder;
+    }
+
+    private synchronized void runScheduledNotificationsService(int checkNewsDelayMinutes) {
+        notifierScheduledFuture = scheduledService.scheduleAtFixedRate(new NotificationsProvider(new ICallback<Integer>() {
                     @Override
                     public void onResult(Integer result) {
-                        switch(result) {
+                        switch (result) {
                             case IEvent.NEW_POST:
                                 notifyObservers(IEvent.NEW_POST);
 
@@ -101,28 +136,7 @@ public class ProviderService extends Service implements IEventNotifier {
 
                     }
                 })
-
-            , 10, 30, SECONDS);
-
-        scheduledService.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                int watcherDelay = AuthManager.getAppPreferences().get(PREFERENCE_NEWS_CHECK_DELAY, 1);
-                if(watcherDelay == 0){
-                    notifierHandle.cancel(true); }
-               }
-
-        }, 1,1, MINUTES);
-
-
-        return binder;
-    }
-
-    void cancelScheduledService (final ScheduledFuture notifierHandle) {
-        scheduledService.schedule(new Runnable() {
-            public void run() { notifierHandle.cancel(true); }
-        }, 0, SECONDS);
-
-        notifierHandle.cancel(false);
+                , checkNewsDelayMinutes, checkNewsDelayMinutes, MINUTES) ;
     }
 
     @Override
@@ -246,5 +260,20 @@ public class ProviderService extends Service implements IEventNotifier {
         for (final IEventObserver observer : eventObservers) {
             observer.updateOnEvent(event);
         }
+    }
+
+    private int getMinutesForScheduleNotifier() {
+        int checkNewsDelayIdx = AuthManager.getAppPreferences().getInt(PREFERENCE_NEWS_CHECK_DELAY, 1);
+
+        switch (checkNewsDelayIdx) {
+            case 1:
+                return 5;
+            case 2:
+                return 15;
+            case 3:
+                return 60;
+        }
+
+        return 0;
     }
 }

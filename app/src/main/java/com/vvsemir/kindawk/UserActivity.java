@@ -59,11 +59,11 @@ public class UserActivity extends AppCompatActivity implements IEventObserver {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         Toolbar toolbar = findViewById(R.id.toolbar);
-
+        View actionMenuView = toolbar.getChildAt(1);
         if (id == R.id.action_options) {
-            showPopupMenu(toolbar.getContext(), findViewById(R.id.action_options));
+            //showPopupMenu(toolbar.getContext(), findViewById(R.id.action_options));
+            showPopupMenu(toolbar.getContext(), actionMenuView);
 
             return true;
         }

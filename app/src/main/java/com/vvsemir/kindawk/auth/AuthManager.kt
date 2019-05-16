@@ -2,6 +2,7 @@ package com.vvsemir.kindawk.auth
 
 import android.content.Context
 import android.webkit.CookieManager
+import com.vvsemir.kindawk.service.Constants
 import com.vvsemir.kindawk.utils.Utilits
 
 class AuthManager private constructor(context : Context) {
@@ -26,12 +27,12 @@ class AuthManager private constructor(context : Context) {
     private fun saveTokenInPreferences(url : String) {
         val params = parseUrlForToken(url)
         val token = params[PREFERENCE_ACCESS_TOKEN]
-        val userId = params[PREFERENCE_USER_ID]
+        val userId = Integer.parseInt(params[PREFERENCE_USER_ID])
 
-        if (token != null && userId != null) {
+        if (token != null && userId != 0) {
             preferenceHelper.set(PREFERENCE_ACCESS_TOKEN, token)
             preferenceHelper.set(PREFERENCE_USER_ID, userId)
-            accessToken.updateToken(Integer.parseInt(userId), token)
+            accessToken.updateToken(userId, token)
         }
     }
 
@@ -55,13 +56,9 @@ class AuthManager private constructor(context : Context) {
             return AccessToken()
         }
 
-        return AccessToken(Integer.parseInt(preferenceHelper.get(PREFERENCE_USER_ID, "") ?: "0"),
-                preferenceHelper.get(PREFERENCE_ACCESS_TOKEN, ""));
+        return AccessToken(preferenceHelper.getInt(PREFERENCE_USER_ID, 0),
+                preferenceHelper.getString(PREFERENCE_ACCESS_TOKEN, Constants.EMPTY))
     }
-
-    //private fun getPreferences() = appContext.getSharedPreferences(PREFERENCE_APP_NAME, Context.MODE_PRIVATE)
-    //private fun getPreferences() = preferenceHelper.sharedPreferences
-
 
     companion object : SingletonHolder<AuthManager, Context>(::AuthManager){
         const val PREFERENCE_APP_NAME = "com.vvsemir.kindawk.app_prefs"

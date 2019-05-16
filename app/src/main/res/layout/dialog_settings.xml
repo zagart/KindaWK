@@ -20,11 +20,9 @@
 
     <TextView
         android:id="@+id/settingsTitle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/settingsIcon"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/settingsIcon"
         android:text="@string/settings"
         android:textAlignment="center"
         android:textColor="@color/colorEnable"
@@ -66,8 +64,8 @@
         android:id="@+id/settingsCheckDelayView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_alignStart="@id/settingsNewsDatePostedView"
         android:layout_below="@id/settingsNewsDatePostedView"
         android:text="@string/settingsCheckDelay"

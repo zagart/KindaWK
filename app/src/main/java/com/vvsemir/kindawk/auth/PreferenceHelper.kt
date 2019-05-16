@@ -37,17 +37,15 @@ class PreferenceHelper (context : Context, name: String){
             else -> throw UnsupportedOperationException("")
         }
     }*/
-    fun <T: Any> get(key: String, defaultValue: T): T? {
-        return when (defaultValue) {
-            is String -> sharedPreferences.getString(key, defaultValue ) as T?
-            is Int -> sharedPreferences.getInt(key, defaultValue ) as T?
-            is Boolean -> sharedPreferences.getBoolean(key, defaultValue ) as T?
-            is Float -> sharedPreferences.getFloat(key, defaultValue ) as T?
-            is Long -> sharedPreferences.getLong(key, defaultValue ) as T?
-            else -> throw UnsupportedOperationException("")
-        }
-    }
+    fun getString(key: String, defaultValue: String) = sharedPreferences.getString(key, defaultValue )
 
+    fun getInt(key: String, defaultValue: Int) = sharedPreferences.getInt(key, defaultValue )
+
+    fun getBoolean(key: String, defaultValue: Boolean) = sharedPreferences.getBoolean(key, defaultValue )
+
+    fun getFloat(key: String, defaultValue: Float) = sharedPreferences.getFloat(key, defaultValue )
+
+    fun getLong(key: String, defaultValue: Long) = sharedPreferences.getLong(key, defaultValue )
 
     fun contains(key: String) = sharedPreferences.contains(key)
 

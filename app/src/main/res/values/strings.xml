@@ -24,6 +24,7 @@
         <item>Last 30 days</item>
     </string-array>
     <string-array name="settingsCheckDelay_array">
+        <item>never</item>
         <item>every 5 minutes</item>
         <item>every 15 minutes</item>
         <item>every 60 minutes</item>

@@ -111,6 +111,7 @@ class DbManager (context : Context) {
         if (cursor != null && cursor.getCount() != 0) {
             cursor.moveToFirst();
             indx = cursor.getInt(0)
+            indx++
         }
 
         posts.forEach(){

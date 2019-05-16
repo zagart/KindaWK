@@ -214,7 +214,7 @@ public class NewsWallProvider extends BaseProvider<NewsWall> {
     }
 
     private long getStartTimeFromPrefs() {
-        int newsDatePostedIndx = (int)AuthManager.getAppPreferences().get(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
+        int newsDatePostedIndx = AuthManager.getAppPreferences().getInt(AuthManager.PREFERENCE_NEWS_DATE_POSTED, 0);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
